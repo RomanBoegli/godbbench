@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"../benchmark"
+	"github.com/RomanBoegli/gobench/benchmark"
 	"github.com/RomanBoegli/gobench/databases"
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
