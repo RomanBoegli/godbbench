@@ -1,19 +1,18 @@
 
 # Abstract
-The goal of this project is to analyse the differences of relational and graph-based database management systems. The representatives used as concrete implementation of these two paradigms will be PostgreSQL (relational) and Neo4j (graph-based).
+The goal of this project is to analyze the differences between relational and graph-based database management systems. The representatives used as concrete implementation of these two paradigms will be PostgreSQL (relational) and Neo4j (graph-based).
 
-The first part of this work will elaborate the background of these technologies with focus on the history, popular use cases, as well as (dis)advantages. Furthermore, the key differences will be outlined in the applicable query languages, namely SQL and Cypher.
+The first part of this work will elaborate on the background of these technologies with a focus on the history, popular use cases, as well as (dis)advantages. Furthermore, the key differences will be outlined in the applicable query languages, namely SQL and Cypher.
 
 The main part is dedicated to a setup and execution of a benchmarking test. The goal is to measure and compare the performances of standard database statements used to create, read, update, and delete data. Therefore, a test console application was developed using [Go](https://go.dev/) in order to consistently and automatically test the given statements with database instances running in [Docker](https://www.docker.com/).
 
-Finally, the benchmarking results are consolidated and interpreted. The findings will be discussed alongside with concrete recommendations in order to facilitate future decision on the given database paradigm.
+Finally, the benchmarking results are consolidated and interpreted. The findings will be discussed alongside concrete recommendations in order to facilitate future decisions on the given database paradigm.
 
 # Relational Database Systems `20%`
-- History
-- Use Cases
-- (Dis)Advantages
 
-Relational databases belong to the most popular database managemenst systems (DBMS) nowadays. Every computer science freshman will address this data storage paradigm in a early stage and everybody in the professional world that relies on computer systems has most probabaly had (un)consciously interacted with it before. Storing data in a relational manner first of all means that every piece of unique information ideally is only stored once in our database and then referenced multiple times to wherever it is required to be. This referencing works with so-called primary and foreign keys. The following example describes such a relationally linked data structure by means of marchandising use case.
+Relational databases belong to the most popular database management systems (DBMS) nowadays. Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before. It was first introduced by Ted Codd in 1970 [[1]](#1). Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS. Micorosft followed with its own products such as SQLServer and Access. Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge. [[2]](#2)
+
+Relationally storing data first and foremost means that every piece of unique information ideally is stored only once in our database and then referenced multiple times to wherever it is required to be. This referencing works with so-called primary keys (PK) and foreign keys (FK), where the latter serves as a pointer to the actual information. The following example describes such a relationally linked data structure utilizing a merchant use case.
 
 ```mermaid
 erDiagram
@@ -23,56 +22,79 @@ erDiagram
     CATEGORY ||--|{ PRODUCT : groups
     SUPPLIER ||--|{ PRODUCT : supplies
     CUSTOMER {
-        int CustomerId
+        id CustomerId
         string Name
         string Address
         date Birthday
     }
     CATEGORY {
-        int CategoryId PK
+        id CategoryId
         string Name
     }
     ORDER {
-        int OrderId PK
-        id CustomerId FK
+        id OrderId
+        int CustomerId
         date CreationDate
         string Comment
     }
     LINEITEM {
-        int LineItemId PK
-        int OrderId FK
-        int ProductId FK
+        id LineItemId
+        int OrderId
+        int ProductId
         int Quantity
         date DeliveryDate
     }
     PRODUCT {
-        int ProductId PK
-        int SupplierId FK
-        int CategoryId FK
+        id ProductId
+        int SupplierId
+        int CategoryId
         string Code
         string Description
         int UnitSize
         float PricePerUnit
     }
     SUPPLIER {
-        int SupplierId PK
+        id SupplierId
         string Name
         string Address
     }
 ```
-<p style="text-align: center;  font-size: .8rem;  color: light-grey;">
-Possible Entity Relationship Diagram of a Merchant's Database
-</p>
 
-Each box represents an *entity*. The the connecting lines specify the *relationships* between the entities, whereas the line endings describe the corresponding *cardinality* represented in [Crow's Foot Notation](https://vertabelo.com/blog/crow-s-foot-notation/). A customer, for instance, can place zero or many orders. Each order contains at least one line item. A supplier, on the other hand, delivers one or more product, while each product belongs to exactly one category. Finnaly, a product can occure zero or many times in the great list of line items.
+<h6 align="center">Possible Entity-Relationship Diagram of a Merchant's Database</h6>
 
-With this relational data structure, the absence of informational redundancy is ensured. In the context of DBMS, the structure is referred to as *schema* and the process of designing it called *database normalization*.
+Each box in this entity-relationship diagram (ERD) represents an *entity*, which is in practice nothing else than a table where each row decribes0 a distinct tuple. The listed attributes in the boxes correspond to the columns of the table, also known as *attributes*. The connecting lines specify the *relationships* between the entities, whereas the line endings denote the corresponding *cardinality* using [Crow's Foot Notation](https://vertabelo.com/blog/crow-s-foot-notation/). A customer, for instance, can place zero or many orders. Each order contains at least one line item. A supplier, on the other hand, delivers one or more products, while each product belongs to exactly one category. Finally, a product can occur zero or many times in the great list of line items.
 
+With this relational data structure, the absence of informational redundancy is ensured. In the context of DBMS, the structure is referred to as *schema*, and the process of designing is called *database normalization*. Working with normalized data is not only storage efficient but also allows keeping the operational costs that might occur when updating information at a minimum. Imagine a concrete product has been ordered many thousand times and suddenly, the merchant would like to rename this product. Thanks to the relational structure, the update operation will only affect one single storage cell, namely in the product entity on the corresponding row-column intersection. The thousandfold mentions of this product in the line item entity will remain unaffected as the referencing foreign key `ProductId` will not change. Only the referenced information does.
+
+
+
+## History
+
+
+## Use Cases
+
+## 
 
 # Graph-Based Database Systems `20%`
 - History
 - Use Cases
 - (Dis)Advantages
+
+```mermaid
+graph TD;
+A---E
+A---D
+B---A
+B---D
+D---E
+D---C
+C---F
+D---G
+G---F
+B---H
+```
+
+
 
 # Query Languages `20%`
 - General way of working
@@ -102,3 +124,16 @@ With this relational data structure, the absence of informational redundancy is 
 
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
+
+
+blabla [[1]](#1) asdfasfd
+
+
+# References
+
+
+<a id="1">[1]</a> Codd, E. F. (1970). A Relational Model for Large Shared
+Data Banks.
+<a id="10">[2]</a> Elmasri, R., & Navathe, S. B. (2010). Fundamentals of database systems (6th ed.). Pearson.
+
+
