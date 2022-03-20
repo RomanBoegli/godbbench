@@ -67,7 +67,6 @@ Each box in this entity-relationship diagram (ERD) represents an *entity*, which
 With this relational data structure, the absence of informational redundancy is ensured. In the context of DBMS, the structure is referred to as *schema*, and the process of designing is called *database normalization*. Working with normalized data is not only storage efficient but also allows keeping the operational costs that might occur when updating information at a minimum. Imagine a concrete product has been ordered many thousand times and suddenly, the merchant would like to rename this product. Thanks to the relational structure, the update operation will only affect one single storage cell, namely in the product entity on the corresponding row-column intersection. The thousandfold mentions of this product in the line item entity will remain unaffected as the referencing foreign key `ProductId` will not change. Only the referenced information does.
 
 
-
 ## History
 
 
@@ -80,6 +79,7 @@ With this relational data structure, the absence of informational redundancy is 
 - Use Cases
 - (Dis)Advantages
 
+<!--- mermaid version of a graph
 ```mermaid
 graph TD;
 A---E
@@ -93,8 +93,11 @@ D---G
 G---F
 B---H
 ```
+-->
 
 
+![Friendships as Weighted Graph](./images/friendsgraph.svg)
+<h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
 
 # Query Languages `20%`
 - General way of working
@@ -134,6 +137,11 @@ blabla [[1]](#1) asdfasfd
 
 <a id="1">[1]</a> Codd, E. F. (1970). A Relational Model for Large Shared
 Data Banks.
-<a id="10">[2]</a> Elmasri, R., & Navathe, S. B. (2010). Fundamentals of database systems (6th ed.). Pearson.
+
+<a id="2">[2]</a> Elmasri, R., & Navathe, S. B. (2010). Fundamentals of database systems (6th ed.). Pearson.
+
+<a id="3">[3]</a> Peixoto, Tiago P., https://graph-tool.skewed.de/, retrieved on March 20. 2022
+
+
 
 
