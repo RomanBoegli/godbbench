@@ -16,7 +16,7 @@ type mockedBencher struct {
 
 func (b *mockedBencher) Benchmarks() []Benchmark { return []Benchmark{} }
 func (b *mockedBencher) Setup()                  {}
-func (b *mockedBencher) Cleanup()                {}
+func (b *mockedBencher) Cleanup(closeConn bool)  {}
 func (b *mockedBencher) Exec(s string)           { _ = b.Called(s) }
 
 func TestBuildStmt(t *testing.T) {
