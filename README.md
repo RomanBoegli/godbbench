@@ -132,6 +132,12 @@ docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d
 docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
 ```
 
+To remove all containers including the associated volumes again, use the following two commands.
+
+```console
+docker rm -f $(docker ps -a -q)
+docker volume rm $(docker volume ls -q)
+```
 
 
 ## Results
