@@ -118,6 +118,22 @@ B---H
 - system setup (docker, etc.)
 - Sample Data
 
+### Docker
+Docker allows the most lightweight and easiest database setup. Just download Docker and execute the following commands.
+
+```console
+# start mysql (user=root, password=password, db=localhost:3306)
+docker run --name gobench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql
+
+# start postgres (user=postgres, password=password, db=localhost:5432)
+docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres
+
+# start neo4j (user=neo4j, password=password, db=localhost:7687, browser=localhost:7474)
+docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
+```
+
+
+
 ## Results
 - Consolidation
 - Interpretation
