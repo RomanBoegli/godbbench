@@ -55,14 +55,16 @@ func (c *Neo4j) Setup() {
 }
 
 // Cleanup removes all remaining benchmarking data.
-func (c *Neo4j) Cleanup() {
+func (c *Neo4j) Cleanup(closeConnection bool) {
 	session := c.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	if _, err := session.Run("MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN n,r", nil); err != nil {
 		log.Printf("failed to drop table: %v\n", err)
 	}
 
-	session.Close()
-	c.driver.Close()
+	if closeConnection {
+		session.Close()
+		c.driver.Close()
+	}
 }
 
 // Exec executes the given statement on the database.
