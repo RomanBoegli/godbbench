@@ -96,7 +96,7 @@ B---H
 -->
 
 
-![Friendships as Weighted Graph](./images/friendsgraph.svg)
+<p align="center"> <img src="./images/friendsgraph.svg" width="700"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
 
 # Query Languages `20%`
@@ -132,7 +132,7 @@ docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d
 docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
 ```
 
-To remove all containers including the associated volumes again, use the following two commands.
+To remove all containers and the associated volumes again, use the following two commands.
 
 ```console
 docker rm -f $(docker ps -a -q)
