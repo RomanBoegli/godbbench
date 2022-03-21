@@ -56,7 +56,7 @@ func TestRun(t *testing.T) {
 
 			iter := 13
 			threads := 5
-			bLoop := Benchmark{Name: "test", Type: tt.givenType, Stmt: "NONE"}
+			bLoop := Benchmark{Name: "test", Type: tt.givenType, IterRatio: 1.0, Stmt: "NONE"}
 
 			// act
 			Run(bencher, bLoop, iter, threads)
@@ -71,6 +71,7 @@ func TestRun(t *testing.T) {
 		})
 	}
 }
+
 func TestLoop(t *testing.T) {
 	// arrange
 	bencher := &mockedBencher{}

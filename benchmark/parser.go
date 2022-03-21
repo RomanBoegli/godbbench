@@ -51,7 +51,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 			benchmarks = append(benchmarks, curBench)
 
 			// Start new empty benchmark
-			curBench = Benchmark{}
+			curBench = Benchmark{IterRatio: 1.0}
 		}
 	}
 
@@ -91,7 +91,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 				return []Benchmark{}, fmt.Errorf("failed to parse mode, neither 'once' nor 'loop': %v", tokens[0])
 			}
 
-			if !strings.HasPrefix(tokens[1], "\\") {
+			if len(tokens) > 1 && !strings.HasPrefix(tokens[1], "\\") {
 				// custom execution count ratio specified
 				if curBench.Type == TypeLoop {
 					ratio, _ := strconv.ParseFloat(tokens[1], 32)

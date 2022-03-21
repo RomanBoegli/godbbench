@@ -19,6 +19,7 @@ func TestParseScript(t *testing.T) {
 		in          string
 		expect      expect
 	}{
+
 		{
 			description: "fail/no mode",
 			in:          "\\benchmark",
@@ -48,241 +49,243 @@ func TestParseScript(t *testing.T) {
 			in:          "INSERT INTO ...;",
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 1-1", Type: TypeLoop, Stmt: "INSERT INTO ...;"},
+					{Name: "(loop) line 1-1", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
 		{
 			description: "two statements",
 			in: `
-			INSERT INTO ...;
-			DELETE FROM ...;
-			`,
+							INSERT INTO ...;
+							DELETE FROM ...;
+							`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 1-4", Type: TypeLoop, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
+					{Name: "(loop) line 1-4", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
 				},
 			},
 		},
+
 		{
 			description: "once/statement",
 			in: `
-			\benchmark once
-			INSERT INTO ...;
-			`,
+						\benchmark once
+						INSERT INTO ...;
+						`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 3", Type: TypeOnce, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 3", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
+
 		{
 			description: "loop/once/statement",
 			in: `
-			\benchmark loop
-			\benchmark once
-			INSERT INTO ...;
-			`,
+					\benchmark loop
+					\benchmark once
+					INSERT INTO ...;
+					`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 4", Type: TypeOnce, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
 		{
 			description: "once/loop/statement",
 			in: `
-			\benchmark once
-			\benchmark loop
-			INSERT INTO ...;
-			`,
+					\benchmark once
+					\benchmark loop
+					INSERT INTO ...;
+					`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 4-5", Type: TypeLoop, Stmt: "INSERT INTO ...;"},
+					{Name: "(loop) line 4-5", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
 		{
 			description: "once/once/statement",
 			in: `
-			\benchmark once
-			\benchmark once
-			INSERT INTO ...;
-			`,
+				\benchmark once
+				\benchmark once
+				INSERT INTO ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 4", Type: TypeOnce, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
 		{
 			description: "loop/loop/statement",
 			in: `
-			\benchmark loop
-			\benchmark loop
-			INSERT INTO ...;
-			`,
+				\benchmark loop
+				\benchmark loop
+				INSERT INTO ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 4-5", Type: TypeLoop, Stmt: "INSERT INTO ...;"},
+					{Name: "(loop) line 4-5", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
 		{
 			description: "loop/two statements",
 			in: `
-			\benchmark loop
-			INSERT INTO ...;
-			DELETE FROM ...;
-			`,
+				\benchmark loop
+				INSERT INTO ...;
+				DELETE FROM ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 3-5", Type: TypeLoop, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
+					{Name: "(loop) line 3-5", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
 				},
 			},
 		},
 		{
 			description: "two loops/two statements",
 			in: `
-			\benchmark loop
-			INSERT INTO ...;
-			\benchmark loop
-			UPDATE ...;
-			`,
+				\benchmark loop
+				INSERT INTO ...;
+				\benchmark loop
+				UPDATE ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 3-3", Type: TypeLoop, Stmt: "INSERT INTO ...;"},
-					{Name: "(loop) line 5-6", Type: TypeLoop, Stmt: "UPDATE ...;"},
+					{Name: "(loop) line 3-3", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(loop) line 5-6", Type: TypeLoop, IterRatio: 1.0, Stmt: "UPDATE ...;"},
 				},
 			},
 		},
 		{
 			description: "once/two statements",
 			in: `
-			\benchmark once
-			INSERT INTO ...;
-			DELETE FROM ...;
-			`,
+				\benchmark once
+				INSERT INTO ...;
+				DELETE FROM ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 3", Type: TypeOnce, Stmt: "INSERT INTO ...;"},
-					{Name: "(once) line 4", Type: TypeOnce, Stmt: "DELETE FROM ...;"},
+					{Name: "(once) line 3", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 0.0, Stmt: "DELETE FROM ...;"},
 				},
 			},
 		},
 		{
 			description: "comment line",
 			in: `
-			-- MY COMMENT
-			INSERT INTO ...;
-			DELETE FROM ...;
-			`,
+				-- MY COMMENT
+				INSERT INTO ...;
+				DELETE FROM ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 1-5", Type: TypeLoop, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
+					{Name: "(loop) line 1-5", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
 				},
 			},
 		},
 		{
 			description: "inline comment",
 			in: `
-			INSERT INTO ...; -- MY COMMENT
-			DELETE FROM ...;
-			`,
+				INSERT INTO ...; -- MY COMMENT
+				DELETE FROM ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 1-4", Type: TypeLoop, Stmt: "INSERT INTO ...; -- MY COMMENT\nDELETE FROM ...;"},
+					{Name: "(loop) line 1-4", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...; -- MY COMMENT\nDELETE FROM ...;"},
 				},
 			},
 		},
 		{
 			description: "full example",
 			in: `
-			-- create table
-			\benchmark once
-			CREATE TABLE ...;
-			
-			-- how long takes an insert and delete?
-			\benchmark loop
-			INSERT INTO ...;
-			DELETE FROM ...; 
-			
-			-- delete table
-			\benchmark once
-			DROP TABLE ...;
-			`,
+				-- create table
+				\benchmark once
+				CREATE TABLE ...;
+
+				-- how long takes an insert and delete?
+				\benchmark loop 0.75
+				INSERT INTO ...;
+				DELETE FROM ...;
+
+				-- delete table
+				\benchmark once
+				DROP TABLE ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 4", Type: TypeOnce, Stmt: "CREATE TABLE ...;"},
-					{Name: "(loop) line 8-11", Type: TypeLoop, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
-					{Name: "(once) line 13", Type: TypeOnce, Stmt: "DROP TABLE ...;"},
+					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 1.0, Stmt: "CREATE TABLE ...;"},
+					{Name: "(loop) line 8-11", Type: TypeLoop, IterRatio: 0.75, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
+					{Name: "(once) line 13", Type: TypeOnce, IterRatio: 1.0, Stmt: "DROP TABLE ...;"},
 				},
 			},
 		},
 		{
 			description: "set names",
 			in: `
-			\benchmark loop \name insert
-			INSERT INTO ...;
-			\benchmark loop \name update
-			UPDATE ...;
-			`,
+				\benchmark loop \name insert
+				INSERT INTO ...;
+				\benchmark loop \name update
+				UPDATE ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) insert", Type: TypeLoop, Stmt: "INSERT INTO ...;"},
-					{Name: "(loop) update", Type: TypeLoop, Stmt: "UPDATE ...;"},
+					{Name: "(loop) insert", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(loop) update", Type: TypeLoop, IterRatio: 1.0, Stmt: "UPDATE ...;"},
 				},
 			},
 		},
 		{
-			description: "loop/set 2/3 names",
+			description: "loop/set 2/3 names (A)",
 			in: `
-			\benchmark loop \name insert
-			INSERT INTO ...;
+					\benchmark loop \name insert
+					INSERT INTO ...;
 
-			\benchmark loop
-			UPDATE ...;
-			
-			\benchmark loop \name delete
-			DELETE ...;
-			`,
+					\benchmark loop
+					UPDATE ...;
+
+					\benchmark loop \name delete
+					DELETE ...;
+					`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) insert", Type: TypeLoop, Stmt: "INSERT INTO ...;"},
-					{Name: "(loop) line 6-7", Type: TypeLoop, Stmt: "UPDATE ...;"},
-					{Name: "(loop) delete", Type: TypeLoop, Stmt: "DELETE ...;"},
+					{Name: "(loop) insert", Type: TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(loop) line 6-7", Type: TypeLoop, IterRatio: 1.0, Stmt: "UPDATE ...;"},
+					{Name: "(loop) delete", Type: TypeLoop, IterRatio: 1.0, Stmt: "DELETE ...;"},
 				},
 			},
 		},
 		{
-			description: "once/set 2/3 names",
+			description: "once/set 2/3 names (B)",
 			in: `
-			\benchmark once \name insert
-			INSERT INTO ...;
+					\benchmark once 0.66 \name insert
+					INSERT INTO ...;
 
-			\benchmark once
-			UPDATE ...;
-			
-			\benchmark once \name delete
-			DELETE ...;
-			`,
+					\benchmark once
+					UPDATE ...;
+
+					\benchmark once \name delete
+					DELETE ...;
+					`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) insert", Type: TypeOnce, Stmt: "INSERT INTO ...;"},
-					{Name: "(once) line 6", Type: TypeOnce, Stmt: "UPDATE ...;"},
-					{Name: "(once) delete", Type: TypeOnce, Stmt: "DELETE ...;"},
+					{Name: "(once) insert", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 6", Type: TypeOnce, IterRatio: 0.0, Stmt: "UPDATE ...;"},
+					{Name: "(once) delete", Type: TypeOnce, IterRatio: 0.0, Stmt: "DELETE ...;"},
 				},
 			},
 		},
 		{
 			description: "parallel",
 			in: `
-			\benchmark loop \parallel
-			INSERT INTO ...;
-			`,
+				\benchmark loop \parallel
+				INSERT INTO ...;
+				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(loop) line 3-4", Type: TypeLoop, Parallel: true, Stmt: "INSERT INTO ...;"},
+					{Name: "(loop) line 3-4", Type: TypeLoop, Parallel: true, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
