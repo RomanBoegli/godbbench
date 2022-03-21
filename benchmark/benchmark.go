@@ -16,7 +16,7 @@ import (
 // Bencher is the interface a benchmark has to impelement.
 type Bencher interface {
 	Setup()
-	Cleanup()
+	Cleanup(bool)
 	Benchmarks() []Benchmark
 	Exec(string)
 }

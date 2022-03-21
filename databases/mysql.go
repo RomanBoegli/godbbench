@@ -37,48 +37,38 @@ func NewMySQL(host string, port int, user, password string, maxOpenConns int) *M
 // Benchmarks returns the individual benchmark functions for the mysql db.
 func (m *Mysql) Benchmarks() []benchmark.Benchmark {
 	return []benchmark.Benchmark{
-		{Name: "inserts", Type: benchmark.TypeLoop, Stmt: "INSERT INTO dbbench.simple (id, name, balance, description) VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandInt63n 9999999999}}, '{{call .RandString 0 100 }}' );"},
-		{Name: "selects_Id", Type: benchmark.TypeLoop, Stmt: "SELECT * FROM dbbench.simple WHERE id = {{.Iter}};"},
-		{Name: "selects_Text", Type: benchmark.TypeLoop, Stmt: "SELECT * FROM dbbench.simple WHERE description LIKE '%{{call .RandString 0 5}}%';"},
-		{Name: "updates", Type: benchmark.TypeLoop, Stmt: "UPDATE dbbench.simple SET name = '{{call .RandString 3 10 }}', balance = {{call .RandInt63n 9999999999}} WHERE id = {{.Iter}};"},
-		//{Name: "deletes", Type: benchmark.TypeLoop, Stmt: "DELETE FROM dbbench.simple WHERE id = {{.Iter}};"},
-		//{Name: "relation_insert0", Type: benchmark.TypeLoop, Stmt: "INSERT INTO dbbench.relational_one (oid, balance_one) VALUES( {{.Iter}}, {{call .RandInt63n 9999999999}});"},
-		//{Name: "relation_insert1", Type: benchmark.TypeLoop, Stmt: "INSERT INTO dbbench.relational_two (relation, balance_two) VALUES( {{.Iter}}, {{call .RandInt63n 9999999999}});"},
-		//{Name: "relation_select", Type: benchmark.TypeLoop, Stmt: "SELECT * FROM dbbench.relational_two INNER JOIN dbbench.relational_one ON relational_one.oid = relational_two.relation WHERE relation = {{.Iter}};"},
-		//{Name: "relation_delete1", Type: benchmark.TypeLoop, Stmt: "DELETE FROM dbbench.relational_two WHERE relation = {{.Iter}};"},
-		//{Name: "relation_delete0", Type: benchmark.TypeLoop, Stmt: "DELETE FROM dbbench.relational_one WHERE oid = {{.Iter}};"},
+		{Name: "inserts", Type: benchmark.TypeLoop, Stmt: "INSERT INTO GoBench.Generic (GenericId, Name, Balance, Description) VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandInt63n 9999999999}}, '{{call .RandString 0 100 }}' );"},
+		{Name: "selects", Type: benchmark.TypeLoop, Stmt: "SELECT * FROM GoBench.Generic WHERE GenericId = {{.Iter}};"},
+		{Name: "updates", Type: benchmark.TypeLoop, Stmt: "UPDATE GoBench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandInt63n 9999999999}} WHERE GenericId = {{.Iter}};"},
+		{Name: "deletes", Type: benchmark.TypeLoop, Stmt: "DELETE FROM GoBench.Generic WHERE GenericId = {{.Iter}};"},
 	}
 }
 
 // Setup initializes the database for the benchmark.
 func (m *Mysql) Setup() {
-	if _, err := m.db.Exec("CREATE DATABASE IF NOT EXISTS dbbench"); err != nil {
+	if _, err := m.db.Exec("CREATE DATABASE IF NOT EXISTS GoBench;"); err != nil {
 		log.Fatalf("failed to create database: %v\n", err)
 	}
-	if _, err := m.db.Exec("USE dbbench"); err != nil {
-		log.Fatalf("failed to USE dbbench: %v\n", err)
+	if _, err := m.db.Exec("USE GoBench;"); err != nil {
+		log.Fatalf("failed to USE GoBench: %v\n", err)
 	}
-	if _, err := m.db.Exec("CREATE TABLE IF NOT EXISTS dbbench.simple (id INT PRIMARY KEY, name VARCHAR(10), balance DECIMAL, description VARCHAR(100));"); err != nil {
+	if _, err := m.db.Exec("CREATE TABLE IF NOT EXISTS GoBench.Generic (GenericId INT PRIMARY KEY, Name VARCHAR(10), Balance DECIMAL, Description VARCHAR(100));"); err != nil {
 		log.Fatalf("failed to create table: %v\n", err)
 	}
-	if _, err := m.db.Exec("CREATE TABLE IF NOT EXISTS dbbench.relational_one (oid INT PRIMARY KEY, balance_one DECIMAL);"); err != nil {
-		log.Fatalf("failed to create table relational_one: %v\n", err)
-	}
-	if _, err := m.db.Exec("CREATE TABLE IF NOT EXISTS dbbench.relational_two (balance_two DECIMAL, relation INT PRIMARY KEY, FOREIGN KEY(relation) REFERENCES relational_one(oid));"); err != nil {
-		log.Fatalf("failed to create table relational_two: %v\n", err)
-	}
-	if _, err := m.db.Exec("TRUNCATE dbbench.simple;"); err != nil {
+	if _, err := m.db.Exec("TRUNCATE GoBench.Generic;"); err != nil {
 		log.Fatalf("failed to truncate table: %v\n", err)
 	}
 }
 
 // Cleanup removes all remaining benchmarking data.
-func (m *Mysql) Cleanup() {
-	if _, err := m.db.Exec("DROP DATABASE dbbench"); err != nil {
+func (m *Mysql) Cleanup(closeConnection bool) {
+	if _, err := m.db.Exec("DROP DATABASE IF EXISTS GoBench;"); err != nil {
 		log.Printf("failed drop schema: %v\n", err)
 	}
-	if err := m.db.Close(); err != nil {
-		log.Printf("failed to close connection: %v", err)
+	if closeConnection {
+		if err := m.db.Close(); err != nil {
+			log.Printf("failed to close connection: %v", err)
+		}
 	}
 }
 

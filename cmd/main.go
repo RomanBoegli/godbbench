@@ -32,10 +32,10 @@ func main() {
 		iter         = defaultFlags.Int("iter", 1000, "how many iterations should be run")
 		threads      = defaultFlags.Int("threads", 25, "max. number of green threads (iter >= threads > 0)")
 		sleep        = defaultFlags.Duration("sleep", 0, "how long to pause after each single benchmark (valid units: ns, us, ms, s, m, h)")
-		nosetup      = defaultFlags.Bool("noinit", false, "do not initialize database and tables, e.g. when only running own script")
-		clean        = defaultFlags.Bool("clean", false, "only cleanup benchmark data, e.g. after a crash")
-		noclean      = defaultFlags.Bool("noclean", false, "keep benchmark data")
-		versionFlag  = defaultFlags.Bool("version", false, "print version information")
+		nosetup      = defaultFlags.Bool("nosetup", false, "initialize database and tables, e.g. when running own scripts")
+		nocleanstart = defaultFlags.Bool("nocleanstart", false, "make a cleanup before setup")
+		keep         = defaultFlags.Bool("keep", false, "keep benchmark data")
+		version      = defaultFlags.Bool("version", false, "print version information")
 		runBench     = defaultFlags.String("run", "all", "only run the specified benchmarks, e.g. \"inserts deletes\"")
 		scriptname   = defaultFlags.String("script", "", "custom sql file to execute")
 
@@ -79,7 +79,7 @@ func main() {
 			log.Fatalf("failed to parse postgres flags: %v", err)
 		}
 		bencher = databases.NewPostgres(*host, *port, *user, *pass, *maxconns)
-	case "mysql", "mariadb", "tidb":
+	case "mysql":
 		mysqlFlags.AddFlagSet(defaultFlags)
 		mysqlFlags.AddFlagSet(connFlags)
 		mysqlFlags.AddFlagSet(maxconnsFlags)
@@ -91,7 +91,7 @@ func main() {
 		neo4jFlags.AddFlagSet(defaultFlags)
 		neo4jFlags.AddFlagSet(connFlags)
 		if err := neo4jFlags.Parse(os.Args[2:]); err != nil {
-			log.Fatalf("failed to parse cassandra flags: %v", err)
+			log.Fatalf("failed to parse neo4j flags: %v", err)
 		}
 		bencher = databases.NewNeo4J(*host, *port, *user, *pass)
 	default:
@@ -100,8 +100,8 @@ func main() {
 		}
 
 		// Only show version information and exit.
-		if *versionFlag {
-			fmt.Printf("dbbench %v, commit %v, built at %v\n", version, commit, date)
+		if *version {
+			fmt.Printf("gobench %v, commit %v, built at %v\n", version, commit, date)
 			os.Exit(0)
 		}
 
@@ -110,11 +110,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// only clean old data when clean flag is set
-	if *clean {
-		bencher.Cleanup()
+	// clean old data when cleanstart flag is set
+	if !*nocleanstart {
+		bencher.Cleanup(false)
 		fmt.Println("cleaned data")
-		os.Exit(0)
+		// os.Exit(0)
 	}
 
 	// setup database
@@ -122,9 +122,9 @@ func main() {
 		bencher.Setup()
 	}
 
-	// only cleanup benchmark data when noclean flag is not set
-	if !*noclean {
-		defer bencher.Cleanup()
+	// cleanup benchmark data when flag is not set
+	if !*keep {
+		defer bencher.Cleanup(true)
 	}
 
 	// we need at least one thread
