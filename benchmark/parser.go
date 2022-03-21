@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 )
 
@@ -39,7 +40,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 		loopStart  = 1             // line the current loop mode started
 		lineN      = 1             // current line number
 		benchmarks = []Benchmark{} // the result
-		curBench   = Benchmark{Type: TypeLoop, Parallel: false}
+		curBench   = Benchmark{Type: TypeLoop, Parallel: false, IterRatio: 1.0}
 	)
 
 	// Helper function to append a new loop benchmark
@@ -50,7 +51,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 			benchmarks = append(benchmarks, curBench)
 
 			// Start new empty benchmark
-			curBench = Benchmark{}
+			curBench = Benchmark{IterRatio: 1.0}
 		}
 	}
 
@@ -89,8 +90,19 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 			default:
 				return []Benchmark{}, fmt.Errorf("failed to parse mode, neither 'once' nor 'loop': %v", tokens[0])
 			}
-			// remove the mode token from the tokens
-			tokens = tokens[1:]
+
+			if len(tokens) > 1 && !strings.HasPrefix(tokens[1], "\\") {
+				// custom execution count ratio specified
+				if curBench.Type == TypeLoop {
+					ratio, _ := strconv.ParseFloat(tokens[1], 32)
+					if ratio > 0.0 && ratio <= 1.0 {
+						curBench.IterRatio = ratio
+					}
+				}
+				tokens = tokens[2:]
+			} else {
+				tokens = tokens[1:]
+			}
 
 			// Parse remaining tokens
 			for _, t := range tokens {

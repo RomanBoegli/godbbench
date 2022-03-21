@@ -1,7 +1,9 @@
 package benchmark
 
 import (
+	"fmt"
 	"log"
+	"math"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -31,10 +33,11 @@ const (
 
 // Benchmark contains the benchmark name, its db statement and its type.
 type Benchmark struct {
-	Name     string
-	Type     BenchType
-	Parallel bool
-	Stmt     string
+	Name      string
+	Type      BenchType
+	IterRatio float64
+	Parallel  bool
+	Stmt      string
 }
 
 // Result encapsulates the metrics of a benchmark run
@@ -85,10 +88,11 @@ func Run(bencher Bencher, b Benchmark, iter, threads int) Result {
 			executor.once(bencher, t)
 		}
 	case TypeLoop:
+		_iter := int(math.Max((float64(iter) * b.IterRatio), 1.0))
 		if b.Parallel {
-			go executor.loop(bencher, t, iter, threads)
+			go executor.loop(bencher, t, _iter, threads)
 		} else {
-			executor.loop(bencher, t, iter, threads)
+			executor.loop(bencher, t, _iter, threads)
 		}
 	}
 
@@ -171,30 +175,58 @@ func buildStmt(t *template.Template, i int) string {
 	sb := &strings.Builder{}
 
 	data := struct {
-		Iter            int
-		Seed            func(int64)
-		RandInt63       func() int64
-		RandInt63n      func(int64) int64
-		RandFloat32     func() float32
-		RandFloat64     func() float64
-		RandExpFloat64  func() float64
-		RandNormFloat64 func() float64
-		RandString      func(int, int) string
+		Iter             int
+		RandIntBetween   func(int, int) int
+		RandFloatBetween func(float64, float64) float64
+		RandId           func(string, string) string
+		Seed             func(int64)
+		RandInt63        func() int64
+		RandInt63n       func(int64) int64
+		RandFloat32      func() float32
+		RandFloat64      func() float64
+		RandExpFloat64   func() float64
+		RandNormFloat64  func() float64
+		RandString       func(int, int) string
+		RandDate         func() string
 	}{
-		Iter:            i,
-		Seed:            rand.Seed,
-		RandInt63:       rand.Int63,
-		RandInt63n:      rand.Int63n,
-		RandFloat32:     rand.Float32,
-		RandFloat64:     rand.Float64,
-		RandExpFloat64:  rand.ExpFloat64,
-		RandNormFloat64: rand.NormFloat64,
-		RandString:      RandStringBytes,
+		Iter:             i,
+		RandIntBetween:   RandInt,
+		RandFloatBetween: RandFloat64Between,
+		RandId:           GetRandId,
+		Seed:             rand.Seed,
+		RandInt63:        rand.Int63,
+		RandInt63n:       rand.Int63n,
+		RandFloat32:      rand.Float32,
+		RandFloat64:      rand.Float64,
+		RandExpFloat64:   rand.ExpFloat64,
+		RandNormFloat64:  rand.NormFloat64,
+		RandString:       RandStringBytes,
+		RandDate:         RandDate,
 	}
 	if err := t.Execute(sb, data); err != nil {
 		log.Fatalf("failed to execute template: %v", err)
 	}
 	return sb.String()
+}
+
+func RandInt(min int, max int) int {
+	return rand.Intn(max-min) + min
+}
+
+func RandFloat64Between(min float64, max float64) float64 {
+	return min + rand.Float64()*(max-min)
+}
+
+func GetRandId(entity string, language string) string {
+	switch language {
+	case "SQL":
+		return fmt.Sprintf("(SELECT %sId FROM GoBench.%s ORDER BY RAND() LIMIT 1)", entity, entity)
+	case "Cypher":
+		return fmt.Sprintf("(MATCH (%s) RETURN %s, rand() as ORDER BY r LIMIT 1)", entity, entity)
+	default:
+		return "1"
+	}
+
 }
 
 func RandStringBytes(min int, max int) string {
@@ -205,4 +237,12 @@ func RandStringBytes(min int, max int) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func RandDate() string {
+	min := time.Date(1970, 1, 0, 0, 0, 0, 0, time.UTC).Unix()
+	max := time.Date(2023, 1, 0, 0, 0, 0, 0, time.UTC).Unix()
+	delta := max - min
+	sec := rand.Int63n(delta) + min
+	return time.Unix(sec, 0).Format("2006-01-02")
 }
