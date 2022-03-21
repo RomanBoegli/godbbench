@@ -17,7 +17,7 @@ type Neo4j struct {
 func NewNeo4J(host string, port int, user, password string) *Neo4j {
 
 	if port == 0 {
-		port = 7474
+		port = 7687
 	}
 
 	uri := fmt.Sprintf("neo4j://%v:%v", host, port)
