@@ -32,4 +32,13 @@ INSERT INTO GoBench.LineItem (LineItemId, OrderId, ProductId, Quantity, Delivery
 
 -- Delete table
 \benchmark once \name clean
-DROP TABLE dbbench_simple;
+USE GoBench;
+SET FOREIGN_KEY_CHECKS=0;
+DROP TABLE GoBench.LineItem;
+DROP TABLE GoBench.Order;
+DROP TABLE GoBench.Customer;
+DROP TABLE GoBench.Product;
+DROP TABLE GoBench.Category;
+DROP TABLE GoBench.Supplier;
+SET FOREIGN_KEY_CHECKS=1;
+DROP DATABASE GoBench;
