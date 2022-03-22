@@ -1,14 +1,13 @@
 -- Create database & tables
 \benchmark once \name init
-DROP DATABASE IF EXISTS GoBench;
-CREATE DATABASE GoBench;
-USE GoBench;
-CREATE TABLE Customer (CustomerId INT PRIMARY KEY, Name VARCHAR(10), Address VARCHAR(50), Birthday  DATE);
-CREATE TABLE `Order` (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, CreationDate DATE, Comment VARCHAR(50), FOREIGN KEY (CustomerId) REFERENCES Customer (CustomerId));
-CREATE TABLE Category (CategoryId INT PRIMARY KEY, Name VARCHAR(10));
-CREATE TABLE Supplier (SupplierId  INT PRIMARY KEY, Name VARCHAR(10), Address VARCHAR(50));
-CREATE TABLE Product (ProductId INT PRIMARY KEY, SupplierId INT NOT NULL, CategoryId INT NOT NULL, Code VARCHAR(6), Description VARCHAR(100), UnitSize INT, PricePerUnit DECIMAL, FOREIGN KEY (SupplierId) REFERENCES Supplier (SupplierId), FOREIGN KEY (CategoryId) REFERENCES Category (CategoryId));
-CREATE TABLE LineItem (LineItemId INT PRIMARY KEY, OrderId INT NOT NULL, ProductId INT NOT NULL, Quantity INT, DeliveryDate DATE, FOREIGN KEY (OrderId) REFERENCES `Order` (OrderId), FOREIGN KEY (ProductId) REFERENCES Product (ProductId));
+DROP SCHEMA IF EXISTS GoBench CASCADE;
+CREATE SCHEMA GoBench;
+CREATE TABLE GoBench.Customer (CustomerId INT PRIMARY KEY, Name VARCHAR(10), Address VARCHAR(50), Birthday  DATE);
+CREATE TABLE "gobench"."order" (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, CreationDate DATE, Comment VARCHAR(50), FOREIGN KEY (CustomerId) REFERENCES GoBench.Customer (CustomerId));
+CREATE TABLE GoBench.Category (CategoryId INT PRIMARY KEY, Name VARCHAR(10));
+CREATE TABLE GoBench.Supplier (SupplierId  INT PRIMARY KEY, Name VARCHAR(10), Address VARCHAR(50));
+CREATE TABLE GoBench.Product (ProductId INT PRIMARY KEY, SupplierId INT NOT NULL, CategoryId INT NOT NULL, Code VARCHAR(6), Description VARCHAR(100), UnitSize INT, PricePerUnit DECIMAL, FOREIGN KEY (SupplierId) REFERENCES GoBench.Supplier (SupplierId), FOREIGN KEY (CategoryId) REFERENCES GoBench.Category (CategoryId));
+CREATE TABLE GoBench.LineItem (LineItemId INT PRIMARY KEY, OrderId INT NOT NULL, ProductId INT NOT NULL, Quantity INT, DeliveryDate DATE, FOREIGN KEY (OrderId) REFERENCES "gobench"."order" (OrderId), FOREIGN KEY (ProductId) REFERENCES GoBench.Product (ProductId));
 
 -- INSERT
 \benchmark loop 0.75 \name single
@@ -32,13 +31,10 @@ INSERT INTO GoBench.LineItem (LineItemId, OrderId, ProductId, Quantity, Delivery
 
 -- Delete table
 \benchmark once \name clean
-USE GoBench;
-SET FOREIGN_KEY_CHECKS=0;
-DROP TABLE GoBench.LineItem;
-DROP TABLE GoBench.Order;
-DROP TABLE GoBench.Customer;
-DROP TABLE GoBench.Product;
-DROP TABLE GoBench.Category;
-DROP TABLE GoBench.Supplier;
-SET FOREIGN_KEY_CHECKS=1;
-DROP DATABASE GoBench;
+DROP TABLE IF EXISTS GoBench.LineItem CASCADE;
+DROP TABLE IF EXISTS GoBench.Product CASCADE;
+DROP TABLE IF EXISTS GoBench.Category CASCADE;
+DROP TABLE IF EXISTS GoBench.Supplier CASCADE;
+DROP TABLE IF EXISTS GoBench.Order CASCADE;
+DROP TABLE IF EXISTS GoBench.Customer CASCADE;
+DROP SCHEMA IF EXISTS GoBench CASCADE;

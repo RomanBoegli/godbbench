@@ -96,7 +96,7 @@ B---H
 -->
 
 
-![Friendships as Weighted Graph](./images/friendsgraph.svg)
+<p align="center"> <img src="./images/friendsgraph.svg" width="700"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
 
 # Query Languages `20%`
@@ -132,6 +132,12 @@ docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d
 docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
 ```
 
+To remove all containers and the associated volumes again, use the following two commands.
+
+```console
+docker rm -f $(docker ps -a -q)
+docker volume rm $(docker volume ls -q)
+```
 
 
 ## Results
@@ -144,8 +150,6 @@ docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/pass
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
 
-
-blabla [[1]](#1) asdfasfd
 
 
 # References
