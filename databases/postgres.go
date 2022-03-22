@@ -60,10 +60,10 @@ func (p *Postgres) Setup() {
 
 // Cleanup removes all remaining benchmarking data.
 func (p *Postgres) Cleanup(closeConnection bool) {
-	if _, err := p.db.Exec("DROP TABLE IF EXISTS GoBench.Generic;"); err != nil {
+	if _, err := p.db.Exec("DROP TABLE IF EXISTS GoBench.Generic CASCADE;"); err != nil {
 		log.Printf("failed to drop table: %v\n", err)
 	}
-	if _, err := p.db.Exec("DROP SCHEMA IF EXISTS GoBench;"); err != nil {
+	if _, err := p.db.Exec("DROP SCHEMA IF EXISTS GoBench CASCADE;"); err != nil {
 		log.Printf("failed drop schema: %v\n", err)
 	}
 	if closeConnection {
