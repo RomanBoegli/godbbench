@@ -3,6 +3,7 @@ package databases
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/RomanBoegli/gobench/benchmark"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
@@ -72,7 +73,21 @@ func (c *Neo4j) Exec(stmt string) {
 	session := c.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close()
 
-	if _, err := session.Run(stmt, nil); err != nil {
-		log.Fatalf("%v: failed(!): %v\n", stmt, err)
+	transaction, err := session.BeginTransaction()
+	if err != nil {
+		panic(err)
 	}
+	defer transaction.Close()
+
+	singleStmts := strings.Split(stmt, ";")
+
+	for _, stmt := range singleStmts {
+		if stmt != "" {
+			if _, err := transaction.Run(stmt, nil); err != nil {
+				log.Fatalf("%v: failed(!): %v\n", stmt, err)
+			}
+		}
+	}
+
+	transaction.Commit()
 }
