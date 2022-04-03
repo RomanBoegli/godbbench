@@ -1,6 +1,7 @@
 \benchmark once \name initialize
 MATCH (n) DETACH DELETE n
 
+// inserting data
 \benchmark loop 0.75 \name insert_customer
 CREATE (n:Customer {CustomerId: {{.Iter}}, Name: '{{call .RandString 3 10 }}', Address: '{{call .RandString 10 50 }}', Birthday: '{{call .RandDate }}' });
 
