@@ -222,7 +222,7 @@ func GetRandId(entity string, language string) string {
 	case "SQL":
 		return fmt.Sprintf("(SELECT %sId FROM GoBench.%s ORDER BY RAND() LIMIT 1)", entity, entity)
 	case "Cypher":
-		return fmt.Sprintf("(MATCH (%s) RETURN %s, rand() as ORDER BY r LIMIT 1)", entity, entity)
+		return fmt.Sprintf("(MATCH (x:%s) RETURN x.%sId, rand() as rand ORDER BY rand ASC LIMIT 1)", entity, entity)
 	default:
 		return "1"
 	}
