@@ -72,7 +72,9 @@ func main() {
 	}
 
 	var bencher benchmark.Bencher
-	switch os.Args[1] {
+	system := os.Args[1]
+
+	switch system {
 	case "postgres":
 		postgresFlags.AddFlagSet(defaultFlags)
 		postgresFlags.AddFlagSet(connFlags)
@@ -167,7 +169,7 @@ func main() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, os.Interrupt)
 
-	summary := [][]string{{"name", "executions", "total (ms)", "avg (ms)", "min (ms)", "max (ms)", "ops/s", "ms/op"}}
+	summary := [][]string{{"system", "multiplicity", "name", "executions", "total (μs)", "avg (μs)", "min (μs)", "max (μs)", "ops/s", "μs/op"}}
 
 	for i, b := range benchmarks {
 		select {
@@ -195,6 +197,8 @@ func main() {
 			}
 
 			summary = append(summary, []string{
+				system,
+				fmt.Sprint(*iter),
 				b.Name,
 				fmt.Sprint(results.TotalExecutionCount),
 				fmt.Sprint(results.Duration.Milliseconds()),
@@ -231,7 +235,7 @@ func main() {
 
 		for _, record := range summary[1:] {
 			y := make([]interface{}, len(record))
-			for i, v := range record {
+			for i, v := range record[2:] {
 				y[i] = v
 			}
 
