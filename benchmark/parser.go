@@ -60,7 +60,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 		line := strings.TrimSpace(scanner.Text())
 
 		// Skip comments and empty lines.
-		if strings.HasPrefix(line, "--") || line == "" {
+		if strings.HasPrefix(line, "--") || strings.HasPrefix(line, "//") || line == "" {
 			continue
 		}
 

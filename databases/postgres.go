@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/RomanBoegli/gobench/benchmark"
 )
@@ -75,8 +76,13 @@ func (p *Postgres) Cleanup(closeConnection bool) {
 
 // Exec executes the given statement on the database.
 func (p *Postgres) Exec(stmt string) {
-	_, err := p.db.Exec(stmt)
-	if err != nil {
-		log.Printf("%v failed: %v", stmt, err)
+	singleStmts := strings.Split(stmt, ";")
+	for _, stmt := range singleStmts {
+		if stmt != "" {
+			_, err := p.db.Exec(stmt)
+			if err != nil {
+				log.Printf("%v failed: %v", stmt, err)
+			}
+		}
 	}
 }
