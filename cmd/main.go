@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/csv"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -38,6 +39,7 @@ func main() {
 		version      = defaultFlags.Bool("version", false, "print version information")
 		runBench     = defaultFlags.String("run", "all", "only run the specified benchmarks, e.g. \"inserts deletes\"")
 		scriptname   = defaultFlags.String("script", "", "custom sql file to execute")
+		writecsv     = defaultFlags.String("writecsv", "", "write result to csv file")
 
 		// Connection flags, applicable for most databases.
 		connFlags = pflag.NewFlagSet("conn", pflag.ExitOnError)
@@ -165,6 +167,8 @@ func main() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, os.Interrupt)
 
+	summary := [][]string{{"name", "executions", "total (ms)", "avg (ms)", "min (ms)", "max (ms)", "ops/s", "ms/op"}}
+
 	for i, b := range benchmarks {
 		select {
 		case <-sigchan:
@@ -182,29 +186,23 @@ func main() {
 			// run the particular benchmark
 			results := benchmark.Run(bencher, b, *iter, *threads)
 
-			took := results.Duration
-			// execution in ns for mode once
-			nsPerOp := took.Nanoseconds()
+			// execution in ms for mode once
+			msPerOp := results.Duration.Milliseconds()
 
 			// execution in ns/op for mode loop
 			if b.Type == benchmark.TypeLoop {
-				nsPerOp /= int64(*iter)
+				msPerOp /= int64(*iter)
 			}
 
-			fmt.Printf(`%v (%vx) took: %v 
-avg: %v, min: %v, max: %v
-%v ops/s
-%v ns/op
-
-`,
+			summary = append(summary, []string{
 				b.Name,
-				results.TotalExecutionCount,
-				took,
-				results.Avg(),
-				results.Min,
-				results.Max,
-				float64(results.TotalExecutionCount)/results.Duration.Seconds(),
-				nsPerOp)
+				fmt.Sprint(results.TotalExecutionCount),
+				fmt.Sprint(results.Duration.Milliseconds()),
+				fmt.Sprint(results.Avg().Milliseconds()),
+				fmt.Sprint(results.Min.Milliseconds()),
+				fmt.Sprint(results.Max.Milliseconds()),
+				fmt.Sprint(float64(results.TotalExecutionCount) / (results.Duration.Seconds())),
+				fmt.Sprint(msPerOp)})
 
 			// Don't sleep after the last benchmark
 			if i != len(benchmarks)-1 {
@@ -213,11 +211,39 @@ avg: %v, min: %v, max: %v
 		}
 	}
 
+	// write results to csv
+	if *writecsv != "" {
+
+		f, err := os.Create(*writecsv)
+		if err != nil {
+			log.Fatalln("failed to open file", err)
+		}
+
+		w := csv.NewWriter(f)
+		err = w.WriteAll(summary) // calls Flush internally
+		if err != nil {
+			log.Fatal(err)
+		}
+		f.Close()
+		fmt.Printf("Results written to: %v\n", *writecsv)
+
+	} else {
+
+		for _, record := range summary[1:] {
+			y := make([]interface{}, len(record))
+			for i, v := range record {
+				y[i] = v
+			}
+
+			fmt.Printf("%v (%vx) took: %vms\navg: %vms, min: %vms, max: %vms\nops/s: %v\nms/op: %v\n\n", y...)
+		}
+	}
+
 	printTotal(startTotal)
 }
 
 func printTotal(startTotal time.Time) {
-	fmt.Printf("total: %v\n", time.Since(startTotal))
+	fmt.Printf("elapsed time: %v\n", time.Since(startTotal))
 }
 
 func contains(options []string, want string) bool {
