@@ -15,7 +15,7 @@
                     , "--port", "3306"
                     , "--user", "root"
                     , "--pass", "password"
-                    , "--iter", "100"
+                    , "--iter", "500"
                     , "--threads", "15"
                     //, "--run", "inserts selects updates"
                     , "--nosetup"
@@ -25,7 +25,8 @@
                     , "--writecsv", "/Users/rbo/Downloads/result_mysql.csv"
                 ],
             "internalConsole": true
-        },{
+        },
+        {
             "name": "launch postgres",
             "type": "go",
             "request": "launch",
@@ -36,7 +37,7 @@
                     , "--port", "5432"
                     , "--user", "postgres"
                     , "--pass", "password"
-                    , "--iter", "100"
+                    , "--iter", "500"
                     , "--threads", "15"
                     //, "--run", "inserts selects updates"
                     , "--nosetup"
@@ -58,7 +59,7 @@
                     , "--port", "7687"
                     , "--user", "neo4j"
                     , "--pass", "password"
-                    , "--iter", "100"
+                    , "--iter", "500"
                     , "--threads", "15"
                     //, "--run", "inserts selects updates"
                     , "--nosetup"
@@ -67,6 +68,24 @@
                     , "--script", "../scripts/neo4j.cql"
                     , "--writecsv", "/Users/rbo/Downloads/result_neo4j.csv"
                 ],
+            "internalConsole": true
+        },
+        {
+            "name": "helper mergecsv",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/helper/main.go",
+            "args": ["mergecsv"],
+            "internalConsole": true
+        },
+        {
+            "name": "helper createcharts",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/helper/main.go",
+            "args": ["createcharts"],
             "internalConsole": true
         }
     ]

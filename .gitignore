@@ -105,3 +105,5 @@ $RECYCLE.BIN/
 
 # End of https://www.gitignore.io/api/go,linux,macos,windows,visualstudiocode
 /.miscellaneous/
+helper/.~lock.charts.ods#
+helper/charts.ods
