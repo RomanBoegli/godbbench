@@ -163,7 +163,7 @@ func main() {
 		*threads = *iter
 	}
 
-	benchmarks := []benchmark.Benchmark{}
+	var benchmarks []benchmark.Benchmark
 
 	// If a script was specified, overwrite built-in benchmarks.
 	if *scriptname != "" {
@@ -255,7 +255,7 @@ func main() {
 	} else {
 
 		for _, record := range summary[1:] {
-			y := make([]interface{}, len(record))
+			y := make([]interface{}, len(record)-2)
 			for i, v := range record[2:] {
 				y[i] = v
 			}
