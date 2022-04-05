@@ -138,6 +138,16 @@ docker rm -f $(docker ps -a -q)
 docker volume rm $(docker volume ls -q)
 ```
 
+### Command Line Interface
+
+```console
+go run main.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 1000 --writecsv "neo4j.csv" \
+&& go run main.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000 --writecsv "postgres.csv" \
+&& go run main.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 1000 --writecsv "mysql.csv" \
+&& go run main.go mergecsv --rootDir "." --targetFile "./merged.csv" \
+&& go run main.go createcharts --dataFile "./merged.csv"
+```
+
 
 ## Results
 - Consolidation
