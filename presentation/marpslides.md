@@ -24,7 +24,6 @@ style: |
 
 ![bg](./assets/OST.svg)
 
-
 ---
 
 # Content
