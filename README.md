@@ -84,7 +84,9 @@ With rising trends in amounts and connections of data, the classic relational da
 <p align="center"> <img src="./images/friendsgraph.svg" width="700"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
 
-Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [neo4j](https://neo4j.com/). Without the specification of a schema, it allows creating nodes with dynamically attributed information as well as the relationships among them. One of the most remarkable advantage is the application of graph algorithms as they are uniquely well suited to reveal and understand patterns in highly connected datasets. Possible real-world problems may include uncovering vulnerable components in a network, discovering unseen dependencies, identifying bottlenecks, revealing communities based on behavior patterns, or specifying the cheapest route through a network [[11]](#11).
+Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [neo4j](https://neo4j.com/). Other than in relational DBMS, neo4j allows heterogenous sets of attribute on both nodes and relationships. This implies that there is also no database schema to be specified beforehand. One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database  [11]](#11).
+
+  One of the most remarkable advantage is the application of graph algorithms as they are uniquely well suited to reveal and understand patterns in highly connected datasets. Possible real-world problems may include uncovering vulnerable components in a network, discovering unseen dependencies, identifying bottlenecks, revealing communities based on behavior patterns, or specifying the cheapest route through a network [[12]](#12).
 
 
 
@@ -104,6 +106,8 @@ Capturing graph-based data domains in a relational DBMS invokes certain limitati
 # Benchmark `40%`
 - Intro
 - Important to Know (e.g. warm up, caching, etc.)
+
+
 
 ## Strategy and Goals
 - Explanation of Automatised Tests 
@@ -136,6 +140,16 @@ docker rm -f $(docker ps -a -q)
 docker volume rm $(docker volume ls -q)
 ```
 
+### Command Line Interface
+
+```console
+go run main.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 1000 --writecsv "neo4j.csv" \
+&& go run main.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000 --writecsv "postgres.csv" \
+&& go run main.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 1000 --writecsv "mysql.csv" \
+&& go run main.go mergecsv --rootDir "." --targetFile "./merged.csv" \
+&& go run main.go createcharts --dataFile "./merged.csv"
+```
+
 
 ## Results
 - Consolidation
@@ -143,6 +157,9 @@ docker volume rm $(docker volume ls -q)
 
 # Discussion
 - Are Graph-Based really always better?
+
+A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
+
 
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
@@ -152,14 +169,19 @@ Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/
 # References
 
 
-<a id="1">[1]</a> Codd, E. F. (1970). A Relational Model for Large Shared
-Data Banks.
+<a id="1">[1]</a> Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-642-59412-0_16
 
-<a id="2">[2]</a> Elmasri, R., & Navathe, S. B. (2010). Fundamentals of database systems (6th ed.). Pearson.
+<a id="2">[2]</a> Elmasri, R., & Navathe, S. (2011). Fundamentals of Database Systems (6th ed). Addison-Wesley.
 
-<a id="3">[3]</a> Peixoto, Tiago P., https://graph-tool.skewed.de/, retrieved on March 20. 2022
+<a id="3">[3]</a> Peixoto, T. P. (n.d.). What is graph-tool? Graph-Tool. Retrieved 20 March 2022, from https://graph-tool.skewed.de/
 
-<a id="10">[10]</a> Robinson, I., Webber, J., & Eifrem, E. (2015). Graph databases: New opportunities for connected data (2nd ed.). O’Reilly Media.
+<a id="10">[10]</a> Robinson, I., Webber, J., & Eifrem, E. (2015). Graph Databases: New Opportunities for Connected Data.
 
-<a id="11">[11]</a> Hodler, A., & Needham, M. (2019). Graph algorithms: Practical examples in Apache spark and Neo4j. O’Reilly Media.
+<a id="11">[11]</a> Stopford, B. (2012, August 17). Thinking in Graphs: Neo4J. http://www.benstopford.com/2012/08/17/thinking-in-graphs-neo4j/
 
+<a id="12">[12]</a> Needham, M., & Hodler, A. E. (2019). Graph Algorithms: Practical Examples in Apache Spark and Neo4j (First edition). O’Reilly Media.
+
+<a id="99">[??]</a> Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
+
+<a id="99">[??]</a> Gregg, B. (2020). Systems Performance: Enterprise and the Cloud (Second). Addison-Wesley.
+ 

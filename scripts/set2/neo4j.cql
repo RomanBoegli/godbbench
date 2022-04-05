@@ -20,7 +20,7 @@ CREATE (n:Product { ProductId: {{.Iter}}, Code: '{{call .RandString 5 6 }}', Des
 CALL {MATCH (x:Supplier) RETURN x, rand() as rand ORDER BY rand ASC LIMIT 1} WITH x.SupplierId as fk MATCH (a:Supplier), (b:Product) WHERE a.SupplierId = fk AND b.ProductId = {{.Iter}} CREATE (a)-[r:SUPPLIES]->(b);
 CALL {MATCH (x:Category) RETURN x, rand() as rand ORDER BY rand ASC LIMIT 1} WITH x.CategoryId as fk MATCH (a:Category), (b:Product) WHERE a.CategoryId = fk AND b.ProductId = {{.Iter}} CREATE (a)-[r:GROUPS]->(b);
 
-\benchmark loop 1.0 \name inserts_lineitem
+\benchmark loop 1.0 \name insert_lineitem
 CREATE (n:LineItem {LineItemId: {{.Iter}}, Quantity: 123, DeliveryDate: '{{call .RandDate }}' });
 CALL {MATCH (x:Order) RETURN x, rand() as rand ORDER BY rand ASC LIMIT 1} WITH x.OrderId as fk MATCH (a:Order), (b:LineItem) WHERE a.OrderId = fk AND b.LineItemId = {{.Iter}} CREATE (a)-[r:CONTAINS]->(b);
 CALL {MATCH (x:Product) RETURN x, rand() as rand ORDER BY rand ASC LIMIT 1} WITH x.ProductId as fk MATCH (a:Product), (b:LineItem) WHERE a.ProductId = fk AND b.LineItemId = {{.Iter}} CREATE (a)-[r:OCCURS]->(b);
@@ -28,6 +28,14 @@ CALL {MATCH (x:Product) RETURN x, rand() as rand ORDER BY rand ASC LIMIT 1} WITH
 
 // SELECTS
 
+\benchmark loop 1.0 \name select_simple
+MATCH (n:Customer) WHERE n.CustomerId = {{.Iter}} RETURN n
+
+\benchmark loop 1.0 \name select_medium
+MATCH (n:Product)<-[r:SUPPLIES]-(f:Supplier) WHERE f.SupplierId = {{.Iter}} RETURN n ORDER BY n.PricePerUnit DESC
+
+\benchmark loop 1.0 \name select_complex
+MATCH (c:Customer)-[:PLACES]->(o:Order)-[:CONTAINS]->(l:LineItem)<-[:OCCURS]-(p:Product) WHERE '{{call .RandDate }}' <= o.CreationDate <= "9999-12-31" RETURN c.CustomerId, c.Name, SUM(l.Quantity * p.UnitSize * p.PricePerUnit) as TotalOrderValue ORDER BY TotalOrderValue DESC
 
 
 // DROPS

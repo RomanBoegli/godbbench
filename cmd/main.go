@@ -4,10 +4,14 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"reflect"
 	"strings"
 	"time"
 
@@ -18,12 +22,15 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/pflag"
+
+	"github.com/go-echarts/go-echarts/v2/charts"
+	"github.com/go-echarts/go-echarts/v2/components"
+	"github.com/go-echarts/go-echarts/v2/opts"
+	"github.com/go-gota/gota/dataframe"
 )
 
 var (
-	version = "dev version"
-	commit  = "none"
-	date    = "unknown"
+	hheaders = []string{"system", "multiplicity", "name", "executions", "total (μs)", "avg (μs)", "min (μs)", "max (μs)", "ops/s", "μs/op"}
 )
 
 func main() {
@@ -36,7 +43,6 @@ func main() {
 		nosetup      = defaultFlags.Bool("nosetup", false, "initialize database and tables, e.g. when running own scripts")
 		nocleanstart = defaultFlags.Bool("nocleanstart", false, "make a cleanup before setup")
 		keep         = defaultFlags.Bool("keep", false, "keep benchmark data")
-		version      = defaultFlags.Bool("version", false, "print version information")
 		runBench     = defaultFlags.String("run", "all", "only run the specified benchmarks, e.g. \"inserts deletes\"")
 		scriptname   = defaultFlags.String("script", "", "custom sql file to execute")
 		writecsv     = defaultFlags.String("writecsv", "", "write result to csv file")
@@ -56,10 +62,19 @@ func main() {
 		mysqlFlags    = pflag.NewFlagSet("mysql", pflag.ExitOnError)
 		postgresFlags = pflag.NewFlagSet("postgres", pflag.ExitOnError)
 		neo4jFlags    = pflag.NewFlagSet("neo4j", pflag.ExitOnError)
+
+		// Flags to merge result csv files
+		mergeCsvFlags = pflag.NewFlagSet("mergecsv", pflag.ExitOnError)
+		rootDir       = mergeCsvFlags.String("rootDir", "../tmp", "path to folder with csv files to be merged")
+		targetFile    = mergeCsvFlags.String("targetFile", "../tmp/merged.csv", "target file path for merged csv")
+
+		// Flags to generate charts
+		createChartFlags = pflag.NewFlagSet("createcharts", pflag.ExitOnError)
+		dataFile         = createChartFlags.String("dataFile", "../tmp/merged.csv", "path to source data file, assumes headers")
 	)
 
 	defaultFlags.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Available subcommands:\n\tcassandra|cockroach|mssql|mysql|postgres|sqlite|spanner\n")
+		fmt.Fprintf(os.Stderr, "Available subcommands:\n\tmysql | postgres | neo4j | mergecsv | createcharts\n")
 		fmt.Fprintf(os.Stderr, "\tUse 'subcommand --help' for all flags of the specified command.\n")
 		fmt.Fprintf(os.Stderr, "Generic flags for all subcommands:\n")
 		defaultFlags.PrintDefaults()
@@ -72,7 +87,9 @@ func main() {
 	}
 
 	var bencher benchmark.Bencher
-	switch os.Args[1] {
+	system := os.Args[1]
+
+	switch system {
 	case "postgres":
 		postgresFlags.AddFlagSet(defaultFlags)
 		postgresFlags.AddFlagSet(connFlags)
@@ -96,15 +113,21 @@ func main() {
 			log.Fatalf("failed to parse neo4j flags: %v", err)
 		}
 		bencher = databases.NewNeo4J(*host, *port, *user, *pass)
+	case "mergecsv":
+		if err := mergeCsvFlags.Parse(os.Args[2:]); err != nil {
+			log.Fatalf("failed to parse postgres flags: %v", err)
+		}
+		MergeKnownCsv(*rootDir, *targetFile)
+		os.Exit(0)
+	case "createcharts":
+		if err := createChartFlags.Parse(os.Args[2:]); err != nil {
+			log.Fatalf("failed to parse postgres flags: %v", err)
+		}
+		CreateCharts(*dataFile)
+		os.Exit(0)
 	default:
 		if err := defaultFlags.Parse(os.Args[1:]); err != nil {
 			log.Fatalf("failed to parse default flags: %v", err)
-		}
-
-		// Only show version information and exit.
-		if *version {
-			fmt.Printf("gobench %v, commit %v, built at %v\n", version, commit, date)
-			os.Exit(0)
 		}
 
 		// Command not recognized. Print usage help and exit.
@@ -140,7 +163,7 @@ func main() {
 		*threads = *iter
 	}
 
-	benchmarks := []benchmark.Benchmark{}
+	var benchmarks []benchmark.Benchmark
 
 	// If a script was specified, overwrite built-in benchmarks.
 	if *scriptname != "" {
@@ -167,7 +190,7 @@ func main() {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, os.Interrupt)
 
-	summary := [][]string{{"name", "executions", "total (ms)", "avg (ms)", "min (ms)", "max (ms)", "ops/s", "ms/op"}}
+	summary := [][]string{hheaders}
 
 	for i, b := range benchmarks {
 		select {
@@ -187,14 +210,16 @@ func main() {
 			results := benchmark.Run(bencher, b, *iter, *threads)
 
 			// execution in ms for mode once
-			msPerOp := results.Duration.Milliseconds()
+			msPerOp := float64(results.Duration.Milliseconds())
 
 			// execution in ns/op for mode loop
 			if b.Type == benchmark.TypeLoop {
-				msPerOp /= int64(*iter)
+				msPerOp /= float64(int64(*iter))
 			}
 
 			summary = append(summary, []string{
+				system,
+				fmt.Sprint(*iter),
 				b.Name,
 				fmt.Sprint(results.TotalExecutionCount),
 				fmt.Sprint(results.Duration.Milliseconds()),
@@ -230,8 +255,8 @@ func main() {
 	} else {
 
 		for _, record := range summary[1:] {
-			y := make([]interface{}, len(record))
-			for i, v := range record {
+			y := make([]interface{}, len(record)-2)
+			for i, v := range record[2:] {
 				y[i] = v
 			}
 
@@ -253,4 +278,186 @@ func contains(options []string, want string) bool {
 		}
 	}
 	return false
+}
+
+func MergeKnownCsv(rootDir string, targetFile string) {
+
+	files, err := ioutil.ReadDir(rootDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	allrecords := [][]string{hheaders}
+
+	for _, file := range files {
+		if filepath.Ext(file.Name()) == ".csv" && filepath.Base(file.Name()) != filepath.Base(targetFile) {
+			fileToMerge := fmt.Sprintf("%v/%v", filepath.Clean(rootDir), file.Name())
+			_file, err := os.Open(fileToMerge)
+			if err != nil {
+				fmt.Println(err)
+			}
+			reader := csv.NewReader(_file)
+			records, _ := reader.ReadAll()
+			if len(records) > 1 {
+				headerrow := records[0]
+				isgood := reflect.DeepEqual(headerrow, hheaders)
+
+				if isgood {
+					allrecords = append(allrecords, records[1:]...)
+					fmt.Printf("Merging:\t%v\n", fileToMerge)
+				} else {
+					fmt.Printf("Bad structure:\t%v\n", fileToMerge)
+				}
+			}
+		}
+	}
+
+	f, err := os.Create(targetFile)
+	if err != nil {
+		fmt.Println("failed to open file", err)
+	}
+
+	w := csv.NewWriter(f)
+	err = w.WriteAll(allrecords) // calls Flush internally
+	if err != nil {
+		fmt.Println(err)
+	}
+	f.Close()
+	fmt.Printf("Result:  \t%v\n", targetFile)
+}
+
+func CreateCharts(dataFile string) {
+
+	csvfile, err := os.Open(dataFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	df := dataframe.ReadCSV(csvfile)
+	if len(df.Records()) <= 1 {
+		fmt.Println("specified file has no data")
+		os.Exit(1)
+	}
+
+	systems := unique(df.Select([]string{"system"}).Records())
+	mults := unique(df.Select([]string{"multiplicity"}).Records())
+	names := unique(df.Select([]string{"name"}).Records())
+
+	page := components.NewPage()
+
+	for c1, metric := range []string{"total (μs)", "avg (μs)", "ops/s", "μs/op"} {
+		for c2, mult := range mults {
+			bar := getBasicBarChart(fmt.Sprintf("Chart %v.%v", c1+1, c2), fmt.Sprintf("%v with %v iterations", metric, mult))
+			bar.SetXAxis(names)
+			for _, system := range systems {
+				data := df.
+					Filter(dataframe.F{0, "system", "==", system}).
+					Filter(dataframe.F{1, "multiplicity", "==", mult}).
+					Select([]string{metric}).Records()
+				if len(data) != 0 {
+					bar.AddSeries(system, generateBarItems(data))
+				}
+			}
+			bar.SetSeriesOptions(
+				charts.WithBarChartOpts(opts.BarChart{Type: "bar", BarGap: "10%", BarCategoryGap: "30%", RoundCap: true}),
+				charts.WithLabelOpts(opts.Label{Show: true, Position: "top"}),
+			)
+			page.AddCharts(bar)
+		}
+	}
+
+	page.SetLayout(components.PageFlexLayout)
+
+	html := fmt.Sprintf("%v/%v", filepath.Dir(dataFile), "charts.html")
+	f, err := os.Create(html)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	page.Render(io.MultiWriter(f))
+
+	fmt.Printf("Charts created in: %v\n", html)
+}
+
+func getBasicBarChart(title string, subtitle string) *charts.Bar {
+
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1300px", Height: "500px"}),
+		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle}),
+		charts.WithLegendOpts(opts.Legend{Show: true, Y: "30", SelectedMode: "multiple", ItemWidth: 20}),
+		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#318BFF", "#23B12A"}),
+		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
+		//charts.WithXAxisOpts(opts.XAxis{AxisLabel: &opts.AxisLabel{Show: true, Rotate: 0, FontSize: "9", Interval: "0"}}), // has a bug
+		charts.WithToolboxOpts(opts.Toolbox{Show: true, Right: "10%", Feature: &opts.ToolBoxFeature{
+			SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{Show: true, Title: "Download", Type: "png"},
+			DataView:    &opts.ToolBoxFeatureDataView{Show: true, Title: "Data", Lang: []string{"raw data", "go back", "refresh"}},
+			DataZoom:    &opts.ToolBoxFeatureDataZoom{Show: true},
+		}}),
+		//charts.WithDataZoomOpts(opts.DataZoom{Type: "slider", Start: 0, End: 100}),
+	)
+
+	return bar
+}
+
+func barSample() *charts.Bar {
+
+	bar := charts.NewBar()
+	bar.SetGlobalOptions(
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "900px", Height: "500px", Theme: "infographic"}),
+		charts.WithTitleOpts(opts.Title{Title: "Chart Title", Subtitle: "Any subtitle or description"}),
+		charts.WithLegendOpts(opts.Legend{Show: true, Y: "20"}),
+		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
+		charts.WithToolboxOpts(opts.Toolbox{Show: true, Right: "10%", Feature: &opts.ToolBoxFeature{
+			SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{Show: true, Title: "Download", Type: "png"},
+			DataView:    &opts.ToolBoxFeatureDataView{Show: true, Title: "Data", Lang: []string{"raw data", "go back", "refresh"}},
+			DataZoom:    &opts.ToolBoxFeatureDataZoom{Show: true},
+		}}),
+		//charts.WithDataZoomOpts(opts.DataZoom{Type: "slider", Start: 0, End: 100}),
+	)
+	bar.SetXAxis([]string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}).
+		AddSeries("mysql", generateRandomBarItems()).
+		AddSeries("postgres", generateRandomBarItems()).
+		AddSeries("neo4j", generateRandomBarItems()).
+		SetSeriesOptions(
+			charts.WithBarChartOpts(opts.BarChart{Type: "bar", BarGap: "10%", BarCategoryGap: "30%", RoundCap: true}),
+			charts.WithLabelOpts(opts.Label{Show: true, Position: "top"}),
+		)
+
+	return bar
+}
+
+// generate random data for bar chart
+func generateRandomBarItems() []opts.BarData {
+	items := make([]opts.BarData, 0)
+	for i := 0; i < 7; i++ {
+		items = append(items, opts.BarData{Value: rand.Intn(30000)})
+	}
+	return items
+}
+
+func generateBarItems(table [][]string) []opts.BarData {
+	items := make([]opts.BarData, 0)
+
+	for _, a := range table[1:] {
+		for _, b := range a {
+			items = append(items, opts.BarData{Name: a[0], Value: b})
+		}
+	}
+
+	return items
+}
+
+func unique(table [][]string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, stringSlice := range table[1:] {
+		for _, entry := range stringSlice {
+			if _, value := keys[entry]; !value {
+				keys[entry] = true
+				list = append(list, entry)
+			}
+		}
+	}
+	return list
 }

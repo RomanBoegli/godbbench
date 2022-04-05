@@ -218,12 +218,12 @@ func RandFloat64Between(min float64, max float64) float64 {
 }
 
 func GetRandId(entity string, language string) string {
-	switch language {
-	case "MySql":
+	switch strings.ToLower(language) {
+	case "mysql":
 		return fmt.Sprintf("(SELECT %sId FROM GoBench.%s ORDER BY RAND() LIMIT 1)", entity, entity)
-	case "Postgres":
+	case "postgres":
 		return fmt.Sprintf("(SELECT %sId FROM GoBench.%s ORDER BY RANDOM() LIMIT 1)", entity, entity)
-	case "Cypher":
+	case "cypher":
 		return fmt.Sprintf("(MATCH (x:%s) RETURN x.%sId, rand() as rand ORDER BY rand ASC LIMIT 1)", entity, entity)
 	default:
 		return "1"
