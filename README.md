@@ -107,6 +107,8 @@ Capturing graph-based data domains in a relational DBMS invokes certain limitati
 - Intro
 - Important to Know (e.g. warm up, caching, etc.)
 
+
+
 ## Strategy and Goals
 - Explanation of Automatised Tests 
 - Evaluation Criteria (Performance)
@@ -155,6 +157,9 @@ go run main.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password -
 
 # Discussion
 - Are Graph-Based really always better?
+
+A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
+
 
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
