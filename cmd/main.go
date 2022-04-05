@@ -210,11 +210,11 @@ func main() {
 			results := benchmark.Run(bencher, b, *iter, *threads)
 
 			// execution in ms for mode once
-			msPerOp := results.Duration.Milliseconds()
+			msPerOp := float64(results.Duration.Milliseconds())
 
 			// execution in ns/op for mode loop
 			if b.Type == benchmark.TypeLoop {
-				msPerOp /= int64(*iter)
+				msPerOp /= float64(int64(*iter))
 			}
 
 			summary = append(summary, []string{
@@ -353,7 +353,7 @@ func CreateCharts(dataFile string) {
 				data := df.
 					Filter(dataframe.F{0, "system", "==", system}).
 					Filter(dataframe.F{1, "multiplicity", "==", mult}).
-					Select([]string{metric}).Records()[1:]
+					Select([]string{metric}).Records()
 				if len(data) != 0 {
 					bar.AddSeries(system, generateBarItems(data))
 				}
@@ -385,10 +385,10 @@ func getBasicBarChart(title string, subtitle string) *charts.Bar {
 	bar.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1300px", Height: "500px"}),
 		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle}),
-		charts.WithLegendOpts(opts.Legend{Show: true, Y: "30"}),
-		charts.WithColorsOpts(opts.Colors{"blue", "red", "green", "purple", "orange", "brown", "yellow", "black"}),
+		charts.WithLegendOpts(opts.Legend{Show: true, Y: "30", SelectedMode: "multiple", ItemWidth: 20}),
+		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#318BFF", "#23B12A"}),
 		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
-		charts.WithXAxisOpts(opts.XAxis{AxisLabel: &opts.AxisLabel{Show: true, Rotate: 20}}),
+		//charts.WithXAxisOpts(opts.XAxis{AxisLabel: &opts.AxisLabel{Show: true, Rotate: 0, FontSize: "9", Interval: "0"}}), // has a bug
 		charts.WithToolboxOpts(opts.Toolbox{Show: true, Right: "10%", Feature: &opts.ToolBoxFeature{
 			SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{Show: true, Title: "Download", Type: "png"},
 			DataView:    &opts.ToolBoxFeatureDataView{Show: true, Title: "Data", Lang: []string{"raw data", "go back", "refresh"}},
@@ -404,10 +404,9 @@ func barSample() *charts.Bar {
 
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "900px", Height: "500px"}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "900px", Height: "500px", Theme: "infographic"}),
 		charts.WithTitleOpts(opts.Title{Title: "Chart Title", Subtitle: "Any subtitle or description"}),
 		charts.WithLegendOpts(opts.Legend{Show: true, Y: "20"}),
-		charts.WithColorsOpts(opts.Colors{"blue", "red", "green"}),
 		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
 		charts.WithToolboxOpts(opts.Toolbox{Show: true, Right: "10%", Feature: &opts.ToolBoxFeature{
 			SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{Show: true, Title: "Download", Type: "png"},
