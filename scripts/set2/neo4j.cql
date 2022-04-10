@@ -1,5 +1,5 @@
 \benchmark once \name initialize
-MATCH (n) DETACH DELETE n
+MATCH (n) DETACH DELETE n;
 
 // INSERT
 \benchmark loop 0.75 \name insert_customer
@@ -29,15 +29,16 @@ CALL {MATCH (x:Product) RETURN x, rand() as rand ORDER BY rand ASC LIMIT 1} WITH
 // SELECTS
 
 \benchmark loop 1.0 \name select_simple
-MATCH (n:Customer) WHERE n.CustomerId = {{.Iter}} RETURN n
+MATCH (n:Customer) WHERE n.CustomerId = {{.Iter}} RETURN n;
 
 \benchmark loop 1.0 \name select_medium
-MATCH (n:Product)<-[r:SUPPLIES]-(f:Supplier) WHERE f.SupplierId = {{.Iter}} RETURN n ORDER BY n.PricePerUnit DESC
+MATCH (n:Product)<-[r:SUPPLIES]-(f:Supplier) WHERE f.SupplierId = {{.Iter}} RETURN n ORDER BY n.PricePerUnit DESC;
 
 \benchmark loop 1.0 \name select_complex
-MATCH (c:Customer)-[:PLACES]->(o:Order)-[:CONTAINS]->(l:LineItem)<-[:OCCURS]-(p:Product) WHERE '{{call .RandDate }}' <= o.CreationDate <= "9999-12-31" RETURN c.CustomerId, c.Name, SUM(l.Quantity * p.UnitSize * p.PricePerUnit) as TotalOrderValue ORDER BY TotalOrderValue DESC
+MATCH (c:Customer)-[:PLACES]->(o:Order)-[:CONTAINS]->(l:LineItem)<-[:OCCURS]-(p:Product) WHERE '{{call .RandDate }}' <= o.CreationDate <= "9999-12-31" RETURN c.CustomerId, c.Name, SUM(l.Quantity * p.UnitSize * p.PricePerUnit) as TotalOrderValue ORDER BY TotalOrderValue DESC;
 
 
-// DROPS
-//\benchmark once \name clean
-//MATCH (n) DETACH DELETE n
+// CLEAN
+\benchmark once \name clean
+MATCH (n) DETACH DELETE n;
+Call db.clearQueryCaches();

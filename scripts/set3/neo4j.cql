@@ -9,7 +9,7 @@ CALL {MATCH (x:employee) WHERE x.employeeId <> {{.Iter}} RETURN x, rand() as ran
 
 // SELECT 1
 \benchmark loop 1.0 \name select_before_index
-MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub
+MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 
 // INDEX
 \benchmark once \name create_index
@@ -18,12 +18,13 @@ CREATE BTREE INDEX index_employeeId FOR (n:employee) ON (n.employeeId);
 
 // CACHE
 \benchmark once \name clear_cache
-Call db.clearQueryCaches()
+Call db.clearQueryCaches();
 
 // SELECT 1
 \benchmark loop 1.0 \name select_after_index
-MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub
+MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 
 // CLEAN
 \benchmark once \name clean
-MATCH (n) DETACH DELETE n
+MATCH (n) DETACH DELETE n;
+Call db.clearQueryCaches();

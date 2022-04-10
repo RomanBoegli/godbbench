@@ -37,6 +37,7 @@ MATCH (n:Product)<-[r:SUPPLIES]-(f:Supplier) WHERE f.SupplierId = {{.Iter}} RETU
 MATCH (c:Customer)-[:PLACES]->(o:Order)-[:CONTAINS]->(l:LineItem)<-[:OCCURS]-(p:Product) WHERE '{{call .RandDate }}' <= o.CreationDate <= "9999-12-31" RETURN c.CustomerId, c.Name, SUM(l.Quantity * p.UnitSize * p.PricePerUnit) as TotalOrderValue ORDER BY TotalOrderValue DESC
 
 
-// DROPS
-//\benchmark once \name clean
-//MATCH (n) DETACH DELETE n
+// CLEAN
+\benchmark once \name clean
+MATCH (n) DETACH DELETE n;
+Call db.clearQueryCaches();
