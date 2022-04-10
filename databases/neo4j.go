@@ -68,6 +68,7 @@ func (c *Neo4j) Cleanup(closeConnection bool) {
 	}
 }
 
+/*
 // Exec executes the given statement on the database.
 func (c *Neo4j) Exec(stmt string) {
 	session := c.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
@@ -82,8 +83,8 @@ func (c *Neo4j) Exec(stmt string) {
 		}
 	}
 }
+*/
 
-/*
 // Exec executes the given statement on the database using transactions.
 func (c *Neo4j) Exec(stmt string) {
 	session := c.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
@@ -106,4 +107,3 @@ func (c *Neo4j) Exec(stmt string) {
 	transaction.Commit()
 
 }
-*/
