@@ -60,7 +60,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 		line := strings.TrimSpace(scanner.Text())
 
 		// Skip comments and empty lines.
-		if strings.HasPrefix(line, "--") || strings.HasPrefix(line, "//") || line == "" {
+		if strings.HasPrefix(line, "--") || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "//") || line == "" {
 			continue
 		}
 
@@ -130,12 +130,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 		switch curBench.Type {
 		case TypeOnce:
 			// Once, append benchmark immediately.
-			curBench.Type = TypeOnce
-			curBench.Name = getName(curBench, loopStart, lineN)
-			curBench.Stmt = line
-			benchmarks = append(benchmarks, curBench)
-			// As long as there is no mode change, keep it TypeOnce, which is the non-default mode.
-			curBench = Benchmark{Type: TypeOnce}
+			curBench.Stmt += line + "\n"
 		case TypeLoop:
 			// Loop, but not finished yet, only append the line to the statement.
 			curBench.Stmt += line + "\n"
