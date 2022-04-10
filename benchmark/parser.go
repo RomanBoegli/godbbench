@@ -125,16 +125,8 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 
 		// Neither a '\benchmark' nor '\name' command line.
 		// Should be an SQL statement line.
-		// Append the line either as benchmark type once
-		// or append line for loop benchmark.
-		switch curBench.Type {
-		case TypeOnce:
-			// Once, append benchmark immediately.
-			curBench.Stmt += line + "\n"
-		case TypeLoop:
-			// Loop, but not finished yet, only append the line to the statement.
-			curBench.Stmt += line + "\n"
-		}
+		// Append the line either as benchmark type once or loop
+		curBench.Stmt += line + "\n"
 	}
 
 	// reached the end of the file, append remaining loop statements to benchmark
