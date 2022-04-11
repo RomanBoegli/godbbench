@@ -76,8 +76,6 @@ func main() {
 	defaultFlags.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Available subcommands:\n\tmysql | postgres | neo4j | mergecsv | createcharts\n")
 		fmt.Fprintf(os.Stderr, "\tUse 'subcommand --help' for all flags of the specified command.\n")
-		fmt.Fprintf(os.Stderr, "Generic flags for all subcommands:\n")
-		defaultFlags.PrintDefaults()
 	}
 
 	// No comamnd given. Print usage help and exit.
@@ -238,7 +236,13 @@ func main() {
 
 	// write results to csv
 	if *writecsv != "" {
-
+		path := filepath.Dir(*writecsv)
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			err := os.MkdirAll(path, os.ModePerm)
+			if err != nil {
+				log.Fatalln("failed to create folder", err)
+			}
+		}
 		f, err := os.Create(*writecsv)
 		if err != nil {
 			log.Fatalln("failed to open file", err)
