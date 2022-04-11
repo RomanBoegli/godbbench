@@ -20,7 +20,7 @@ style: |
 **Author:**&emsp;&emsp;&emsp; Roman Bögli
 **Supervisor:**&emsp;&nbsp; Prof. Stefan F. Keller
 **Stage:**&emsp;&emsp;&emsp;&nbsp;&nbsp; *interim*
-**Date:**&emsp;&emsp;&emsp;&emsp; April 6, 2023
+**Date:**&emsp;&emsp;&emsp;&emsp; April 14, 2023
 
 ![bg](./assets/OST.svg)
 
@@ -28,13 +28,11 @@ style: |
 
 # Content
 
-1. Relational DBMS
-2. Graph-Based DBMS
-3. Query Languages
-4. System Setup
-5. Command Line Interface
-6. Result Analysis
-7. Conclusion
+- Relational DBMS vs. Graph-Based DBMS
+- Tool `gobench`
+- Synthetic Script & Substitution
+- Automation
+- Result Analysis
 
 ----
 
@@ -91,6 +89,7 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 ----
 
 # System Setup
+
 - requirements:
   - [Docker](https://docs.docker.com/get-docker/)
   - [Go](https://go.dev/doc/install)
@@ -195,9 +194,16 @@ $ bash bashscript.sh
 
 ----
 
-![bg 95%](./assets/test.png)
-
+![bg 95% drop-shadow](./assets/showcase.gif)
 
 ----
 
-thanks!
+# Result Analysis
+
+- generating a `chart.html` file with various visualizations
+
+![drop-shadow](./assets/chart.png)
+
+----
+
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;thanks!
