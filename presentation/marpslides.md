@@ -101,19 +101,86 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 
 ----
 
-# Command Line Interface
-tbd
+# Command Line Interface (CLI)
+
+- open terminal and navigate to the location of `main.go`
+`$ cd ~/path/to/gobench/cmd`
+
+- interact with `go run main.go` to see flags
+
+![drop-shadow](./assets/gorunmaingoh.png)
 
 ----
 
-# Result Analysis
-tbd
+# Possilbe CLI Commands
+
+```ps
+# run synthetic INSERT and SELECT statements against MySQL, each 100x
+go run main.go mysql --host 127.0.0.1 --port 3306 --user "root" \
+        --pass "password" --iter 100 --run "inserts selects"
+```
+
+```ps
+# run statemets of custom script against Postgres, save results in file
+go run main.go postgres --host 127.0.0.1 --port 5432 --user "postgres" \
+        --pass "password" --iter 100 --script "./path/to/mysql.sql" \
+        --writecsv "./path/to/results/mysql.csv"
+```
+
+```ps
+# merge serveral result files
+go run main.go mergecsv \
+        --rootDir "~/path/with/csv-files/to-be-merged"
+        --targetFile "~/anypath/allresults.csv"
+```
+
+```ps
+# merge serveral result files
+go run main.go createcharts \
+        --dataFile "~/anypath/allresults.csv" --charttype "line"
+```
 
 ----
 
-# Conclusion
-tbd
+# Custom Script
 
+```SQL
+-- INIT
+\benchmark once \name initialize
+DROP SCHEMA IF EXISTS gobench CASCADE;
+CREATE SCHEMA gobench;
+CREATE TABLE gobench.Customer (CustomerId INT PRIMARY KEY, Name VARCHAR(10), ... );
+CREATE TABLE gobench.order (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, ... );
+
+-- INSERTS
+\benchmark loop 1.0 \name inserts
+INSERT INTO gobench.Customer (CustomerId, Name, Address, Birthday) 
+VALUES ( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandString 10 50 }}', '{{call .RandDate }}');
+
+INSERT INTO gobench.Order (OrderId, CustomerId, CreationDate, Comment) 
+VALUES( {{.Iter}}, (SELECT CustomerId FROM gobench.Customer ORDER BY RANDOM() LIMIT 1), 
+        '{{call .RandDate }}', '{{call .RandString 0 50 }}');
+
+-- SELECTS
+\benchmark loop 1.0 \name select_simple
+SELECT * FROM gobench.Customer WHERE CustomerId = {{.Iter}} 
+
+-- CLEAN
+\benchmark once \name clean
+DROP SCHEMA IF EXISTS gobench CASCADE;
+```
+
+----
+
+# Statement Substitutions
+
+Sequences of the following patterns will be substituted before the statement is executed:
+
+`{{.Iter}}` --> The iteration counter. Will return 1 when `\benchmark once`.
+`{{call .RandIntBetween 1 100}}` --> Random integer between `1` and `100`.
+`{{call .RandFloatBetween 0 1}}` --> Random float between `0` and `1`.
+`{{call .RandString 3 15}}` --> Random string with length between `3` and `15`.
+`{{call .RandDate}}` --> Random date.
 
 ----
 
