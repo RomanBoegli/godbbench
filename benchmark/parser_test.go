@@ -74,7 +74,7 @@ func TestParseScript(t *testing.T) {
 						`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 3", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 3-4", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
@@ -88,7 +88,7 @@ func TestParseScript(t *testing.T) {
 					`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 4-5", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
@@ -114,7 +114,7 @@ func TestParseScript(t *testing.T) {
 				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
+					{Name: "(once) line 4-5", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
 				},
 			},
 		},
@@ -168,8 +168,7 @@ func TestParseScript(t *testing.T) {
 				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 3", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
-					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 0.0, Stmt: "DELETE FROM ...;"},
+					{Name: "(once) line 3-5", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
 				},
 			},
 		},
@@ -216,9 +215,9 @@ func TestParseScript(t *testing.T) {
 				`,
 			expect: expect{
 				benchmarks: []Benchmark{
-					{Name: "(once) line 4", Type: TypeOnce, IterRatio: 1.0, Stmt: "CREATE TABLE ...;"},
+					{Name: "(once) line 4-6", Type: TypeOnce, IterRatio: 1.0, Stmt: "CREATE TABLE ...;"},
 					{Name: "(loop) line 8-11", Type: TypeLoop, IterRatio: 0.75, Stmt: "INSERT INTO ...;\nDELETE FROM ...;"},
-					{Name: "(once) line 13", Type: TypeOnce, IterRatio: 1.0, Stmt: "DROP TABLE ...;"},
+					{Name: "(once) line 13-14", Type: TypeOnce, IterRatio: 1.0, Stmt: "DROP TABLE ...;"},
 				},
 			},
 		},
@@ -260,10 +259,10 @@ func TestParseScript(t *testing.T) {
 		{
 			description: "once/set 2/3 names (B)",
 			in: `
-					\benchmark once 0.66 \name insert
+					\benchmark once \name insert
 					INSERT INTO ...;
 
-					\benchmark once
+					\benchmark loop 0.75 \name update
 					UPDATE ...;
 
 					\benchmark once \name delete
@@ -272,8 +271,8 @@ func TestParseScript(t *testing.T) {
 			expect: expect{
 				benchmarks: []Benchmark{
 					{Name: "(once) insert", Type: TypeOnce, IterRatio: 1.0, Stmt: "INSERT INTO ...;"},
-					{Name: "(once) line 6", Type: TypeOnce, IterRatio: 0.0, Stmt: "UPDATE ...;"},
-					{Name: "(once) delete", Type: TypeOnce, IterRatio: 0.0, Stmt: "DELETE ...;"},
+					{Name: "(loop) update", Type: TypeLoop, IterRatio: 0.75, Stmt: "UPDATE ...;"},
+					{Name: "(once) delete", Type: TypeOnce, IterRatio: 1.0, Stmt: "DELETE ...;"},
 				},
 			},
 		},

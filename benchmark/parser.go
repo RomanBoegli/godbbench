@@ -28,7 +28,7 @@ func getName(benchmark Benchmark, start, line int) string {
 		if benchmark.Name != "" {
 			return "(once) " + benchmark.Name
 		}
-		return fmt.Sprintf("(once) line %v", line)
+		return fmt.Sprintf("(once) line %v-%v", start, line-1)
 	}
 	return "" // shouldn't happen
 }
@@ -83,6 +83,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 					flushLoop()
 				}
 				curBench.Type = TypeOnce
+				loopStart = lineN + 1
 			case "loop":
 				flushLoop()
 				curBench.Type = TypeLoop
