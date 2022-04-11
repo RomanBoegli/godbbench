@@ -91,7 +91,13 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 ----
 
 # System Setup
-tbd
+- requirements:
+  - [Docker](https://docs.docker.com/get-docker/)
+  - [Go](https://go.dev/doc/install)
+  - [gobench](https://github.com/RomanBoegli/gobench)
+
+![bg fit 97% right:65%](./assets/systemlandscape.drawio.svg)
+
 
 ----
 
