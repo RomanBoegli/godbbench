@@ -3,20 +3,20 @@
 DROP DATABASE IF EXISTS gobench; 
 CREATE DATABASE gobench; 
 USE gobench;
-CREATE TABLE employee (
-	employeeId SERIAL PRIMARY KEY,
-	firstname varchar(50) NOT NULL,
-	boss_id INT NULL REFERENCES employee(employeeId),
-  salary INT NULL
-);
-INSERT INTO employee (firstname, boss_id, salary) VALUES ('BigBoss', null, 999999);
+START TRANSACTION;
+  CREATE TABLE employee (
+    employeeId SERIAL PRIMARY KEY,
+    firstname varchar(50) NOT NULL,
+    boss_id INT NULL REFERENCES employee(employeeId),
+    salary INT NULL
+  );
+  INSERT INTO employee (firstname, boss_id, salary) VALUES ('BigBoss', null, 999999);
+COMMIT;
 
 -- INSERT
 \benchmark loop 1.0 \name insert_employee
---CREATE TEMPORARY TABLE gobench.tmp SELECT employeeId FROM gobench.employee ORDER BY RAND() LIMIT 1;
 SET @fk := (SELECT employeeId FROM gobench.employee ORDER BY RAND() LIMIT 1);
 INSERT INTO gobench.employee (firstname, boss_id, salary) VALUES ('{{call .RandString 3 50 }}', @fk, {{call .RandIntBetween 10000 500000 }});
---DROP TEMPORARY TABLE gobench.tmp;
 
 -- SELECT 1
 \benchmark loop 1.0 \name select_before_index
@@ -35,6 +35,7 @@ SELECT * FROM hierarchy;
 \benchmark once \name create_index
 USE gobench;
 CREATE INDEX index_boss_id USING BTREE on gobench.employee (boss_id);
+
 
 -- CACHE
 \benchmark once \name clear_cache

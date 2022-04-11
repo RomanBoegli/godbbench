@@ -2,13 +2,15 @@
 \benchmark once \name initialize
 DROP SCHEMA IF EXISTS gobench CASCADE; 
 CREATE SCHEMA gobench;
-CREATE TABLE gobench.employee (	
-    employeeId SERIAL PRIMARY KEY,	
-    firstname varchar(50) NOT NULL,	
-    boss_id INT NULL, 
-    salary INT NULL, 
-    FOREIGN KEY (boss_id) REFERENCES gobench.employee (employeeId));
-INSERT INTO gobench.employee (firstname, boss_id, salary) VALUES ('BigBoss', null, 999999);
+BEGIN;
+    CREATE TABLE gobench.employee (	
+        employeeId SERIAL PRIMARY KEY,	
+        firstname varchar(50) NOT NULL,	
+        boss_id INT NULL, 
+        salary INT NULL, 
+        FOREIGN KEY (boss_id) REFERENCES gobench.employee (employeeId));
+    INSERT INTO gobench.employee (firstname, boss_id, salary) VALUES ('BigBoss', null, 999999);
+COMMIT;
 
 -- INSERT
 \benchmark loop 1.0 \name insert_employee
