@@ -3,7 +3,7 @@ MATCH (n) DETACH DELETE n;
 CREATE (n:employee {employeeId: 0, firstname: 'BigBoss', salary: 999999 });
 
 // INSERT
-\benchmark loop 1.0 \name insert_customer
+\benchmark loop 1.0 \name insert_employee
 CREATE (n:employee {employeeId: {{.Iter}}, firstname: '{{call .RandString 3 50 }}', salary: {{call .RandIntBetween 10000 500000 }} }); 
 CALL {MATCH (x:employee) WHERE x.employeeId <> {{.Iter}} RETURN x, rand() as randomsort ORDER BY randomsort DESC LIMIT 1} WITH x.employeeId as fk MATCH (a:employee), (b:employee) WHERE a.employeeId = fk AND b.employeeId = {{.Iter}} CREATE (a)-[r:BOSS_OF]->(b);
 
