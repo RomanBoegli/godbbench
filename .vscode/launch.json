@@ -105,6 +105,7 @@
             "program": "${workspaceFolder}/cmd/main.go",
             "args": ["createcharts"
                     , "--dataFile","${workspaceFolder}/tmp/results-${input:set}/merged.csv"
+                    , "--charttype","line"
             ],
             "internalConsole": true
         }
