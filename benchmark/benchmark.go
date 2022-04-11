@@ -1,7 +1,6 @@
 package benchmark
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"math/rand"
@@ -178,7 +177,6 @@ func buildStmt(t *template.Template, i int) string {
 		Iter             int
 		RandIntBetween   func(int, int) int
 		RandFloatBetween func(float64, float64) float64
-		RandId           func(string, string) string
 		Seed             func(int64)
 		RandInt63        func() int64
 		RandInt63n       func(int64) int64
@@ -192,7 +190,6 @@ func buildStmt(t *template.Template, i int) string {
 		Iter:             i,
 		RandIntBetween:   RandInt,
 		RandFloatBetween: RandFloat64Between,
-		RandId:           GetRandId,
 		Seed:             rand.Seed,
 		RandInt63:        rand.Int63,
 		RandInt63n:       rand.Int63n,
@@ -215,20 +212,6 @@ func RandInt(min int, max int) int {
 
 func RandFloat64Between(min float64, max float64) float64 {
 	return min + rand.Float64()*(max-min)
-}
-
-func GetRandId(entity string, language string) string {
-	switch strings.ToLower(language) {
-	case "mysql":
-		return fmt.Sprintf("(SELECT %sId FROM gobench.%s ORDER BY RAND() LIMIT 1)", entity, entity)
-	case "postgres":
-		return fmt.Sprintf("(SELECT %sId FROM gobench.%s ORDER BY RANDOM() LIMIT 1)", entity, entity)
-	case "cypher":
-		return fmt.Sprintf("(MATCH (x:%s) RETURN x.%sId, rand() as rand ORDER BY rand ASC LIMIT 1)", entity, entity)
-	default:
-		return "1"
-	}
-
 }
 
 func RandStringBytes(min int, max int) string {

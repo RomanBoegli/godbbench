@@ -14,7 +14,7 @@ CREATE TABLE gobench.LineItem (LineItemId INT PRIMARY KEY, OrderId INT NOT NULL,
 INSERT INTO gobench.Customer (CustomerId, Name, Address, Birthday) VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandString 10 50 }}', '{{call .RandDate }}');
 
 \benchmark loop 1.0 \name insert_order
-INSERT INTO gobench.Order (OrderId, CustomerId, CreationDate, Comment) VALUES( {{.Iter}}, {{call .RandId "Customer" "Postgres" }}, '{{call .RandDate }}', '{{call .RandString 0 50 }}');
+INSERT INTO gobench.Order (OrderId, CustomerId, CreationDate, Comment) VALUES( {{.Iter}}, (SELECT CustomerId FROM gobench.Customer ORDER BY RANDOM() LIMIT 1), '{{call .RandDate }}', '{{call .RandString 0 50 }}');
 
 \benchmark loop 0.25 \name insert_supplier
 INSERT INTO gobench.Supplier (SupplierId, Name, Address) VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandString 10 50 }}');
@@ -23,10 +23,10 @@ INSERT INTO gobench.Supplier (SupplierId, Name, Address) VALUES( {{.Iter}}, '{{c
 INSERT INTO gobench.Category (CategoryId, Name) VALUES( {{.Iter}}, '{{call .RandString 3 10 }}');
 
 \benchmark loop 0.5 \name insert_product
-INSERT INTO gobench.Product (ProductId, SupplierId, CategoryId, Code, Description, UnitSize, PricePerUnit) VALUES( {{.Iter}}, {{call .RandId "Supplier" "Postgres" }}, {{call .RandId "Category" "Postgres" }}, '{{call .RandString 5 6 }}', '{{call .RandString 0 100 }}', {{call .RandIntBetween 1 10 }}, {{call .RandFloatBetween 0.01 999999.99 }});
+INSERT INTO gobench.Product (ProductId, SupplierId, CategoryId, Code, Description, UnitSize, PricePerUnit) VALUES( {{.Iter}}, (SELECT SupplierId FROM gobench.Supplier ORDER BY RANDOM() LIMIT 1), (SELECT CategoryId FROM gobench.Category ORDER BY RANDOM() LIMIT 1), '{{call .RandString 5 6 }}', '{{call .RandString 0 100 }}', {{call .RandIntBetween 1 10 }}, {{call .RandFloatBetween 0.01 999999.99 }});
 
 \benchmark loop 1.0 \name insert_lineitem
-INSERT INTO gobench.LineItem (LineItemId, OrderId, ProductId, Quantity, DeliveryDate) VALUES( {{.Iter}}, {{call .RandId "Order" "Postgres" }}, {{call .RandId "Product" "Postgres" }}, {{call .RandIntBetween 1 5000 }}, '{{call .RandDate }}');
+INSERT INTO gobench.LineItem (LineItemId, OrderId, ProductId, Quantity, DeliveryDate) VALUES( {{.Iter}}, (SELECT OrderId FROM gobench.Order ORDER BY RANDOM() LIMIT 1), (SELECT ProductId FROM gobench.Product ORDER BY RANDOM() LIMIT 1), {{call .RandIntBetween 1 5000 }}, '{{call .RandDate }}');
 
 
 -- SELECTS
