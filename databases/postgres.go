@@ -76,13 +76,57 @@ func (p *Postgres) Cleanup(closeConnection bool) {
 
 // Exec executes the given statement on the database.
 func (p *Postgres) Exec(stmt string) {
+
+	isInTransaciton := false
 	singleStmts := strings.Split(stmt, ";")
+	execTrans := []string{}
+	for _, stmt := range singleStmts {
+
+		stmt = strings.TrimSpace(stmt)
+
+		if stmt == "BEGIN" {
+			isInTransaciton = true
+			continue
+		}
+		if stmt == "COMMIT" {
+			isInTransaciton = false
+			p.ExecTransaction(execTrans)
+			execTrans = []string{}
+			continue
+		}
+
+		if isInTransaciton {
+			execTrans = append(execTrans, stmt)
+		} else {
+			p.ExecStatement(stmt)
+		}
+	}
+}
+
+// Exec executes the given statement on the database.
+func (p *Postgres) ExecStatement(stmt string) {
+	if stmt != "" {
+		_, err := p.db.Exec(stmt)
+		if err != nil {
+			log.Printf("%v failed: %v", stmt, err)
+		}
+	}
+}
+
+// Exec executes the given statement on the database using transactions.
+func (p *Postgres) ExecTransaction(singleStmts []string) {
+	transaction, err := p.db.Begin()
+	if err != nil {
+		panic(err)
+	}
 	for _, stmt := range singleStmts {
 		if stmt != "" {
-			_, err := p.db.Exec(stmt)
-			if err != nil {
-				log.Printf("%v failed: %v", stmt, err)
+			if _, err := transaction.Exec(stmt); err != nil {
+				log.Fatalf("%v: failed(!): %v\n", stmt, err)
 			}
 		}
+	}
+	if err = transaction.Commit(); err != nil {
+		log.Fatalf("%v: failed(!): %v\n", transaction, err)
 	}
 }

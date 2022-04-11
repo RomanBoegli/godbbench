@@ -75,13 +75,59 @@ func (m *Mysql) Cleanup(closeConnection bool) {
 
 // Exec executes the given statement on the database.
 func (m *Mysql) Exec(stmt string) {
+
+	isInTransaciton := false
 	singleStmts := strings.Split(stmt, ";")
+	execTrans := []string{}
+	for _, stmt := range singleStmts {
+
+		stmt = strings.TrimSpace(stmt)
+
+		if stmt == "START TRANSACTION" {
+			isInTransaciton = true
+			continue
+		}
+		if stmt == "COMMIT" {
+			isInTransaciton = false
+			m.ExecTransaction(execTrans)
+			execTrans = []string{}
+			continue
+		}
+
+		if isInTransaciton {
+			execTrans = append(execTrans, stmt)
+		} else {
+			m.ExecStatement(stmt)
+		}
+	}
+}
+
+// Exec executes the given statement on the database.
+func (m *Mysql) ExecStatement(stmt string) {
+
+	if stmt != "" {
+		_, err := m.db.Exec(stmt)
+		if err != nil {
+			log.Printf("%v failed: %v", stmt, err)
+		}
+	}
+
+}
+
+// Exec executes the given statement on the database using transactions.
+func (m *Mysql) ExecTransaction(singleStmts []string) {
+	transaction, err := m.db.Begin()
+	if err != nil {
+		panic(err)
+	}
 	for _, stmt := range singleStmts {
 		if stmt != "" {
-			_, err := m.db.Exec(stmt)
-			if err != nil {
-				log.Printf("%v failed: %v", stmt, err)
+			if a, err := transaction.Exec(stmt); err != nil {
+				log.Fatalf("%v: failed(!): %v\n%v\n", stmt, err, a)
 			}
 		}
+	}
+	if err = transaction.Commit(); err != nil {
+		log.Fatalf("%v: failed(!): %v\n", transaction, err)
 	}
 }

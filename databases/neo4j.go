@@ -68,34 +68,55 @@ func (c *Neo4j) Cleanup(closeConnection bool) {
 	}
 }
 
-/*
 // Exec executes the given statement on the database.
-func (c *Neo4j) Exec(stmt string) {
-	session := c.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
-	defer session.Close()
+func (n *Neo4j) Exec(stmt string) {
 
+	isInTransaciton := false
 	singleStmts := strings.Split(stmt, ";")
+	execTrans := []string{}
 	for _, stmt := range singleStmts {
-		if stmt != "" {
-			if _, err := session.Run(stmt, nil); err != nil {
-				log.Fatalf("%v: failed(!): %v\n", stmt, err)
-			}
+
+		stmt = strings.TrimSpace(stmt)
+
+		if stmt == ":begin" {
+			isInTransaciton = true
+			continue
+		}
+		if stmt == ":commit" {
+			isInTransaciton = false
+			n.ExecTransaction(execTrans)
+			execTrans = []string{}
+			continue
+		}
+
+		if isInTransaciton {
+			execTrans = append(execTrans, stmt)
+		} else {
+			n.ExecStatement(stmt)
 		}
 	}
 }
-*/
+
+// Exec executes the given statement on the database.
+func (n *Neo4j) ExecStatement(stmt string) {
+	session := n.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer session.Close()
+	if stmt != "" {
+		if _, err := session.Run(stmt, nil); err != nil {
+			log.Fatalf("%v: failed(!): %v\n", stmt, err)
+		}
+	}
+}
 
 // Exec executes the given statement on the database using transactions.
-func (c *Neo4j) Exec(stmt string) {
-	session := c.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+func (n *Neo4j) ExecTransaction(singleStmts []string) {
+	session := n.driver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close()
-
 	transaction, err := session.BeginTransaction()
 	if err != nil {
 		panic(err)
 	}
 	defer transaction.Close()
-	singleStmts := strings.Split(stmt, ";")
 	for _, stmt := range singleStmts {
 		if stmt != "" {
 			if _, err := transaction.Run(stmt, nil); err != nil {
@@ -103,7 +124,5 @@ func (c *Neo4j) Exec(stmt string) {
 			}
 		}
 	}
-
 	transaction.Commit()
-
 }
