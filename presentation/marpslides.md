@@ -116,27 +116,27 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 
 ```ps
 # run synthetic INSERT and SELECT statements against MySQL, each 100x
-go run main.go mysql --host 127.0.0.1 --port 3306 --user "root" \
+$ go run main.go mysql --host 127.0.0.1 --port 3306 --user "root" \
         --pass "password" --iter 100 --run "inserts selects"
 ```
 
 ```ps
 # run statemets of custom script against Postgres, save results in file
-go run main.go postgres --host 127.0.0.1 --port 5432 --user "postgres" \
+$ go run main.go postgres --host 127.0.0.1 --port 5432 --user "postgres" \
         --pass "password" --iter 100 --script "./path/to/mysql.sql" \
         --writecsv "./path/to/results/mysql.csv"
 ```
 
 ```ps
 # merge serveral result files
-go run main.go mergecsv \
+$ go run main.go mergecsv \
         --rootDir "~/path/with/csv-files/to-be-merged"
         --targetFile "~/anypath/allresults.csv"
 ```
 
 ```ps
 # merge serveral result files
-go run main.go createcharts \
+$ go run main.go createcharts \
         --dataFile "~/anypath/allresults.csv" --charttype "line"
 ```
 
@@ -181,6 +181,22 @@ Sequences of the following patterns will be substituted before the statement is 
 `{{call .RandFloatBetween 0 1}}` --> Random float between `0` and `1`.
 `{{call .RandString 3 15}}` --> Random string with length between `3` and `15`.
 `{{call .RandDate}}` --> Random date.
+
+----
+
+# Bash Script Doing The Work
+
+```ps
+$ bash bashscript.sh
+```
+![drop-shadow width:700px](./assets/bashscript.png)
+
+>see showcase on next slide...
+
+----
+
+![bg 95%](./assets/test.png)
+
 
 ----
 
