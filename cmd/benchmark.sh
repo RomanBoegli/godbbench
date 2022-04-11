@@ -10,7 +10,7 @@ script_set="employees"
 
 # general
 db_host="127.0.0.1"
-MULTIPLICITIES=("10" "100" "1000" "10000")
+MULTIPLICITIES=("10" "20" "40" "80")
 threads=15
 gobench_main_path="/Users/rbo/Documents/Gits/gobench/cmd/main.go"
 script_base_path="/Users/rbo/Documents/Gits/gobench/scripts"
