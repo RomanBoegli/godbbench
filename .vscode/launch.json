@@ -7,20 +7,26 @@
         {
             "description": "set",
             "id": "set",
-            "options": ["set1", "set2", "set3"],
+            "options": ["employees", "merchant"],
             "type":"pickString"
         }, 
         {
             "description": "multiplicity",
             "id": "iter",
             "default": "100",
-            "options": ["100", "500", "1000", "10000", "100000"],
+            "options": ["100", "1000", "10000", "100000", "1000000"],
             "type":"pickString"
+        }, 
+        {
+            "description": "threads",
+            "id": "threads",
+            "default": "15",
+            "type":"promptString"
         }
       ],
     "configurations": [
         {
-            "name": "launch mysql",
+            "name": "mysql (script)",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -31,18 +37,30 @@
                     , "--user", "root"
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
-                    , "--threads", "15"
-                    //, "--run", "inserts selects updates"
-                    , "--nosetup"
-                    //, "--nocleanstart"
-                    , "--keep"
+                    , "--threads", "${input:threads}"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/mysql.sql"
                     , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_mysql_${input:iter}.csv"
                 ],
             "internalConsole": true
         },
         {
-            "name": "launch postgres",
+            "name": "mysql (synthetic)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/main.go",
+            "args": ["mysql"
+                    , "--host", "127.0.0.1"
+                    , "--port", "3306"
+                    , "--user", "root"
+                    , "--pass", "password"
+                    , "--iter", "${input:iter}"
+                    , "--threads", "${input:threads}"
+                ],
+            "internalConsole": true
+        },
+        {
+            "name": "postgres (script)",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -53,18 +71,30 @@
                     , "--user", "postgres"
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
-                    , "--threads", "15"
-                    //, "--run", "inserts selects updates"
-                    , "--nosetup"
-                    //, "--nocleanstart"
-                    , "--keep"
+                    , "--threads", "${input:threads}"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/postgres.sql"
                     , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_postgres_${input:iter}.csv"
                 ],
             "internalConsole": true
         },
         {
-            "name": "launch neo4j",
+            "name": "postgres (synthetic)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/main.go",
+            "args": ["postgres"
+                    , "--host", "127.0.0.1"
+                    , "--port", "5432"
+                    , "--user", "postgres"
+                    , "--pass", "password"
+                    , "--iter", "${input:iter}"
+                    , "--threads", "${input:threads}"
+                ],
+            "internalConsole": true 
+        },
+        {
+            "name": "neo4j (script)",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -75,13 +105,25 @@
                     , "--user", "neo4j"
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
-                    , "--threads", "15"
-                    //, "--run", "inserts selects updates"
-                    , "--nosetup"
-                    //, "--nocleanstart"
-                    , "--keep"
+                    , "--threads", "${input:threads}"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/neo4j.cql"
                     , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_neo4j_${input:iter}.csv"
+                ],
+            "internalConsole": true 
+        },
+        {
+            "name": "neo4j (synthetic)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/main.go",
+            "args": ["neo4j"
+                    , "--host", "127.0.0.1"
+                    , "--port", "7687"
+                    , "--user", "neo4j"
+                    , "--pass", "password"
+                    , "--iter", "${input:iter}"
+                    , "--threads", "${input:threads}"
                 ],
             "internalConsole": true 
         },
@@ -105,6 +147,7 @@
             "program": "${workspaceFolder}/cmd/main.go",
             "args": ["createcharts"
                     , "--dataFile","${workspaceFolder}/tmp/results-${input:set}/merged.csv"
+                    , "--charttype","line"
             ],
             "internalConsole": true
         }

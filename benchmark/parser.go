@@ -28,7 +28,7 @@ func getName(benchmark Benchmark, start, line int) string {
 		if benchmark.Name != "" {
 			return "(once) " + benchmark.Name
 		}
-		return fmt.Sprintf("(once) line %v", line)
+		return fmt.Sprintf("(once) line %v-%v", start, line-1)
 	}
 	return "" // shouldn't happen
 }
@@ -60,7 +60,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 		line := strings.TrimSpace(scanner.Text())
 
 		// Skip comments and empty lines.
-		if strings.HasPrefix(line, "--") || strings.HasPrefix(line, "//") || line == "" {
+		if strings.HasPrefix(line, "--") || strings.HasPrefix(line, "#") || strings.HasPrefix(line, "//") || line == "" {
 			continue
 		}
 
@@ -83,6 +83,7 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 					flushLoop()
 				}
 				curBench.Type = TypeOnce
+				loopStart = lineN + 1
 			case "loop":
 				flushLoop()
 				curBench.Type = TypeLoop
@@ -125,21 +126,8 @@ func ParseScript(r io.Reader) ([]Benchmark, error) {
 
 		// Neither a '\benchmark' nor '\name' command line.
 		// Should be an SQL statement line.
-		// Append the line either as benchmark type once
-		// or append line for loop benchmark.
-		switch curBench.Type {
-		case TypeOnce:
-			// Once, append benchmark immediately.
-			curBench.Type = TypeOnce
-			curBench.Name = getName(curBench, loopStart, lineN)
-			curBench.Stmt = line
-			benchmarks = append(benchmarks, curBench)
-			// As long as there is no mode change, keep it TypeOnce, which is the non-default mode.
-			curBench = Benchmark{Type: TypeOnce}
-		case TypeLoop:
-			// Loop, but not finished yet, only append the line to the statement.
-			curBench.Stmt += line + "\n"
-		}
+		// Append the line either as benchmark type once or loop
+		curBench.Stmt += line + "\n"
 	}
 
 	// reached the end of the file, append remaining loop statements to benchmark

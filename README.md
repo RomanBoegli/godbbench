@@ -81,17 +81,16 @@ With this relational data structure, the absence of informational redundancy is 
 
 With rising trends in amounts and connections of data, the classic relational database management systems seemed not to be the ideal choice. In the field of mathematics, graph theory was already established and algorithms to assess networks of connected nodes became more and more popular. The core business model of emerging companies such as Twitter or Facebook was and still is based on data that can be represented ideally as graphs. For instance, think of friendship relations among people as shown in the figure below. Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them. The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
-<p align="center"> <img src="./images/friendsgraph.svg" width="700"/> </p>
+<p align="center"> <img src="./presentation/assets/friendsgraph.svg" width="700"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
 
-Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [neo4j](https://neo4j.com/). Other than in relational DBMS, neo4j allows heterogenous sets of attribute on both nodes and relationships. This implies that there is also no database schema to be specified beforehand. One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database  [11]](#11).
+Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [neo4j](https://neo4j.com/). Other than in relational DBMS, neo4j allows heterogenous sets of attribute on both nodes and relationships. This implies that there is also no database schema to be specified beforehand. One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database [[11]](#11).
 
-  One of the most remarkable advantage is the application of graph algorithms as they are uniquely well suited to reveal and understand patterns in highly connected datasets. Possible real-world problems may include uncovering vulnerable components in a network, discovering unseen dependencies, identifying bottlenecks, revealing communities based on behavior patterns, or specifying the cheapest route through a network [[12]](#12).
-
+One of the most remarkable advantage is the application of graph algorithms as they are uniquely well suited to reveal and understand patterns in highly connected datasets. Possible real-world problems may include uncovering vulnerable components in a network, discovering unseen dependencies, identifying bottlenecks, revealing communities based on behavior patterns, or specifying the cheapest route through a network [[12]](#12).
 
 
 <!--
-<p align="center"> <img src="./images/merchandneo4j.png" /> </p>
+<p align="center"> <img src="./presentation/assets/merchandneo4j.png" /> </p>
 <h6 align="center">Merchand's Database Use Case in neo4j</h6>
 -->
 

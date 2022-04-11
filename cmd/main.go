@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -71,13 +70,12 @@ func main() {
 		// Flags to generate charts
 		createChartFlags = pflag.NewFlagSet("createcharts", pflag.ExitOnError)
 		dataFile         = createChartFlags.String("dataFile", "../tmp/merged.csv", "path to source data file, assumes headers")
+		charttype        = createChartFlags.String("charttype", "line", "default is 'line', alternative is 'bar'")
 	)
 
 	defaultFlags.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Available subcommands:\n\tmysql | postgres | neo4j | mergecsv | createcharts\n")
 		fmt.Fprintf(os.Stderr, "\tUse 'subcommand --help' for all flags of the specified command.\n")
-		fmt.Fprintf(os.Stderr, "Generic flags for all subcommands:\n")
-		defaultFlags.PrintDefaults()
 	}
 
 	// No comamnd given. Print usage help and exit.
@@ -123,7 +121,7 @@ func main() {
 		if err := createChartFlags.Parse(os.Args[2:]); err != nil {
 			log.Fatalf("failed to parse postgres flags: %v", err)
 		}
-		CreateCharts(*dataFile)
+		CreateCharts(*dataFile, *charttype)
 		os.Exit(0)
 	default:
 		if err := defaultFlags.Parse(os.Args[1:]); err != nil {
@@ -238,7 +236,13 @@ func main() {
 
 	// write results to csv
 	if *writecsv != "" {
-
+		path := filepath.Dir(*writecsv)
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			err := os.MkdirAll(path, os.ModePerm)
+			if err != nil {
+				log.Fatalln("failed to create folder", err)
+			}
+		}
 		f, err := os.Create(*writecsv)
 		if err != nil {
 			log.Fatalln("failed to open file", err)
@@ -326,7 +330,7 @@ func MergeKnownCsv(rootDir string, targetFile string) {
 	fmt.Printf("Result:  \t%v\n", targetFile)
 }
 
-func CreateCharts(dataFile string) {
+func CreateCharts(dataFile string, charttype string) {
 
 	csvfile, err := os.Open(dataFile)
 	if err != nil {
@@ -345,24 +349,25 @@ func CreateCharts(dataFile string) {
 
 	page := components.NewPage()
 
-	for c1, metric := range []string{"total (μs)", "avg (μs)", "ops/s", "μs/op"} {
-		for c2, mult := range mults {
-			bar := getBasicBarChart(fmt.Sprintf("Chart %v.%v", c1+1, c2), fmt.Sprintf("%v with %v iterations", metric, mult))
-			bar.SetXAxis(names)
+	for c1, name := range names {
+		for c2, metric := range []string{"avg (μs)", "ops/s", "μs/op"} {
+			chart := getBasicChart(fmt.Sprintf("Chart %v.%v: %v", c1+1, c2, name), "", "multiplicity", metric)
+			chart.SetXAxis(mults)
 			for _, system := range systems {
 				data := df.
 					Filter(dataframe.F{0, "system", "==", system}).
-					Filter(dataframe.F{1, "multiplicity", "==", mult}).
+					Filter(dataframe.F{1, "name", "==", name}).
 					Select([]string{metric}).Records()
 				if len(data) != 0 {
-					bar.AddSeries(system, generateBarItems(data))
+					chart.AddSeries(system, generateBarItems(data))
 				}
 			}
-			bar.SetSeriesOptions(
-				charts.WithBarChartOpts(opts.BarChart{Type: "bar", BarGap: "10%", BarCategoryGap: "30%", RoundCap: true}),
+			chart.SetSeriesOptions(
+				charts.WithBarChartOpts(opts.BarChart{Type: charttype, BarGap: "10%", BarCategoryGap: "30%", RoundCap: true}),
+				charts.WithLineChartOpts(opts.LineChart{Smooth: true}),
 				charts.WithLabelOpts(opts.Label{Show: true, Position: "top"}),
 			)
-			page.AddCharts(bar)
+			page.AddCharts(chart)
 		}
 	}
 
@@ -379,7 +384,7 @@ func CreateCharts(dataFile string) {
 	fmt.Printf("Charts created in: %v\n", html)
 }
 
-func getBasicBarChart(title string, subtitle string) *charts.Bar {
+func getBasicChart(title string, subtitle string, xAxisLabel string, yAxisLabel string) *charts.Bar {
 
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
@@ -394,57 +399,21 @@ func getBasicBarChart(title string, subtitle string) *charts.Bar {
 			DataView:    &opts.ToolBoxFeatureDataView{Show: true, Title: "Data", Lang: []string{"raw data", "go back", "refresh"}},
 			DataZoom:    &opts.ToolBoxFeatureDataZoom{Show: true},
 		}}),
-		//charts.WithDataZoomOpts(opts.DataZoom{Type: "slider", Start: 0, End: 100}),
+		charts.WithXAxisOpts(opts.XAxis{Name: xAxisLabel}),
+		charts.WithYAxisOpts(opts.YAxis{Name: yAxisLabel}),
+		charts.WithDataZoomOpts(opts.DataZoom{Type: "slider", Start: 0, End: 100}),
 	)
 
 	return bar
-}
-
-func barSample() *charts.Bar {
-
-	bar := charts.NewBar()
-	bar.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "900px", Height: "500px", Theme: "infographic"}),
-		charts.WithTitleOpts(opts.Title{Title: "Chart Title", Subtitle: "Any subtitle or description"}),
-		charts.WithLegendOpts(opts.Legend{Show: true, Y: "20"}),
-		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
-		charts.WithToolboxOpts(opts.Toolbox{Show: true, Right: "10%", Feature: &opts.ToolBoxFeature{
-			SaveAsImage: &opts.ToolBoxFeatureSaveAsImage{Show: true, Title: "Download", Type: "png"},
-			DataView:    &opts.ToolBoxFeatureDataView{Show: true, Title: "Data", Lang: []string{"raw data", "go back", "refresh"}},
-			DataZoom:    &opts.ToolBoxFeatureDataZoom{Show: true},
-		}}),
-		//charts.WithDataZoomOpts(opts.DataZoom{Type: "slider", Start: 0, End: 100}),
-	)
-	bar.SetXAxis([]string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}).
-		AddSeries("mysql", generateRandomBarItems()).
-		AddSeries("postgres", generateRandomBarItems()).
-		AddSeries("neo4j", generateRandomBarItems()).
-		SetSeriesOptions(
-			charts.WithBarChartOpts(opts.BarChart{Type: "bar", BarGap: "10%", BarCategoryGap: "30%", RoundCap: true}),
-			charts.WithLabelOpts(opts.Label{Show: true, Position: "top"}),
-		)
-
-	return bar
-}
-
-// generate random data for bar chart
-func generateRandomBarItems() []opts.BarData {
-	items := make([]opts.BarData, 0)
-	for i := 0; i < 7; i++ {
-		items = append(items, opts.BarData{Value: rand.Intn(30000)})
-	}
-	return items
 }
 
 func generateBarItems(table [][]string) []opts.BarData {
 	items := make([]opts.BarData, 0)
-
 	for _, a := range table[1:] {
 		for _, b := range a {
 			items = append(items, opts.BarData{Name: a[0], Value: b})
 		}
 	}
-
 	return items
 }
 
