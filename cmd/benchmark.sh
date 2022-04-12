@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This script assumes the docker containers are already up and running.
+# All paths should be indicated relatively to this file.
 
 ####################
 #### VARIABLES #####
@@ -10,11 +11,11 @@ script_set="employees"
 
 # general
 db_host="127.0.0.1"
-MULTIPLICITIES=("10" "20" "40" "80")
+MULTIPLICITIES=("10" "100" "1000" "10000")
 threads=15
-gobench_main_path="/Users/rbo/Documents/Gits/gobench/cmd/main.go"
-script_base_path="/Users/rbo/Documents/Gits/gobench/scripts"
-result_base_path="/Users/rbo/Documents/Gits/gobench/tmp/results"
+gobench_main_path="./main.go"
+script_base_path="../scripts"
+result_base_path="../tmp/results"
 chart_type="line"
 
 # mysql
