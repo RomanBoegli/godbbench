@@ -23,8 +23,8 @@ style: |
 ---
 <!-- _class: custom1 -->
 
-# Performance Analysis of MySQL, Neo4j, and Postgres
-###### Performance Analysis of MySQL, Neo4j, and Postgres using Different Data Scenarios
+# Automated Database Benchmarking Tool
+###### Performance Analysis of MySQL, Neo4j, and PostgreSQL using Different Data Scenarios
 ###
 
 **Institute:**&emsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eastern Switzerland University of Applied Science
