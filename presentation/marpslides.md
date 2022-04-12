@@ -56,7 +56,10 @@ style: |
 
 - Tables are entities
 - Relationships using keys
-- Homogenous data <br>through schema
+- Homogenous data 
+through schema
+- Ideal for **predefinable** & **rigid** 
+data use cases
 
 ![bg fit right:50%](./assets/ERD.svg)
 
@@ -67,10 +70,15 @@ style: |
 # Graph-Based DBMS
 
 - Attributed nodes and edges
-- Relationships are first class elements
-- Heterogenous data <br>(schema-less)
+- Relationships are 
+first-class citizen
+- Heterogenous data 
+(schema-less)
+- Ideal for **alternating** &  
+**highly connected** 
+data use cases
 
-![bg fit right:50%](./assets/friendsgraph.svg)
+![bg 105% right:54%](./assets/friendsgraph.svg)
 
 
 ----
@@ -156,39 +164,14 @@ $ go run main.go createcharts \
 
 ----
 
-# Custom Script (`merchant`)
-
-```SQL
--- INIT
-\benchmark once \name initialize
-DROP SCHEMA IF EXISTS gobench CASCADE;
-CREATE SCHEMA gobench;
-CREATE TABLE gobench.Customer (CustomerId INT PRIMARY KEY, Name VARCHAR(10), ... );
-CREATE TABLE gobench.order (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, ... );
-
--- INSERTS
-\benchmark loop 1.0 \name inserts
-INSERT INTO gobench.Customer (CustomerId, Name, Birthday) 
-VALUES ( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandDate }}');
-
-INSERT INTO gobench.Order (OrderId, CustomerId, CreationDate, Comment) 
-VALUES( {{.Iter}}, (SELECT CustomerId FROM gobench.Customer ORDER BY RANDOM() LIMIT 1), 
-        '{{call .RandDate }}', '{{call .RandString 0 50 }}');
-
--- SELECTS
-\benchmark loop 1.0 \name select_simple
-SELECT * FROM gobench.Customer WHERE CustomerId = {{.Iter}} 
-
--- CLEAN
-\benchmark once \name clean
-DROP SCHEMA IF EXISTS gobench CASCADE;
-```
-
-----
-
 # Statement Substitutions
 
-Sequences of the following patterns will be substituted before the statement is executed:
+```SQL
+INSERT INTO Customer (Id, Name, Birthday) 
+VALUES ( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandDate }}');
+```
+
+Following expressions will be substituted before the statement is executed:
 
 `{{.Iter}}` --> The iteration counter. Will return 1 when `\benchmark once`.
 `{{call .RandIntBetween 1 100}}` --> Random integer between `1` and `100`.
@@ -198,6 +181,53 @@ Sequences of the following patterns will be substituted before the statement is 
 
 ----
 
+# Custom Script (`merchant`)
+
+```SQL
+-- INIT (illustration purposes)
+\benchmark once \name initialize
+DROP SCHEMA IF EXISTS gobench CASCADE; CREATE SCHEMA gobench;
+CREATE TABLE gobench.order (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, ... );
+
+-- INSERTS (illustration purposes)
+\benchmark loop 1.0 \name inserts
+INSERT INTO gobench.Order (OrderId, CustomerId, CreationDate, Comment) 
+VALUES( {{.Iter}}, (SELECT CustomerId FROM gobench.Customer ORDER BY RANDOM() LIMIT 1), 
+        '{{call .RandDate }}', '{{call .RandString 0 50 }}');
+
+-- SELECTS
+\benchmark loop 1.0 \name select_simple
+SELECT * FROM gobench.Customer WHERE CustomerId = {{.Iter}} 
+
+\benchmark loop 1.0 \name select_medium
+SELECT * FROM gobench.Product p JOIN gobench.Supplier s ON ...
+  
+\benchmark loop 1.0 \name select_complex
+SELECT c.CustomerId, c.Name, SUM(li.Quantity * p.UnitSize * p.PricePerUnit) as  ...
+
+-- CLEAN (illustration purposes)
+\benchmark once \name clean
+DROP SCHEMA IF EXISTS gobench CASCADE;
+```
+
+
+----
+
+![bg fit](./assets/ERD.svg)
+
+----
+
+
+![drop-shadow](./assets/merchandneo4j.png)
+
+**Attention:** 
+Relational data schemas should not directly be mapped into a graph-world. 
+Relationships in graph-based DBs are first-class citizen that can hold information by itself.
+ 
+
+----
+
+
 # Custom Script (`employees`)
 
 Show all subordinates of an employee (tree queries)
@@ -206,20 +236,18 @@ Show all subordinates of an employee (tree queries)
 -- use WITH RECURISON notation in Postgres (similar in MySQL)
 WITH RECURSIVE hierarchy AS (
     SELECT employeeId, firstname, boss_id, 0 AS level 
-    FROM gobench.employee 
+    FROM employee 
     WHERE employeeId = {{.Iter}}
   UNION ALL 
     SELECT e.employeeId, e.firstname, e.boss_id, hierarchy.level + 1 AS level 
-    FROM gobench.employee e JOIN hierarchy ON e.boss_id = hierarchy.employeeId 
-) 
-SELECT * FROM hierarchy;
+    FROM employee e JOIN hierarchy ON e.boss_id = hierarchy.employeeId 
+) SELECT * FROM hierarchy;
+INSERT INTO employee (firstname, boss_id, salary) VALUES ('BigBoss', null, 999999);
 
 -- simpler query using Cypher
 MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 ```
-
 ####
-
 > see example graph on next slide ...
 
 ----
@@ -227,19 +255,19 @@ MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 ![bg 95% drop-shadow](./assets/employeesgraph.svg)
 
 ----
+<!-- backgroundColor: #60AAF2 -->
 
-# Custom Script (`friends`)
+# Custom Script Idea: `friends`
 
 Show the shortest acquaintance path of two people (cyclic graph queries)
 
-##
+*Would be cool to find a data scenario where Neo4j outperforms the others ...*
 
-```golang
-*************************************************************************
-************************** `WORK IN PROGRESS` ***************************
-*************************************************************************
-```
+
+
 ----
+
+<!-- backgroundColor: white -->
 
 # Automation
 
@@ -279,11 +307,16 @@ Generating a `chart.html` file to visualize
 <!-- footer: ""  -->
 
 # Open Work
+
 ##
 
 CLI Tool | Custom Scripts | Writing
 :--------|:---------------|:-------
-✅ Benchmarking<br>✅ Result consolidation<br>✅ Chart generation <br>  <br><br>| ✅ `merchant` <br> ✅ `employees`<br>⭕️ `friends` <br><br><br>| ✅ Abstract <br>✅ Intro <br>⭕️ System specs & setup <br>⭕️ Benchmarking approaches <br> ⭕️ Result analysis & conclusion
+✅ Benchmarking<br>✅ Result consolidation<br>✅ Chart generation <br> 🔷 Docker automatization  <br><br>| ✅ `merchant` <br> ✅ `employees`<br>🔷 `friends` <br><br><br>| ✅ Abstract <br>✅ Intro <br>⭕️ System documentation <br>⭕️ Benchmarking approaches <br> ⭕️ Result analysis & conclusion
+
+##
+
+###### Legend: &emsp;✅ done, &emsp; ⭕️ todo, &emsp; 🔷 optional
 
 
 ----
