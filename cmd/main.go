@@ -388,7 +388,7 @@ func getBasicChart(title string, subtitle string, xAxisLabel string, yAxisLabel 
 
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1300px", Height: "500px"}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1100px", Height: "450px"}),
 		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle}),
 		charts.WithLegendOpts(opts.Legend{Show: true, Y: "30", SelectedMode: "multiple", ItemWidth: 20}),
 		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#318BFF", "#23B12A"}),

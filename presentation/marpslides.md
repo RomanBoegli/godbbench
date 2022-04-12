@@ -8,11 +8,24 @@ style: |
   section::after {
     /* Layout of pagination content */
     font-size: medium
+    }   
+    section.custom1 h1 {
+       text-align: left;
+       padding-top:65px;
+       margin-bottom:-20px;
+    }
+    section.lead h1 {
+       text-align: center;
+    }
+    section.custom ul {
+       font-size: 22px;
     }
 ---
+<!-- _class: custom1 -->
 
-# Command Line Interface Tool for Automatized Database Benchmarks
-##
+# Automated Database Benchmarking Tool
+###### Performance Analysis of MySQL, Neo4j, and PostgreSQL using Different Data Scenarios
+###
 
 **Institute:**&emsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eastern Switzerland University of Applied Science
 **Program:**&emsp;&emsp;&nbsp; MSc Computer Science
@@ -20,7 +33,7 @@ style: |
 **Author:**&emsp;&emsp;&emsp; Roman Bögli
 **Supervisor:**&emsp;&nbsp; Prof. Stefan F. Keller
 **Stage:**&emsp;&emsp;&emsp;&nbsp;&nbsp; *interim*
-**Date:**&emsp;&emsp;&emsp;&emsp; April 14, 2023
+**Date:**&emsp;&emsp;&emsp;&emsp; 14. April 2023
 
 ![bg](./assets/OST.svg)
 
@@ -31,17 +44,19 @@ style: |
 - Relational DBMS vs. Graph-Based DBMS
 - Tool `gobench`
 - Synthetic Script & Substitution
+- Custom Scripts (`merchant`, `employees`, `friends`)
 - Automation
 - Result Analysis
+- Open Work
 
 ----
 
 
 # Relational DBMS
 
-- tables are entities
-- relationships using keys
-- homogenous data through schema
+- Tables are entities
+- Relationships using keys
+- Homogenous data <br>through schema
 
 ![bg fit right:50%](./assets/ERD.svg)
 
@@ -51,9 +66,9 @@ style: |
 
 # Graph-Based DBMS
 
-- attributed nodes and edges
-- relationships are first class elements
-- heterogenous data (schema-less)
+- Attributed nodes and edges
+- Relationships are first class elements
+- Heterogenous data <br>(schema-less)
 
 ![bg fit right:50%](./assets/friendsgraph.svg)
 
@@ -90,7 +105,7 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 
 # System Setup
 
-- requirements:
+- Requirements:
   - [Docker](https://docs.docker.com/get-docker/)
   - [Go](https://go.dev/doc/install)
   - [gobench](https://github.com/RomanBoegli/gobench)
@@ -102,10 +117,10 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 
 # Command Line Interface (CLI)
 
-- open terminal and navigate to the location of `main.go`
+- Open terminal and navigate to the location of `main.go`
 `$ cd ~/path/to/gobench/cmd`
 
-- interact with `go run main.go` to see flags
+- Interact with `go run main.go` to see flags
 
 ![drop-shadow](./assets/gorunmaingoh.png)
 
@@ -134,14 +149,14 @@ $ go run main.go mergecsv \
 ```
 
 ```ps
-# merge serveral result files
+# visualize the benchmarking results
 $ go run main.go createcharts \
         --dataFile "~/anypath/allresults.csv" --charttype "line"
 ```
 
 ----
 
-# Custom Script
+# Custom Script (`merchant`)
 
 ```SQL
 -- INIT
@@ -153,8 +168,8 @@ CREATE TABLE gobench.order (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, ..
 
 -- INSERTS
 \benchmark loop 1.0 \name inserts
-INSERT INTO gobench.Customer (CustomerId, Name, Address, Birthday) 
-VALUES ( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandString 10 50 }}', '{{call .RandDate }}');
+INSERT INTO gobench.Customer (CustomerId, Name, Birthday) 
+VALUES ( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandDate }}');
 
 INSERT INTO gobench.Order (OrderId, CustomerId, CreationDate, Comment) 
 VALUES( {{.Iter}}, (SELECT CustomerId FROM gobench.Customer ORDER BY RANDOM() LIMIT 1), 
@@ -183,14 +198,57 @@ Sequences of the following patterns will be substituted before the statement is 
 
 ----
 
-# Bash Script Doing The Work
+# Custom Script (`employees`)
+
+Show all subordinates of an employee (tree queries)
+
+```SQL
+-- use WITH RECURISON notation in Postgres (similar in MySQL)
+WITH RECURSIVE hierarchy AS (
+    SELECT employeeId, firstname, boss_id, 0 AS level 
+    FROM gobench.employee 
+    WHERE employeeId = {{.Iter}}
+  UNION ALL 
+    SELECT e.employeeId, e.firstname, e.boss_id, hierarchy.level + 1 AS level 
+    FROM gobench.employee e JOIN hierarchy ON e.boss_id = hierarchy.employeeId 
+) 
+SELECT * FROM hierarchy;
+
+-- simpler query using Cypher
+MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
+```
+
+####
+
+> see example graph on next slide ...
+
+----
+
+![bg 95% drop-shadow](./assets/employeesgraph.svg)
+
+----
+
+# Custom Script (`friends`)
+
+Show the shortest acquaintance path of two people (cyclic graph queries)
+
+##
+
+```golang
+*************************************************************************
+************************** `WORK IN PROGRESS` ***************************
+*************************************************************************
+```
+----
+
+# Automation
 
 ```ps
 $ bash bashscript.sh
 ```
 ![drop-shadow width:700px](./assets/bashscript.png)
 
->see showcase on next slide...
+>see demo on next slide...
 
 ----
 
@@ -199,11 +257,48 @@ $ bash bashscript.sh
 ----
 
 # Result Analysis
+<!-- footer: 1 second (s) = 1'000'0000 microseconds (μs)  -->
+Generating a `chart.html` file to visualize
+- average amount of microseconds (`μs`) per benchmark (the lower the better)
+- operations per second (the higher the better)
+- microseconds per operation (the lower the better) 
 
-- generating a `chart.html` file with various visualizations
 
-![drop-shadow](./assets/chart.png)
+![drop-shadow width:700px](./assets/charts.png)
 
 ----
 
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;thanks!
+![bg 95% ](./assets/chartbar.png)
+
+----
+
+![bg 95% ](./assets/chartline.png)
+
+----
+
+<!-- footer: ""  -->
+
+# Open Work
+##
+
+CLI Tool | Custom Scripts | Writing
+:--------|:---------------|:-------
+✅ Benchmarking<br>✅ Result consolidation<br>✅ Chart generation <br>  <br><br>| ✅ `merchant` <br> ✅ `employees`<br>⭕️ `friends` <br><br><br>| ✅ Abstract <br>✅ Intro <br>⭕️ System specs & setup <br>⭕️ Benchmarking approaches <br> ⭕️ Result analysis & conclusion
+
+
+----
+# References
+<!-- _class: custom -->
+
+- Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
+- Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-642-59412-0_16
+- Elmasri, R., & Navathe, S. (2011). Fundamentals of Database Systems (6th ed). Addison-Wesley.
+- Gregg, B. (2020). Systems Performance: Enterprise and the Cloud (Second). Addison-Wesley.
+- Needham, M., & Hodler, A. E. (2019). Graph Algorithms: Practical Examples in Apache Spark and Neo4j (First edition). O’Reilly Media.
+- Peixoto, T. P. (n.d.). What is graph-tool? Graph-Tool. Retrieved 20 March 2022, from https://graph-tool.skewed.de/
+- Robinson, I., Webber, J., & Eifrem, E. (2015). Graph Databases: New Opportunities for Connected Data.
+- Stopford, B. (2012, August 17). Thinking in Graphs: Neo4J. http://www.benstopford.com/2012/08/17/thinking-in-graphs-neo4j/
+
+----
+<!-- _class: lead -->
+# Thanks

@@ -14,7 +14,7 @@
             "description": "multiplicity",
             "id": "iter",
             "default": "100",
-            "options": ["100", "1000", "10000", "100000", "1000000"],
+            "options": ["10", "100", "1000", "10000", "100000", "1000000"],
             "type":"pickString"
         }, 
         {
@@ -38,6 +38,7 @@
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
                     , "--threads", "${input:threads}"
+                    , "--keep", "true"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/mysql.sql"
                     , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_mysql_${input:iter}.csv"
                 ],
@@ -72,6 +73,7 @@
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
                     , "--threads", "${input:threads}"
+                    , "--keep", "true"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/postgres.sql"
                     , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_postgres_${input:iter}.csv"
                 ],
@@ -106,6 +108,7 @@
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
                     , "--threads", "${input:threads}"
+                    , "--keep", "true"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/neo4j.cql"
                     , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_neo4j_${input:iter}.csv"
                 ],
@@ -134,8 +137,8 @@
             "mode": "debug",
             "program": "${workspaceFolder}/cmd/main.go",
             "args": ["mergecsv"
-                    , "--rootDir","${workspaceFolder}/tmp/results-${input:set}/"
-                    , "--targetFile","${workspaceFolder}/tmp/results-${input:set}/merged.csv"
+                    , "--rootDir","${workspaceFolder}/tmp/results/${input:set}/"
+                    , "--targetFile","${workspaceFolder}/tmp/results/${input:set}/merged.csv"
                 ],
             "internalConsole": true
         },
@@ -146,8 +149,8 @@
             "mode": "debug",
             "program": "${workspaceFolder}/cmd/main.go",
             "args": ["createcharts"
-                    , "--dataFile","${workspaceFolder}/tmp/results-${input:set}/merged.csv"
-                    , "--charttype","line"
+                    , "--dataFile","${workspaceFolder}/tmp/results/${input:set}/merged.csv"
+                    , "--charttype","bar"
             ],
             "internalConsole": true
         }
