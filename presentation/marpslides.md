@@ -125,10 +125,10 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 
 # Command Line Interface (CLI)
 
-- Open terminal and navigate to the location of `main.go`
+- Open terminal and navigate to the location of `godbbench.go`
 `$ cd ~/path/to/gobench/cmd`
 
-- Interact with `go run main.go` to see flags
+- Interact with `go run godbbench.go` to see flags
 
 ![drop-shadow](./assets/gorunmaingoh.png)
 
@@ -138,27 +138,27 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 
 ```ps
 # run synthetic INSERT and SELECT statements against MySQL, each 100x
-$ go run main.go mysql --host 127.0.0.1 --port 3306 --user "root" \
+$ go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user "root" \
         --pass "password" --iter 100 --run "inserts selects"
 ```
 
 ```ps
 # run statemets of custom script against Postgres, save results in file
-$ go run main.go postgres --host 127.0.0.1 --port 5432 --user "postgres" \
+$ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user "postgres" \
         --pass "password" --iter 100 --script "./path/to/mysql.sql" \
         --writecsv "./path/to/results/mysql.csv"
 ```
 
 ```ps
 # merge serveral result files
-$ go run main.go mergecsv \
+$ go run godbbench.go mergecsv \
         --rootDir "~/path/with/csv-files/to-be-merged"
         --targetFile "~/anypath/allresults.csv"
 ```
 
 ```ps
 # visualize the benchmarking results
-$ go run main.go createcharts \
+$ go run godbbench.go createcharts \
         --dataFile "~/anypath/allresults.csv" --charttype "line"
 ```
 
