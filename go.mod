@@ -1,4 +1,4 @@
-module github.com/RomanBoegli/gobench
+module github.com/RomanBoegli/godbbench
 
 go 1.14
 

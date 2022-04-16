@@ -123,20 +123,28 @@ Docker allows the most lightweight and easiest database setup. Just download Doc
 
 ```console
 # start mysql (user=root, password=password, db=localhost:3306)
-docker run --name gobench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql
+docker run --name godbbench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql
 
 # start postgres (user=postgres, password=password, db=localhost:5432)
-docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres
+docker run --name godbbench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres
 
 # start neo4j (user=neo4j, password=password, db=localhost:7687, browser=localhost:7474)
+docker run --name godbbench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
+```
+
+For the sake of ease, concatenate the three commands above to one single command using `&&`. The backslashes (`\`) allow line breaks.
+
+```console
+docker run --name gobench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql && \
+docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres && \
 docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
 ```
+
 
 To remove all containers and the associated volumes again, use the following two commands.
 
 ```console
-docker rm -f $(docker ps -a -q)
-docker volume rm $(docker volume ls -q)
+docker rm -f $(docker ps -a -q) && docker volume rm $(docker volume ls -q)
 ```
 
 ### Command Line Interface

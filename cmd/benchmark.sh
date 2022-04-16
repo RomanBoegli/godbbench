@@ -13,7 +13,7 @@ script_set="employees"
 db_host="127.0.0.1"
 MULTIPLICITIES=("10" "100" "1000" "10000")
 threads=15
-gobench_main_path="./main.go"
+godbbench_main_path="./main.go"
 script_base_path="../scripts"
 result_base_path="../tmp/results"
 chart_type="line"
@@ -45,7 +45,7 @@ for MULT in "${MULTIPLICITIES[@]}"; do
     echo -e "\nITERATIONS: ${MULT}"
     
     echo -e "\nTEST MYSQL"
-    go run $gobench_main_path mysql \
+    go run $godbbench_main_path mysql \
         --host $db_host \
         --port $mysql_port \
         --user $mysql_user \
@@ -56,7 +56,7 @@ for MULT in "${MULTIPLICITIES[@]}"; do
         --writecsv "${result_base_path}/${script_set}/mysql_${MULT}.csv"
 
     echo -e "\nTEST NEO4J"
-    go run $gobench_main_path neo4j \
+    go run $godbbench_main_path neo4j \
         --host $db_host \
         --port $neo_port \
         --user $neo_user \
@@ -67,7 +67,7 @@ for MULT in "${MULTIPLICITIES[@]}"; do
         --writecsv "${result_base_path}/${script_set}/neo4j_${MULT}.csv"
 
     echo -e "\nTEST POSTGRES"
-    go run $gobench_main_path postgres \
+    go run $godbbench_main_path postgres \
         --host $db_host \
         --port $postgres_port \
         --user $postgres_user \
@@ -82,12 +82,12 @@ echo -e "\n"
 echo $(for i in $(seq 1 50); do printf "#"; done) 
 
 echo -e "\nMERGE RESULTS"
-go run $gobench_main_path mergecsv \
+go run $godbbench_main_path mergecsv \
     --rootDir "${result_base_path}/${script_set}" \
     --targetFile "${result_base_path}/${script_set}/merged_results.csv" 
 
 echo -e "\nCREATE CHARTS"
-go run $gobench_main_path createcharts \
+go run $godbbench_main_path createcharts \
     --dataFile "${result_base_path}/${script_set}/merged_results.csv" \
     --charttype $chart_type
 

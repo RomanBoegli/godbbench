@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RomanBoegli/gobench/benchmark"
-	"github.com/RomanBoegli/gobench/databases"
+	"github.com/RomanBoegli/godbbench/benchmark"
+	"github.com/RomanBoegli/godbbench/databases"
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"

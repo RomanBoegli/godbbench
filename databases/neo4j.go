@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/RomanBoegli/gobench/benchmark"
+	"github.com/RomanBoegli/godbbench/benchmark"
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 )
 
