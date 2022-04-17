@@ -47,6 +47,7 @@ th { display:none;}
 ![bg](./assets/OST.svg)
 
 ---
+<!-- footer: ""  -->
 
 # Content
 
