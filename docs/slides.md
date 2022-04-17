@@ -24,7 +24,7 @@ style: |
 <!-- _class: custom1 -->
 
 # Automated Database Benchmarking Tool
-###### Performance Analysis of MySQL, Neo4j, and PostgreSQL using Different Data Scenarios
+###### Performance Analysis of MySQL, PostgreSQL and Neo4j using Different Data Scenarios
 ###
 
 **Institute:**&emsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eastern Switzerland University of Applied Science
@@ -42,9 +42,9 @@ style: |
 # Content
 
 - Relational DBMS vs. Graph-Based DBMS
-- Tool `gobench`
+- Tool `godbbench`
 - Synthetic Script & Substitution
-- Custom Scripts (`merchant`, `employees`, `friends`)
+- Custom Scripts (`merchant`, `employees`)
 - Automation
 - Result Analysis
 - Open Work
@@ -116,7 +116,7 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 - Requirements:
   - [Docker](https://docs.docker.com/get-docker/)
   - [Go](https://go.dev/doc/install)
-  - [gobench](https://github.com/RomanBoegli/gobench)
+  - [godbbench](https://github.com/RomanBoegli/godbbench)
 
 ![bg fit 97% right:65%](./assets/systemlandscape.drawio.svg)
 
@@ -126,7 +126,7 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 # Command Line Interface (CLI)
 
 - Open terminal and navigate to the location of `godbbench.go`
-`$ cd ~/path/to/gobench/cmd`
+`$ cd ~/path/to/godbbench/cmd`
 
 - Interact with `go run godbbench.go` to see flags
 
@@ -186,28 +186,28 @@ Following expressions will be substituted before the statement is executed:
 ```SQL
 -- INIT (illustration purposes)
 \benchmark once \name initialize
-DROP SCHEMA IF EXISTS gobench CASCADE; CREATE SCHEMA gobench;
-CREATE TABLE gobench.order (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, ... );
+DROP SCHEMA IF EXISTS godbbench CASCADE; CREATE SCHEMA godbbench;
+CREATE TABLE godbbench.order (OrderId INT PRIMARY KEY, CustomerId INT NOT NULL, ... );
 
 -- INSERTS (illustration purposes)
 \benchmark loop 1.0 \name inserts
-INSERT INTO gobench.Order (OrderId, CustomerId, CreationDate, Comment) 
-VALUES( {{.Iter}}, (SELECT CustomerId FROM gobench.Customer ORDER BY RANDOM() LIMIT 1), 
+INSERT INTO godbbench.Order (OrderId, CustomerId, CreationDate, Comment) 
+VALUES( {{.Iter}}, (SELECT CustomerId FROM godbbench.Customer ORDER BY RANDOM() LIMIT 1), 
         '{{call .RandDate }}', '{{call .RandString 0 50 }}');
 
 -- SELECTS
 \benchmark loop 1.0 \name select_simple
-SELECT * FROM gobench.Customer WHERE CustomerId = {{.Iter}} 
+SELECT * FROM godbbench.Customer WHERE CustomerId = {{.Iter}} 
 
 \benchmark loop 1.0 \name select_medium
-SELECT * FROM gobench.Product p JOIN gobench.Supplier s ON ...
+SELECT * FROM godbbench.Product p JOIN godbbench.Supplier s ON ...
   
 \benchmark loop 1.0 \name select_complex
 SELECT c.CustomerId, c.Name, SUM(li.Quantity * p.UnitSize * p.PricePerUnit) as  ...
 
 -- CLEAN (illustration purposes)
 \benchmark once \name clean
-DROP SCHEMA IF EXISTS gobench CASCADE;
+DROP SCHEMA IF EXISTS godbbench CASCADE;
 ```
 
 
@@ -332,7 +332,7 @@ CLI Tool | Custom Scripts | Writing
 - Robinson, I., Webber, J., & Eifrem, E. (2015). Graph Databases: New Opportunities for Connected Data.
 - Stopford, B. (2012, August 17). Thinking in Graphs: Neo4J. http://www.benstopford.com/2012/08/17/thinking-in-graphs-neo4j/
 
-Also see [PDF version](https://github.com/RomanBoegli/godbbench/raw/main/presentation/marpslides.pdf) of this presentation
+Also see [PDF version](https://github.com/RomanBoegli/godbbench/raw/main/docs/slides.pdf) of this presentation
 
 ----
 <!-- _class: lead -->
