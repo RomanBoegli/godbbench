@@ -22,6 +22,7 @@ style: |
     }
 ---
 <!-- _class: custom1 -->
+<!-- footer: this slide deck is also available as [PDF](https://github.com/RomanBoegli/godbbench/raw/main/docs/slides.pdf)--->
 <style scoped>
 table { font-size:0.8em;  min-width: 100%; }
 th { display:none;}
@@ -40,6 +41,7 @@ th { display:none;}
 **Supervisor** | Prof. Stefan F. Keller
 **Date** | 14. April 2022
 **Context** | Final Presentation
+
 
 
 ![bg](./assets/OST.svg)
@@ -336,7 +338,6 @@ CLI Tool | Custom Scripts | Writing
 - Robinson, I., Webber, J., & Eifrem, E. (2015). Graph Databases: New Opportunities for Connected Data.
 - Stopford, B. (2012, August 17). Thinking in Graphs: Neo4J. http://www.benstopford.com/2012/08/17/thinking-in-graphs-neo4j/
 
-Also see [PDF version](https://github.com/RomanBoegli/godbbench/raw/main/docs/slides.pdf) of this presentation
 
 ----
 <!-- _class: lead -->
