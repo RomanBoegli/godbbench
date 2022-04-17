@@ -11,7 +11,7 @@ style: |
     }   
     section.custom1 h1 {
        text-align: left;
-       padding-top:65px;
+       padding-top:40px;
        margin-bottom:-20px;
     }
     section.lead h1 {
@@ -26,14 +26,23 @@ style: |
 # Automated Database Benchmarking Tool
 ###### Performance Analysis of MySQL, PostgreSQL and Neo4j using Different Data Scenarios
 ###
+<style scoped>
+th {
+    color: blue;
+    display:none;
+}
+</style>
 
-**Institute:**&emsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eastern Switzerland University of Applied Science
-**Program:**&emsp;&emsp;&nbsp; MSc Computer Science
-**Course:**&emsp;&emsp;&emsp;DB Seminar
-**Author:**&emsp;&emsp;&emsp; Roman Bögli
-**Supervisor:**&emsp;&nbsp; Prof. Stefan F. Keller
-**Stage:**&emsp;&emsp;&emsp;&nbsp;&nbsp; *interim*
-**Date:**&emsp;&emsp;&emsp;&emsp; 14. April 2023
+
+.. | .. 
+:-----|:------
+**Institute** | Eastern Switzerland University of Applied Science
+**Program** | MSE Computer Science
+**Module** | DB Seminar
+**Author** | Roman Bögli
+**Supervisor** | Prof. Stefan F. Keller
+**Date** | 14. April 2022
+
 
 ![bg](./assets/OST.svg)
 
@@ -61,7 +70,7 @@ through schema
 - Ideal for **predefinable** & **rigid** 
 data use cases
 
-![bg fit right:50%](./assets/ERD.svg)
+![bg fit right:50% drop-shadow](./assets/merchanterd.drawio.svg)
 
 
 ----
@@ -78,7 +87,7 @@ first-class citizen
 **highly connected** 
 data use cases
 
-![bg 105% right:54%](./assets/friendsgraph.svg)
+![bg 105% right:54% drop-shadow](./assets/friendsgraph.svg)
 
 
 ----
@@ -118,7 +127,7 @@ RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
   - [Go](https://go.dev/doc/install)
   - [godbbench](https://github.com/RomanBoegli/godbbench)
 
-![bg fit 97% right:65%](./assets/systemlandscape.drawio.svg)
+![bg fit right:65% drop-shadow](./assets/systemlandscape.drawio.svg)
 
 
 ----
@@ -213,7 +222,7 @@ DROP SCHEMA IF EXISTS godbbench CASCADE;
 
 ----
 
-![bg fit](./assets/ERD.svg)
+![bg fit drop-shadow](./assets/merchanterd.drawio.svg)
 
 ----
 
