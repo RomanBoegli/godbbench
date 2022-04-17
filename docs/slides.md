@@ -11,7 +11,7 @@ style: |
     }   
     section.custom1 h1 {
        text-align: left;
-       padding-top:40px;
+       padding-top:60px;
        margin-bottom:-20px;
     }
     section.lead h1 {
@@ -22,19 +22,16 @@ style: |
     }
 ---
 <!-- _class: custom1 -->
+<style scoped>
+table { font-size:0.8em;  min-width: 100%; }
+th { display:none;}
+</style>
 
 # Automated Database Benchmarking Tool
 ###### Performance Analysis of MySQL, PostgreSQL and Neo4j using Different Data Scenarios
 ###
-<style scoped>
-th {
-    color: blue;
-    display:none;
-}
-</style>
 
-
-.. | .. 
+.     | .
 :-----|:------
 **Institute** | Eastern Switzerland University of Applied Science
 **Program** | MSE Computer Science
@@ -42,6 +39,7 @@ th {
 **Author** | Roman Bögli
 **Supervisor** | Prof. Stefan F. Keller
 **Date** | 14. April 2022
+**Context** | Final Presentation
 
 
 ![bg](./assets/OST.svg)
@@ -269,9 +267,6 @@ MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 # Custom Script Idea: `friends`
 
 Show the shortest acquaintance path of two people (cyclic graph queries)
-
-*Would be cool to find a data scenario where Neo4j outperforms the others ...*
-
 
 
 ----
