@@ -8,7 +8,7 @@ The main part is dedicated to a setup and execution of a benchmarking test. The 
 
 Finally, the benchmarking results are consolidated and interpreted. The findings will be discussed alongside concrete recommendations in order to facilitate future decisions on the given database paradigm.
 
-# Relational Database Systems `20%`
+# Relational Database Systems
 
 Relational databases belong to the most popular database management systems (DBMS) nowadays. Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before. It was first introduced by Ted Codd in 1970 [[1]](#1). Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS. Micorosft followed with its own products such as SQLServer and Access. Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge. [[2]](#2)
 
@@ -27,7 +27,7 @@ Once a database has been initiated with a schema, one can start storing and quer
 
 On the other hand, can the rigidness of relational DBMS also be seen as an advantage. Every software engineer that is responsible for implementing the business logic and presentation layer for an application appreciates a definite and rather complete definition of the data ensemble. Little schema changes are often followed by major source code changes which can be costly.
 
-# Graph-Based Database Systems `20%`
+# Graph-Based Database Systems
 
 With rising trends in amounts and connections of data, the classic relational database management systems seemed not to be the ideal choice. In the field of mathematics, graph theory was already established and algorithms to assess networks of connected nodes became more and more popular. The core business model of emerging companies such as Twitter or Facebook was and still is based on data that can be represented ideally as graphs. For instance, think of friendship relations among people as shown in the figure below. Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them. The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
@@ -44,7 +44,7 @@ On the other hand, graph-based DBMS also bear certain disadvantages. First, ther
 
 
 
-# Query Languages `20%`
+# Query Languages
 
 The communication language for relational DBMS is called *Structured Query Language* (SQL). Although each DBMS has its own slightly different SQL implementation, so-called dialects, the language follows a standard that is broadly known among developers and database engineers. SQL statements can be structured into three subdivisions, namely Data Definition Language (DDL), Data Manipulation Language (DML) and Data Control Language (DCL)[[15]](#15). The following table specified the associated database operations for each subdivision.
 
@@ -76,8 +76,7 @@ Cypher's elegance predominates when more than one entity is involved, as shown i
 ```sql
 -- SQL
 SELECT c.CustomerId, c.Name, SUM(p.Total)
-FROM Customer c 
-    INNER JOIN Purchase p on c.CustomerId = p.CustomerId 
+FROM Customer c INNER JOIN Purchase p on c.CustomerId = p.CustomerId 
 GROUP BY c.CustomerId, c.Name 
 ORDER BY SUM(p.Total) DESC
 
@@ -91,7 +90,8 @@ ORDER BY TotalOrderValue DESC
 The SQL approach involves joining the `Purchase` entity via the explicitly stated mapping key `CustomerId`. Furthermore, the usage of the aggregation function `SUM`requires the subsequent `GROUP BY` clause to become a valid statement. In Cypher, however, joining is done using the (attributed) arrow clause `-->` which simply indicates a relationship and no grouping clause is required in order to benefit from aggregation functions.
 
 
-# Benchmark `40%`
+
+# Benchmark
 - Intro
 - Important to Know (e.g. warm up, caching, etc.)
 
@@ -162,8 +162,8 @@ Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/
 
 
 
-# References
 
+# References
 
 <a id="1">[1]</a> Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-642-59412-0_16
 
