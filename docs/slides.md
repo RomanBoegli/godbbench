@@ -18,11 +18,11 @@ style: |
        text-align: center;
     }
     section.custom ul {
-       font-size: 22px;
+       font-size: 0.6em;
     }
 ---
 <!-- _class: custom1 -->
-<!-- footer: this slide deck is also available as [PDF](https://github.com/RomanBoegli/godbbench/raw/main/docs/slides.pdf)--->
+<!-- footer: also available as [PDF](https://github.com/RomanBoegli/godbbench/raw/main/docs/slides.pdf) --->
 <style scoped>
 table { font-size:0.8em;  min-width: 100%; }
 th { display:none;}
@@ -57,7 +57,7 @@ th { display:none;}
 - Custom Scripts (`merchant`, `employees`)
 - Automation
 - Result Analysis
-- Open Work
+- Conclusion & Future Work
 
 ----
 
@@ -264,15 +264,8 @@ MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 
 ![bg 95% drop-shadow](./assets/employeesgraph.svg)
 
-----
-<!-- backgroundColor: #60AAF2 -->
 
-# Custom Script Idea: `friends`
-
-Show the shortest acquaintance path of two people (cyclic graph queries)
-
-
-----
+---
 
 <!-- backgroundColor: white -->
 
@@ -309,34 +302,34 @@ Generating a `chart.html` file to visualize
 
 ![bg 95% ](./assets/chartline.png)
 
+
 ----
 
 <!-- footer: ""  -->
 
-# Open Work
+# Conclusion & Future Work
 
-##
-
-CLI Tool | Custom Scripts | Writing
-:--------|:---------------|:-------
-✅ Benchmarking<br>✅ Result consolidation<br>✅ Chart generation <br> 🔷 Docker automatization  <br><br>| ✅ `merchant` <br> ✅ `employees`<br>🔷 `friends` <br><br><br>| ✅ Abstract <br>✅ Intro <br>⭕️ System documentation <br>⭕️ Benchmarking approaches <br> ⭕️ Result analysis & conclusion
-
-##
-
-###### Legend: &emsp;✅ done, &emsp; ⭕️ todo, &emsp; 🔷 optional
-
+- todo
 
 ----
+
+
 # References
 <!-- _class: custom -->
 
+- Bechberger, D., & Perryman, J. (2020). Graph databases in Action: Examples in Gremlin. Manning.
+- Bush, J. (2020). Learn SQL Database Programming: Query and manipulate databases from popular relational database servers using SQL.
 - Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
 - Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-642-59412-0_16
 - Elmasri, R., & Navathe, S. (2011). Fundamentals of Database Systems (6th ed). Addison-Wesley.
+- Fleming, P. J., & Wallace, J. J. (1986). How not to lie with statistics: The correct way to summarize benchmark results. Communications of the ACM, 29(3), 218–221. https://doi.org/10.1145/5666.5673
+- Gray, J. (Ed.). (1994). The Benchmark Handbook for Database and Transaction Processing Systems (2. ed., 2. [print.]). Morgan Kaufmann.
 - Gregg, B. (2020). Systems Performance: Enterprise and the Cloud (Second). Addison-Wesley.
+- Meier, A., & Kaufmann, M. (2019). SQL & NoSQL Databases: Models, Languages, Consistency Options and Architectures for Big Data Management. Springer Vieweg.
 - Needham, M., & Hodler, A. E. (2019). Graph Algorithms: Practical Examples in Apache Spark and Neo4j (First edition). O’Reilly Media.
 - Peixoto, T. P. (n.d.). What is graph-tool? Graph-Tool. Retrieved 20 March 2022, from https://graph-tool.skewed.de/
 - Robinson, I., Webber, J., & Eifrem, E. (2015). Graph Databases: New Opportunities for Connected Data.
+- Scalzo, B. (2018). Database Benchmarking and Stress Testing: An Evidence-Based Approach to Decisions on Architecture and Technology. Springer Science+Business Media, LLC.
 - Stopford, B. (2012, August 17). Thinking in Graphs: Neo4J. http://www.benstopford.com/2012/08/17/thinking-in-graphs-neo4j/
 
 
