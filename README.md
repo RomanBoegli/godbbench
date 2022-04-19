@@ -118,7 +118,7 @@ Relational as well as graph-based DBMS improve the performance by design using e
 
 Each benchmark performed with `goddbbench` requires the indication of the number of iterations, also called *multiplicity*. Usually, these value series follow the pattern of $10^x$. 
 
-## Use Geometric Mean
+## Geometric Mean
 Following the advice of repeated statement executions will lead to many different time measurements. In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers. A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[18]](#18). It is defined as followed:
 
 <p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
