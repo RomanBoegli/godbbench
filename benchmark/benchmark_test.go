@@ -127,5 +127,5 @@ func TestResults(t *testing.T) {
 
 	assert.Equal(t, uint64(1), executor.result.TotalExecutionCount)
 
-	assert.Equal(t, executor.result.TotalExecutionTime, executor.result.Avg())
+	assert.Equal(t, executor.result.TotalExecutionTime, executor.result.ArithMean())
 }

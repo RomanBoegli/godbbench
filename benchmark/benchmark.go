@@ -41,21 +41,46 @@ type Benchmark struct {
 
 // Result encapsulates the metrics of a benchmark run
 type Result struct {
-	Min                 time.Duration
-	Max                 time.Duration
-	TotalExecutionTime  time.Duration
-	Start               time.Time
-	End                 time.Time
-	Duration            time.Duration
-	TotalExecutionCount uint64
+	Min                    time.Duration
+	Max                    time.Duration
+	ExecutionTimes         []time.Duration
+	TotalExecutionTime     time.Duration
+	TotalExecutionTimeMult time.Duration
+	Start                  time.Time
+	End                    time.Time
+	Duration               time.Duration
+	TotalExecutionCount    uint64
 }
 
-// Avg calculates the results average
-func (r Result) Avg() time.Duration {
+// Calculates the results arithmetic mean
+func (r Result) ArithMean() time.Duration {
 	if r.TotalExecutionCount == 0 {
 		return 0
 	}
+	if r.TotalExecutionCount == 1 {
+		return r.TotalExecutionTime
+	}
 	return time.Duration(int64(r.TotalExecutionTime) / int64(r.TotalExecutionCount))
+}
+
+// Calculates the results geometric mean
+func (r Result) GeoMean() time.Duration {
+	if r.TotalExecutionCount == 0 {
+		return 0
+	}
+	if r.TotalExecutionCount == 1 {
+		return r.TotalExecutionTime
+	}
+	count := float64(0)
+	product := float64(1.0)
+	for _, v := range r.ExecutionTimes {
+		p := float64(v)
+		k := math.Log2(p)
+		count += 1
+		product += k
+	}
+	meanExp := product / count
+	return time.Duration(math.Pow(float64(2), meanExp))
 }
 
 // bencherExecutor is responsible for running the benchmark, keeping track
@@ -151,7 +176,9 @@ func (b *bencherExecutor) collectStats(start time.Time) {
 
 	durTime := time.Since(start)
 
+	b.result.ExecutionTimes = append(b.result.ExecutionTimes, durTime)
 	b.result.TotalExecutionTime += durTime
+	b.result.TotalExecutionTimeMult *= durTime
 
 	if durTime > b.result.Max {
 		b.result.Max = durTime
