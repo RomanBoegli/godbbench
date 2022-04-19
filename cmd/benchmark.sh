@@ -11,7 +11,7 @@ script_set="employees"
 
 # general
 db_host="127.0.0.1"
-MULTIPLICITIES=("10" "100" "1000" "10000")
+MULTIPLICITIES=("10" "100" "1000")
 threads=15
 godbbench_main_path="./godbbench.go"
 script_base_path="../scripts"
