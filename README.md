@@ -100,9 +100,33 @@ The SQL approach involves joining the `Purchase` entity via the explicitly state
 
 
 # Benchmark
-- Intro
-- Important to Know (e.g. warm up, caching, etc.)
 
+Benchmarking allows testing a system's performance in a controlled and repeatable manner. Reasons to conduct benchmarks may include system design, proofs of concepts, tuning, capacity planning, troubleshooting or marketing [[16]](#16). In order to conduct a thoughtful and unbiased benchmark, multiple points must be considered. This chapter will give an overview of the most important considerations alongside the argumentation of how these challenges are counteracted in `godbbench`.
+
+## Domain-Specific
+The Benchmark Handbook by Jim Gray emphasizes the need for domain-specific benchmarks as the diversity of computer systems is huge [[17]](#17). Since each computer system is usually designed for a few domain-specific problems, there exists no global metric to measure the system performance for later comparison. Thus it is crucial also to work with domain-specific benchmarks in order to receive meaningful insights. Additionally, such benchmarks should meet four important criteria, namely:
+
+- **Relevancy:** Benchmark must measure the peak performance when performing typical operations within that problem domain.
+- **Portability:** Benchmark must be easy to implement on different systems and architectures.
+- **Scalability:** Benchmark must be applicable on small to large systems.
+- **Simplicity:** Benchmark must be understandable in order to not lack credibility.
+
+One key feature of `goddbbench` is the allowance of custom database scripts. This allows the creators of these scripts to capture the domain-specific data scenario. Statements or transactions in these scripts are prepended with special tags. These tags allow parts of the script to be named which facilitates the result analysis in a later step. Furthermore, tags can specify the number of times a certain statement should be executed. Examples will be given in later chapters.
+
+## Repeated Execution
+Relational as well as graph-based DBMS improve the performance by design using execution plans and cached information. Therefore a single execution of a single query is hardly meaningful. The database should rather be stressed with thousands of statement executions, for instance querying the purchasing history of customers based on their randomly chosen identification number. This not only simulates real-world requirements on the DBMS, it also allows the system to *warm-up* and mitigates the benefits from cached information [[10]](#10).
+
+Each benchmark performed with `goddbbench` requires the indication of the number of iterations, also called *multiplicity*. Usually, these value series follow the pattern of $10^x$. 
+
+## Use Geometric Mean
+Following the advice of repeated statement executions will lead to many different time measurements. In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers. A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[18]](#18). It is defined as followed:
+
+$$
+{\displaystyle \left(\prod _{i=1}^{n}x_{i}\right)^{\frac {1}{n}}={\sqrt[{n}]{x_{1}x_{2}\cdots x_{n}}}}
+$$
+<h6 align="center">Geometric Mean</h6>
+
+The measurements for each benchmark in `goddbbench` include the extremas (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  
 
 
 ## Strategy and Goals
@@ -191,10 +215,13 @@ Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/
 
 <a id="15">[15]</a> Bush, J. (2020). Learn SQL Database Programming: Query and manipulate databases from popular relational database servers using SQL.
 
+<a id="16">[16]</a> Gregg, B. (2020). Systems Performance: Enterprise and the Cloud (Second). Addison-Wesley.
+ 
+<a id="17">[17]</a> Gray, J. (Ed.). (1994). The Benchmark Handbook for Database and Transaction Processing Systems (2. ed., 2. [print.]). Morgan Kaufmann.
 
+<a id="18">[18]</a> Fleming, P. J., & Wallace, J. J. (1986). How not to lie with statistics: The correct way to summarize benchmark results. Communications of the ACM, 29(3), 218–221. https://doi.org/10.1145/5666.5673
 
 
 <a id="98">[??]</a> Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
 
-<a id="99">[??]</a> Gregg, B. (2020). Systems Performance: Enterprise and the Cloud (Second). Addison-Wesley.
- 
+
