@@ -39,9 +39,9 @@ func NewNeo4J(host string, port int, user, password string) *Neo4j {
 // TODO: update is not like other db statements balance = balance + balance!
 func (c *Neo4j) Benchmarks() []benchmark.Benchmark {
 	return []benchmark.Benchmark{
-		{Name: "inserts", Type: benchmark.TypeLoop, IterRatio: 1.0, Parallel: false, Stmt: "CREATE (ee:Person {id: {{.Iter}}, from: 'Switzerland', balance: {{call .RandInt63}}});"},
+		{Name: "inserts", Type: benchmark.TypeLoop, IterRatio: 1.0, Parallel: false, Stmt: "CREATE (ee:Person {id: {{.Iter}}, from: 'Switzerland', balance: {{call .RandInt64}}});"},
 		{Name: "selects", Type: benchmark.TypeLoop, IterRatio: 1.0, Parallel: false, Stmt: "MATCH (ee:Person) WHERE ee.id = {{.Iter}} RETURN ee;"},
-		{Name: "updates", Type: benchmark.TypeLoop, IterRatio: 1.0, Parallel: false, Stmt: "MATCH (ee:Person {id: {{.Iter}} }) SET ee.balance = {{call .RandInt63}};"},
+		{Name: "updates", Type: benchmark.TypeLoop, IterRatio: 1.0, Parallel: false, Stmt: "MATCH (ee:Person {id: {{.Iter}} }) SET ee.balance = {{call .RandInt64}};"},
 		{Name: "deletes", Type: benchmark.TypeLoop, IterRatio: 1.0, Parallel: false, Stmt: "MATCH (n:Person {id: {{.Iter}} }) DELETE n"},
 	}
 }

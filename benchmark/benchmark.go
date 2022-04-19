@@ -204,26 +204,16 @@ func buildStmt(t *template.Template, i int) string {
 		Iter             int
 		RandIntBetween   func(int, int) int
 		RandFloatBetween func(float64, float64) float64
-		Seed             func(int64)
-		RandInt63        func() int64
-		RandInt63n       func(int64) int64
-		RandFloat32      func() float32
 		RandFloat64      func() float64
-		RandExpFloat64   func() float64
-		RandNormFloat64  func() float64
+		RandInt64        func() int64
 		RandString       func(int, int) string
 		RandDate         func() string
 	}{
 		Iter:             i,
 		RandIntBetween:   RandInt,
 		RandFloatBetween: RandFloat64Between,
-		Seed:             rand.Seed,
-		RandInt63:        rand.Int63,
-		RandInt63n:       rand.Int63n,
-		RandFloat32:      rand.Float32,
 		RandFloat64:      rand.Float64,
-		RandExpFloat64:   rand.ExpFloat64,
-		RandNormFloat64:  rand.NormFloat64,
+		RandInt64:        rand.Int63,
 		RandString:       RandStringBytes,
 		RandDate:         RandDate,
 	}
