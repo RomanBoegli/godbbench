@@ -121,9 +121,7 @@ Each benchmark performed with `goddbbench` requires the indication of the number
 ## Use Geometric Mean
 Following the advice of repeated statement executions will lead to many different time measurements. In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers. A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[18]](#18). It is defined as followed:
 
-$$
-{\displaystyle \left(\prod _{i=1}^{n}x_{i}\right)^{\frac {1}{n}}={\sqrt[{n}]{x_{1}x_{2}\cdots x_{n}}}}
-$$
+<p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
 <h6 align="center">Geometric Mean</h6>
 
 The measurements for each benchmark in `goddbbench` include the extremas (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  
