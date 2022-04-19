@@ -139,24 +139,10 @@ The following subchapter will give further insights into the setup process.
 Docker allows the most lightweight and easiest database setup. Download [Docker](https://www.docker.com/products/docker-desktop/) via the provided installers. To check whether the installation was successful, enter the following command to print the installed version:
 
 ```console
-$ docker -v
-Docker version 20.10.12, build e91ed57
+docker -v  # should print something like "Docker version 20..."
 ```
 
-As a next step, execute the following commands in order to create an instance for each DBMS focused in this project.
-
-```console
-# start mysql (user=root, password=password, db=localhost:3306)
-docker run --name godbbench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql
-
-# start postgres (user=postgres, password=password, db=localhost:5432)
-docker run --name godbbench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres
-
-# start neo4j (user=neo4j, password=password, db=localhost:7687, browser=localhost:7474)
-docker run --name godbbench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
-```
-
-For the sake of ease, concatenate the three commands above to one single command using `&&`. The backslashes (`\`) allow line breaks.
+As a next step, execute the following command in order to create an instance for each DBMS focused in this project. Actually, these are three single commands but using `&&` allows concatenation. The backslashes (`\`) allow line breaks.
 
 ```console
 docker run --name gobench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql && \
@@ -176,29 +162,44 @@ docker rm -f $(docker ps -a -q) && docker volume rm $(docker volume ls -q)
 Download the suitable installer for the latest version on the [project's homepage](https://go.dev/dl/) and execute it. To check if the installation was successful enter `go version` in your terminal - the version should be printed.
 
 ```console
-$ go version
-go version go1.18.1 darwin/amd64
+go version # should print something like "go version go1...."
 ```
 
 ### Source Code of `godbbench`
 Either download this GitHub repository manually as ZIP file and extract it on your computer. In case [`git`](https://git-scm.com/downloads) is installed on your system, navigate to the desired storage location in your file system using the terminal and execute the following command.
 
 ```console
-$ git clone https://github.com/RomanBoegli/godbbench.git
+git clone https://github.com/RomanBoegli/godbbench.git
 ```
 
 After successfully downloading the source code, navigate into the `cmd` folder. It contains the two most important files to work with. Test the communication with the tool by entering the following command in your terminal. It should print the available subcommands.
 
 ```console
-$ go run godbbench.go
-Available subcommands:
-	mysql | postgres | neo4j | mergecsv | createcharts
-	Use 'subcommand --help' for all flags of the specified command.
+go run godbbench.go # should print "Available subcommands: ..."
 ```
 
 ## Running Benchmarks
+Once the system setup was successfully completed, first benchmarks can be executed. 
+ 
 
 ### Synthetic Statements
+
+When no custom script is passed to the argument `--script`, synthetic statements are executed. So far these include very basic CRUD operations on one single (generic) entity with random values. Taking the example of PostgreSQL, the synthetic script looks like the following (equally implemented for MySQL and Neo4j).
+
+```SQL
+-- synthetic INSERT
+INSERT INTO godbbench.generic (genericId, name, balance, description) 
+    VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999999}}, '{{call .RandString 0 100 }}' );
+
+-- synthetic SELECT
+SELECT * FROM godbbench.Generic WHERE GenericId = {{.Iter}};
+
+-- synthetic UPDATE
+UPDATE godbbench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999999}} WHERE GenericId = {{.Iter}};
+
+-- synthetic DELETE
+DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};
+```
 
 ```console
 go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 1000 --writecsv "neo4j.csv" \
@@ -229,11 +230,8 @@ A data schema in a relational DBMS should not directly be translated into a grap
 It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19). 
 
 
-
-
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
-
 
 
 # References
