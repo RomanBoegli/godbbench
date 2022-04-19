@@ -44,7 +44,7 @@ th { display:none;}
 
 
 
-![bg](./assets/titleslidebackground.drawio.svg)
+![bg fit](./assets/titleslidebackground.drawio.svg)
 
 ---
 <!-- footer: ""  -->
