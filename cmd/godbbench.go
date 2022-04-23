@@ -265,7 +265,7 @@ func main() {
 				y[i] = v
 			}
 
-			fmt.Printf("%v (%vx) took: %vμs\narithMean: %vμs, geoMean: %vμs\nmin: %vμs, max: %vμs\nops/s: %v\nμs/op: %v\n\n", y...)
+			fmt.Printf("%v (%vx) took: %vμs\narithMean: %vμs, geoMean: %vμs\nmin: %vμs, max: %vμs\nops/s: %v, μs/op: %v\n\n", y...)
 		}
 	}
 
