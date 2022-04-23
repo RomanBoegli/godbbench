@@ -68,13 +68,10 @@ The fundamentally different paradigm in graph-based DBMS requires different comm
 
 The two languages SQL and Cypher exhibit significant differences in their statement formulation, as the following examples show. 
 
-```sql
--- SQL
-SELECT * FROM Customer c WHERE c.Age >= 18
+SQL | Cypher
+:---|:------
+`SELECT * FROM Customer c`<br/>`WHERE c.Age >= 18`| `MATCH (c:Customer)`<br/>`WHERE c.Age > 18`<br/>`RETURN c;`
 
--- Cyper
-MATCH (c:Customer) WHERE c.Age > 18 RETURN c;
-```
 <h6 align="center">SQL vs. Cypher: Querying Adults</h6>
 
 The simple selection of a set of customers seems in both languages natural. It is important to understand, however, that the SQL statement addresses a specific entity, i.e. table, called `Customer`, while the Cypher version matches all nodes in with the label `Customer`.
@@ -179,37 +176,79 @@ go run godbbench.go # should print "Available subcommands: ..."
 ```
 
 ## Running Benchmarks
-Once the system setup was successfully completed, first benchmarks can be executed. 
- 
+Once the system setup was completed, the first benchmarks can be executed. There are two possibilities to run benchmarks. The *synthetic mode* includes the execution of a few default CRUD statements with a single generic entity. The other possibility would be the *custom script mode* which executes whatever is specified in an externally provided script file. Both modes allow so-called *statement substitution* which is best explained with the examples provided in the following chapter.
 
-### Synthetic Statements
-
-When no custom script is passed to the argument `--script`, synthetic statements are executed. So far these include very basic CRUD operations on one single (generic) entity with random values. Taking the example of PostgreSQL, the synthetic script looks like the following (equally implemented for MySQL and Neo4j).
+### Synthetic Mode
+When no custom script is passed to the argument `--script`, synthetic statements are executed. So far these include very basic CRUD operations on one single (generic) entity with random values. Taking the example of PostgreSQL, the synthetic script looks like the following (similar implementation in MySQL and Neo4j adapters).
 
 ```SQL
 -- synthetic INSERT
 INSERT INTO godbbench.generic (genericId, name, balance, description) 
-    VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999999}}, '{{call .RandString 0 100 }}' );
+    VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999}}, '{{call .RandString 0 100 }}' );
 
 -- synthetic SELECT
 SELECT * FROM godbbench.Generic WHERE GenericId = {{.Iter}};
 
 -- synthetic UPDATE
-UPDATE godbbench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999999}} WHERE GenericId = {{.Iter}};
+UPDATE godbbench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999}} WHERE GenericId = {{.Iter}};
 
 -- synthetic DELETE
 DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};
 ```
 
+### Statement Substitutions
+Obviously, these statements above seem not to respect the SQL standard. The declarations embraced with double curly brackets will be substituted right before the statement is passed to the DBMS. This allows to dynamically create random queries without specifying thousands of structurally identical SQL statements. All possible substitution commands are listed in the following table.
+
+Declaration &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Substitution
+:---------|:------------
+`{{.Iter}}`| Counter that starts with 1 and ends with the specified multiplicity of the given benchmark.
+`{{call .RandInt64}}`|Returns a random non-negative value of type [Int64](https://pkg.go.dev/builtin#int64).
+`{{call .RandFloat64}}`|Returns a random value within the interval [0.0,1.0) as [Float64](https://pkg.go.dev/builtin#float64).
+`{{call .RandIntBetween 1 42}}`| Returns a random integer between 1 and 42. Input values must be a valid [Int32](https://pkg.go.dev/builtin#int32).
+`{{call .RandFloatBetween 0.8 9.9}}`| Returns a random float between 0.8 and 9.9. Input values must be a valid [Float64](https://pkg.go.dev/builtin#float64).
+`{{call .RandString 1 9}}`| Returns a random string with a length between 1 and 9 characters.
+`{{call .RandDate}}`|Returns a random date as string (yyyy-MM-dd) between `1970-01-01` and `2023-01-01`.
+
+In order to run the synthetic CRUD benchmarks with a multiplicity of 1'000 against the running PostgreSQL Docker instance, execute the following statement.
+
+````console
+go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000
+````
+
+The benchmark results will directly be printed to your console as visualized below.
+
+<p align="center"> <img src="./docs/assets/cmd_synthetic_postgres.gif"/> </p>
+<h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
+
+Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
+
+After several runs on various DBMS and with different multiplicities, the different result files located in the same folder can be merged into one single file using the following command.
+
 ```console
-go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 1000 --writecsv "neo4j.csv" \
-&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000 --writecsv "postgres.csv" \
-&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 1000 --writecsv "mysql.csv" \
+go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
+````
+
+Finally, the following command will create a static `HTML` page that can be opened using any web browser that visualized the merged result.
+
+```console
+go run godbbench.go createcharts --dataFile "./merged.csv"
+````
+
+With help of the concatenation sign `&&`, all these commands can be combined and executed at once as shown below.
+
+```console
+go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 100 --writecsv "neo4j.csv" \
+&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 100 --writecsv "postgres.csv" \
+&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 100 --writecsv "mysql.csv" \
 && go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
-### Custom Scripts
+<p align="center"> <img src="./docs/assets/cmd_concatenated_commands.gif"/> </p>
+<h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
+
+
+### Custom Script Mode
 
 
 ### Result Visulazation
