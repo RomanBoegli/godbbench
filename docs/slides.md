@@ -39,8 +39,7 @@ th { display:none;}
 **Module** | DB Seminar
 **Author** | Roman Bögli
 **Supervisor** | Prof. Stefan F. Keller
-**Date** | 14. April 2022
-**Context** | Final Presentation
+**Date** | 13. June 2022
 
 
 
@@ -200,7 +199,7 @@ table { font-size:0.83em;  min-width: 110%; }
 
 # Substitution Possibilities
 
-Statement | Substitution
+Declaration | Substitution
 :---------|:------------
 `{{.Iter}}`| Counter that starts with 1 and ends with the specified multiplicity<br/>of the given benchmark.
 `{{call .RandInt64}}`|Returns a random non-negative value of type [Int64](https://pkg.go.dev/builtin#int64).
