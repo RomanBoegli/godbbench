@@ -1,7 +1,7 @@
 <p align="center"> <img src="./docs/assets/logo.svg" width="300"/> </p>
 
 
-This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see the [final presentation](https://romanboegli.github.io/godbbench/).
+>This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see [this presentation](https://romanboegli.github.io/godbbench/).
 
 
 </br>
