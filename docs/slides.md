@@ -39,8 +39,7 @@ th { display:none;}
 **Module** | DB Seminar
 **Author** | Roman Bögli
 **Supervisor** | Prof. Stefan F. Keller
-**Date** | 14. April 2022
-**Context** | Final Presentation
+**Date** | 13. June 2022
 
 
 
@@ -176,18 +175,39 @@ $ go run godbbench.go createcharts \
 
 # Statement Substitutions
 
+Allows for dynamic creation of queries without specifying thousands of structurally identical DBMS statements.
+
+
+#### Example
+
 ```SQL
 INSERT INTO Customer (Id, Name, Birthday) 
 VALUES ( {{.Iter}}, '{{call .RandString 3 10 }}', '{{call .RandDate }}');
 ```
 
-Following expressions will be substituted before the statement is executed:
+will become...
 
-`{{.Iter}}` --> The iteration counter. Will return 1 when `\benchmark once`.
-`{{call .RandIntBetween 1 100}}` --> Random integer between `1` and `100`.
-`{{call .RandFloatBetween 0 1}}` --> Random float between `0` and `1`.
-`{{call .RandString 3 15}}` --> Random string with length between `3` and `15`.
-`{{call .RandDate}}` --> Random date.
+```SQL
+INSERT INTO Customer (Id, Name, Birthday) VALUES ( 1, 'd9cfApqFe', '1999-11-25');
+```
+
+
+----
+<style scoped>
+table { font-size:0.83em;  min-width: 110%; }
+</style>
+
+# Substitution Possibilities
+
+Declaration | Substitution
+:---------|:------------
+`{{.Iter}}`| Counter that starts with 1 and ends with the specified multiplicity<br/>of the given benchmark.
+`{{call .RandInt64}}`|Returns a random non-negative value of type [Int64](https://pkg.go.dev/builtin#int64).
+`{{call .RandFloat64}}`|Returns a random value within the interval [0.0,1.0) as [Float64](https://pkg.go.dev/builtin#float64).
+`{{call .RandIntBetween 1 42}}`| Returns a random integer between 1 and 42 ([Int32](https://pkg.go.dev/builtin#int32)).
+`{{call .RandFloatBetween 0.8 9.9}}`| Returns a random float between 0.8 and 9.9 ([Float64](https://pkg.go.dev/builtin#float64)).
+`{{call .RandString 1 9}}`| Returns a random string with a length between 1 and 9 characters.
+`{{call .RandDate}}`|Returns a random date as string (yyyy-MM-dd) between <br/>`1970-01-01` and `2023-01-01`.
 
 ----
 

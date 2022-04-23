@@ -41,21 +41,46 @@ type Benchmark struct {
 
 // Result encapsulates the metrics of a benchmark run
 type Result struct {
-	Min                 time.Duration
-	Max                 time.Duration
-	TotalExecutionTime  time.Duration
-	Start               time.Time
-	End                 time.Time
-	Duration            time.Duration
-	TotalExecutionCount uint64
+	Min                    time.Duration
+	Max                    time.Duration
+	ExecutionTimes         []time.Duration
+	TotalExecutionTime     time.Duration
+	TotalExecutionTimeMult time.Duration
+	Start                  time.Time
+	End                    time.Time
+	Duration               time.Duration
+	TotalExecutionCount    uint64
 }
 
-// Avg calculates the results average
-func (r Result) Avg() time.Duration {
+// Calculates the results arithmetic mean
+func (r Result) ArithMean() time.Duration {
 	if r.TotalExecutionCount == 0 {
 		return 0
 	}
+	if r.TotalExecutionCount == 1 {
+		return r.TotalExecutionTime
+	}
 	return time.Duration(int64(r.TotalExecutionTime) / int64(r.TotalExecutionCount))
+}
+
+// Calculates the results geometric mean
+func (r Result) GeoMean() time.Duration {
+	if r.TotalExecutionCount == 0 {
+		return 0
+	}
+	if r.TotalExecutionCount == 1 {
+		return r.TotalExecutionTime
+	}
+	count := float64(0)
+	product := float64(1.0)
+	for _, v := range r.ExecutionTimes {
+		p := float64(v)
+		k := math.Log2(p)
+		count += 1
+		product += k
+	}
+	meanExp := product / count
+	return time.Duration(math.Pow(float64(2), meanExp))
 }
 
 // bencherExecutor is responsible for running the benchmark, keeping track
@@ -151,7 +176,9 @@ func (b *bencherExecutor) collectStats(start time.Time) {
 
 	durTime := time.Since(start)
 
+	b.result.ExecutionTimes = append(b.result.ExecutionTimes, durTime)
 	b.result.TotalExecutionTime += durTime
+	b.result.TotalExecutionTimeMult *= durTime
 
 	if durTime > b.result.Max {
 		b.result.Max = durTime
@@ -177,26 +204,16 @@ func buildStmt(t *template.Template, i int) string {
 		Iter             int
 		RandIntBetween   func(int, int) int
 		RandFloatBetween func(float64, float64) float64
-		Seed             func(int64)
-		RandInt63        func() int64
-		RandInt63n       func(int64) int64
-		RandFloat32      func() float32
 		RandFloat64      func() float64
-		RandExpFloat64   func() float64
-		RandNormFloat64  func() float64
+		RandInt64        func() int64
 		RandString       func(int, int) string
 		RandDate         func() string
 	}{
 		Iter:             i,
 		RandIntBetween:   RandInt,
 		RandFloatBetween: RandFloat64Between,
-		Seed:             rand.Seed,
-		RandInt63:        rand.Int63,
-		RandInt63n:       rand.Int63n,
-		RandFloat32:      rand.Float32,
 		RandFloat64:      rand.Float64,
-		RandExpFloat64:   rand.ExpFloat64,
-		RandNormFloat64:  rand.NormFloat64,
+		RandInt64:        rand.Int63,
 		RandString:       RandStringBytes,
 		RandDate:         RandDate,
 	}

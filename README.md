@@ -1,7 +1,7 @@
 <p align="center"> <img src="./docs/assets/logo.svg" width="300"/> </p>
 
 
-This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see the [final presentation](https://romanboegli.github.io/godbbench/).
+>This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see [this presentation](https://romanboegli.github.io/godbbench/).
 
 
 </br>
@@ -68,13 +68,10 @@ The fundamentally different paradigm in graph-based DBMS requires different comm
 
 The two languages SQL and Cypher exhibit significant differences in their statement formulation, as the following examples show. 
 
-```sql
--- SQL
-SELECT * FROM Customer c WHERE c.Age >= 18
+SQL | Cypher
+:---|:------
+`SELECT * FROM Customer c`<br/>`WHERE c.Age >= 18`| `MATCH (c:Customer)`<br/>`WHERE c.Age > 18`<br/>`RETURN c;`
 
--- Cyper
-MATCH (c:Customer) WHERE c.Age > 18 RETURN c;
-```
 <h6 align="center">SQL vs. Cypher: Querying Adults</h6>
 
 The simple selection of a set of customers seems in both languages natural. It is important to understand, however, that the SQL statement addresses a specific entity, i.e. table, called `Customer`, while the Cypher version matches all nodes in with the label `Customer`.
@@ -98,12 +95,13 @@ ORDER BY TotalOrderValue DESC
 The SQL approach involves joining the `Purchase` entity via the explicitly stated mapping key `CustomerId`. Furthermore, the usage of the aggregation function `SUM`requires the subsequent `GROUP BY` clause to become a valid statement. In Cypher, however, joining is done using the (attributed) arrow clause `-->` which simply indicates a relationship and no grouping clause is required in order to benefit from aggregation functions.
 
 
-
 # Benchmark
+The beginning of this chapter covers general considerations regarding database benchmarks. Subsequently, it guides through the required system setup in order to start benchmarking with `godbbench`. Some examples are shown how to create custom scripts and visualize the resulting measurements. Lastly, a whole showcase called `employees` is presesented using further automation via a bash-script.
 
-Benchmarking allows testing a system's performance in a controlled and repeatable manner. Reasons to conduct benchmarks may include system design, proofs of concepts, tuning, capacity planning, troubleshooting or marketing [[16]](#16). In order to conduct a thoughtful and unbiased benchmark, multiple points must be considered. This chapter will give an overview of the most important considerations alongside the argumentation of how these challenges are counteracted in `godbbench`.
+## General Considerations
+Benchmarking allows testing a system's performance in a controlled and repeatable manner. Reasons to conduct benchmarks may include system design, proofs of concepts, tuning, capacity planning, troubleshooting or marketing [[16]](#16). To conduct a thoughtful and unbiased benchmark, multiple points must be considered. This chapter will give an overview of the most important considerations alongside the argumentation of how these challenges are counteracted in `godbbench`.
 
-## Domain-Specific
+### Domain-Specific
 The Benchmark Handbook by Jim Gray emphasizes the need for domain-specific benchmarks as the diversity of computer systems is huge [[17]](#17). Since each computer system is usually designed for a few domain-specific problems, there exists no global metric to measure the system performance for later comparison. Thus it is crucial also to work with domain-specific benchmarks in order to receive meaningful insights. Additionally, such benchmarks should meet four important criteria, namely:
 
 - **Relevancy:** Benchmark must measure the peak performance when performing typical operations within that problem domain.
@@ -113,45 +111,35 @@ The Benchmark Handbook by Jim Gray emphasizes the need for domain-specific bench
 
 One key feature of `goddbbench` is the allowance of custom database scripts. This allows the creators of these scripts to capture the domain-specific data scenario. Statements or transactions in these scripts are prepended with special tags. These tags allow parts of the script to be named which facilitates the result analysis in a later step. Furthermore, tags can specify the number of times a certain statement should be executed. Examples will be given in later chapters.
 
-## Repeated Execution
-Relational as well as graph-based DBMS improve the performance by design using execution plans and cached information. Therefore a single execution of a single query is hardly meaningful. The database should rather be stressed with thousands of statement executions, for instance querying the purchasing history of customers based on their randomly chosen identification number. This not only simulates real-world requirements on the DBMS, it also allows the system to *warm-up* and mitigates the benefits from cached information [[10]](#10).
+### Repeated Execution
+Relational as well as graph-based DBMS improve the performance by design using execution plans and cached information. Therefore a single execution of a single query is hardly meaningful. The database should rather be stressed with thousands of statement executions, for instance querying the purchasing history of customers based on their randomly chosen identification number. This not only simulates real-world requirements on the DBMS, it also allows the system to *warm-up* and mitigates the benefits of cached information [[10]](#10).
 
 Each benchmark performed with `goddbbench` requires the indication of the number of iterations, also called *multiplicity*. Usually, these value series follow the pattern of $10^x$. 
 
-## Use Geometric Mean
+### Geometric Mean
 Following the advice of repeated statement executions will lead to many different time measurements. In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers. A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[18]](#18). It is defined as followed:
 
 <p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
 <h6 align="center">Geometric Mean</h6>
 
-The measurements for each benchmark in `goddbbench` include the extremas (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  
-
-
-## Strategy and Goals
-- Explanation of Automatised Tests 
-- Evaluation Criteria (Performance)
+The measurements for each benchmark in `goddbbench` include the extrema (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  For all metrics except the latter, the time unit is given in microseconds (μs).
 
 ## Setup
-- Hardware
-- Software
-- system setup (docker, etc.)
-- Sample Data
+Three components are required in order to use `goddbench`. These are:
+- Docker to run the DBMS instances. Technically, these instances can also run somewhere else as long as the IP address and port number is known.
+- The programming language `Go` to execute the tool.
+- The source code of `goddbbench`
+
+The following subchapter will give further insights into the setup process.
 
 ### Docker
-Docker allows the most lightweight and easiest database setup. Just download Docker and execute the following commands.
+Docker allows the most lightweight and easiest database setup. Download [Docker](https://www.docker.com/products/docker-desktop/) via the provided installers. To check whether the installation was successful, enter the following command to print the installed version:
 
 ```console
-# start mysql (user=root, password=password, db=localhost:3306)
-docker run --name godbbench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql
-
-# start postgres (user=postgres, password=password, db=localhost:5432)
-docker run --name godbbench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres
-
-# start neo4j (user=neo4j, password=password, db=localhost:7687, browser=localhost:7474)
-docker run --name godbbench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
+docker -v  # should print something like "Docker version 20..."
 ```
 
-For the sake of ease, concatenate the three commands above to one single command using `&&`. The backslashes (`\`) allow line breaks.
+As a next step, execute the following command in order to create an instance for each DBMS focused in this project. Actually, these are three single commands but using `&&` allows concatenation. The backslashes (`\`) allow line breaks.
 
 ```console
 docker run --name gobench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql && \
@@ -159,38 +147,130 @@ docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d
 docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
 ```
 
+Docker will automatically download the required images, set up and start the containers. This is required as `godbbench` expects these DBMS to be up and running at the specified ports. 
 
-To remove all containers and the associated volumes again, use the following two commands.
+To remove all existing containers and the associated volumes again, use the following two commands.
 
 ```console
 docker rm -f $(docker ps -a -q) && docker volume rm $(docker volume ls -q)
 ```
 
-### Command Line Interface
+### Go
+Download the suitable installer for the latest version on the [project's homepage](https://go.dev/dl/) and execute it. To check if the installation was successful enter `go version` in your terminal - the version should be printed.
 
 ```console
-go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 1000 --writecsv "neo4j.csv" \
-&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000 --writecsv "postgres.csv" \
-&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 1000 --writecsv "mysql.csv" \
+go version # should print something like "go version go1...."
+```
+
+### Source Code of `godbbench`
+Either download this GitHub repository manually as ZIP file and extract it on your computer. In case [`git`](https://git-scm.com/downloads) is installed on your system, navigate to the desired storage location in your file system using the terminal and execute the following command.
+
+```console
+git clone https://github.com/RomanBoegli/godbbench.git
+```
+
+After successfully downloading the source code, navigate into the `cmd` folder. It contains the two most important files to work with. Test the communication with the tool by entering the following command in your terminal. It should print the available subcommands.
+
+```console
+go run godbbench.go # should print "Available subcommands: ..."
+```
+
+## Running Benchmarks
+Once the system setup was completed, the first benchmarks can be executed. There are two possibilities to run benchmarks. The *synthetic mode* includes the execution of a few default CRUD statements with a single generic entity. The other possibility would be the *custom script mode* which executes whatever is specified in an externally provided script file. Both modes allow so-called *statement substitution* which is best explained with the examples provided in the following chapter.
+
+### Synthetic Mode
+When no custom script is passed to the argument `--script`, synthetic statements are executed. So far these include very basic CRUD operations on one single (generic) entity with random values. Taking the example of PostgreSQL, the synthetic script looks like the following (similar implementation in MySQL and Neo4j adapters).
+
+```SQL
+-- synthetic INSERT
+INSERT INTO godbbench.generic (genericId, name, balance, description) 
+    VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999}}, '{{call .RandString 0 100 }}' );
+
+-- synthetic SELECT
+SELECT * FROM godbbench.Generic WHERE GenericId = {{.Iter}};
+
+-- synthetic UPDATE
+UPDATE godbbench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999}} WHERE GenericId = {{.Iter}};
+
+-- synthetic DELETE
+DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};
+```
+
+### Statement Substitutions
+Obviously, these statements above seem not to respect the SQL standard. The declarations embraced with double curly brackets will be substituted right before the statement is passed to the DBMS. This allows to dynamically create random queries without specifying thousands of structurally identical SQL statements. All possible substitution commands are listed in the following table.
+
+Declaration | Substitution
+:-----------|:------------
+`{{.Iter}}`| Counter that starts with 1 and ends with the specified multiplicity of the given benchmark.
+`{{call .RandInt64}}`|Returns a random non-negative value of type [Int64](https://pkg.go.dev/builtin#int64).
+`{{call .RandFloat64}}`|Returns a random value within the interval [0.0,1.0) as [Float64](https://pkg.go.dev/builtin#float64).
+`{{call .RandIntBetween 1 42}}`| Returns a random integer between 1 and 42. Input values must be a valid [Int32](https://pkg.go.dev/builtin#int32).
+`{{call .RandFloatBetween 0.8 9.9}}`| Returns a random float between 0.8 and 9.9. Input values must be a valid [Float64](https://pkg.go.dev/builtin#float64).
+`{{call .RandString 1 9}}`| Returns a random string with a length between 1 and 9 characters.
+`{{call .RandDate}}`|Returns a random date as string (yyyy-MM-dd) between `1970-01-01` and `2023-01-01`.
+
+In order to run the synthetic CRUD benchmarks with a multiplicity of 1'000 against the running PostgreSQL Docker instance, execute the following statement.
+
+````console
+go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000
+````
+
+The benchmark results will directly be printed to your console as visualized below.
+
+<p align="center"> <img src="./docs/assets/cmd_synthetic_postgres.gif"/> </p>
+<h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
+
+Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
+
+After several runs on various DBMS and with different multiplicities, the different result files located in the same folder can be merged into one single file using the following command.
+
+```console
+go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
+````
+
+Finally, the following command will create a static `HTML` page that can be opened using any web browser that visualized the merged result.
+
+```console
+go run godbbench.go createcharts --dataFile "./merged.csv"
+````
+
+With help of the concatenation sign `&&`, all these commands can be combined and executed at once as shown below.
+
+```console
+go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 100 --writecsv "neo4j.csv" \
+&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 100 --writecsv "postgres.csv" \
+&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 100 --writecsv "mysql.csv" \
 && go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
+<p align="center"> <img src="./docs/assets/cmd_concatenated_commands.gif"/> </p>
+<h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
 
-## Results
-- Consolidation
-- Interpretation
+
+### Custom Script Mode
+
+
+### Result Visulazation
+- Evaluation Criteria (Performance)
+
+### Further Automation using Bash Script
+
+
+## Showcase `employees`
+All benchmarks are conducted on a MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM).
+
+
 
 # Discussion
-- Are Graph-Based really always better?
 
 A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
+
+It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19). 
 
 
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
-
-
 
 
 # References
@@ -219,6 +299,7 @@ Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/
 
 <a id="18">[18]</a> Fleming, P. J., & Wallace, J. J. (1986). How not to lie with statistics: The correct way to summarize benchmark results. Communications of the ACM, 29(3), 218–221. https://doi.org/10.1145/5666.5673
 
+<a id="19">[19]</a> Turner-Trauring, I. (2021, May 12). Docker can slow down your code and distort your benchmarks. Python=>Speed. https://pythonspeed.com/articles/docker-performance-overhead/
 
 <a id="98">[??]</a> Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
 

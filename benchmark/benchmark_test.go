@@ -21,7 +21,7 @@ func (b *mockedBencher) Exec(s string)           { _ = b.Called(s) }
 
 func TestBuildStmt(t *testing.T) {
 	// arrange
-	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt63}}"))
+	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt64}}"))
 
 	// act
 	stmt := buildStmt(tmpl, 1337)
@@ -76,7 +76,7 @@ func TestLoop(t *testing.T) {
 	// arrange
 	bencher := &mockedBencher{}
 	bencher.On("Exec", mock.Anything)
-	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt63}}"))
+	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt64}}"))
 
 	executor := bencherExecutor{
 		result: Result{
@@ -95,7 +95,7 @@ func TestOnce(t *testing.T) {
 	// arrange
 	bencher := &mockedBencher{}
 	bencher.On("Exec", mock.Anything)
-	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt63}}"))
+	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt64}}"))
 
 	executor := bencherExecutor{
 		result: Result{
@@ -114,7 +114,7 @@ func TestResults(t *testing.T) {
 	// arrange
 	bencher := &mockedBencher{}
 	bencher.On("Exec", mock.Anything)
-	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt63}}"))
+	tmpl := template.Must(template.New("test").Parse("{{.Iter}} {{call .RandInt64}}"))
 
 	executor := bencherExecutor{
 		result: Result{
@@ -127,5 +127,5 @@ func TestResults(t *testing.T) {
 
 	assert.Equal(t, uint64(1), executor.result.TotalExecutionCount)
 
-	assert.Equal(t, executor.result.TotalExecutionTime, executor.result.Avg())
+	assert.Equal(t, executor.result.TotalExecutionTime, executor.result.ArithMean())
 }

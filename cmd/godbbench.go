@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	hheaders = []string{"system", "multiplicity", "name", "executions", "total (μs)", "avg (μs)", "min (μs)", "max (μs)", "ops/s", "μs/op"}
+	hheaders = []string{"system", "multiplicity", "name", "executions", "total (μs)", "arithMean (μs)", "geoMean (μs)", "min (μs)", "max (μs)", "ops/s", "μs/op"}
 )
 
 func main() {
@@ -208,11 +208,11 @@ func main() {
 			results := benchmark.Run(bencher, b, *iter, *threads)
 
 			// execution in ms for mode once
-			msPerOp := float64(results.Duration.Milliseconds())
+			μsPerOp := float64(results.Duration.Microseconds())
 
 			// execution in ns/op for mode loop
 			if b.Type == benchmark.TypeLoop {
-				msPerOp /= float64(int64(*iter))
+				μsPerOp /= float64(int64(*iter))
 			}
 
 			summary = append(summary, []string{
@@ -220,12 +220,13 @@ func main() {
 				fmt.Sprint(*iter),
 				b.Name,
 				fmt.Sprint(results.TotalExecutionCount),
-				fmt.Sprint(results.Duration.Milliseconds()),
-				fmt.Sprint(results.Avg().Milliseconds()),
-				fmt.Sprint(results.Min.Milliseconds()),
-				fmt.Sprint(results.Max.Milliseconds()),
-				fmt.Sprint(float64(results.TotalExecutionCount) / (results.Duration.Seconds())),
-				fmt.Sprint(msPerOp)})
+				fmt.Sprint(results.Duration.Microseconds()),
+				fmt.Sprint(results.ArithMean().Microseconds()),
+				fmt.Sprint(results.GeoMean().Microseconds()),
+				fmt.Sprint(results.Min.Microseconds()),
+				fmt.Sprint(results.Max.Microseconds()),
+				fmt.Sprint(int64(float64(results.TotalExecutionCount) / (results.Duration.Seconds()))),
+				fmt.Sprint(int64(μsPerOp))})
 
 			// Don't sleep after the last benchmark
 			if i != len(benchmarks)-1 {
@@ -264,7 +265,7 @@ func main() {
 				y[i] = v
 			}
 
-			fmt.Printf("%v (%vx) took: %vms\navg: %vms, min: %vms, max: %vms\nops/s: %v\nms/op: %v\n\n", y...)
+			fmt.Printf("%v (%vx) took: %vμs\narithMean: %vμs, geoMean: %vμs\nmin: %vμs, max: %vμs\nops/s: %v, μs/op: %v\n\n", y...)
 		}
 	}
 
@@ -350,7 +351,7 @@ func CreateCharts(dataFile string, charttype string) {
 	page := components.NewPage()
 
 	for c1, name := range names {
-		for c2, metric := range []string{"avg (μs)", "ops/s", "μs/op"} {
+		for c2, metric := range []string{"arithMean (μs)", "geoMean (μs)", "ops/s", "μs/op"} {
 			chart := getBasicChart(fmt.Sprintf("Chart %v.%v: %v", c1+1, c2, name), "", "multiplicity", metric)
 			chart.SetXAxis(mults)
 			for _, system := range systems {
