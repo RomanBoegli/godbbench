@@ -4,6 +4,31 @@
 >This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see [this presentation](https://romanboegli.github.io/godbbench/).
 
 
+- [Abstract](#abstract)
+- [Relational Database Systems](#relational-database-systems)
+- [Graph-Based Database Systems](#graph-based-database-systems)
+- [Query Languages](#query-languages)
+- [Benchmark](#benchmark)
+  * [General Considerations](#general-considerations)
+    + [Domain-Specific](#domain-specific)
+    + [Repeated Execution](#repeated-execution)
+    + [Geometric Mean](#geometric-mean)
+  * [System Setup](#system-setup)
+    + [Docker](#docker)
+    + [Go](#go)
+    + [Source Code of `godbbench`](#source-code-of--godbbench-)
+  * [Running Benchmarks](#running-benchmarks)
+    + [Synthetic Mode](#synthetic-mode)
+    + [Statement Substitutions](#statement-substitutions)
+    + [Custom Script Mode](#custom-script-mode)
+    + [Result Visulazation](#result-visulazation)
+    + [Further Automation using Bash Script](#further-automation-using-bash-script)
+  * [Showcase](#showcase)
+- [Discussion](#discussion)
+- [Acknowledgements](#acknowledgements)
+- [References](#references)
+
+
 </br>
 </br>
 
@@ -16,13 +41,13 @@ The main part is dedicated to a setup and execution of a benchmarking test. The 
 
 Finally, the benchmarking results are consolidated and interpreted. The findings will be discussed alongside concrete recommendations in order to facilitate future decisions on the given database paradigm.
 
-# Relational Database Systems
 
+# Relational Database Systems
 Relational databases belong to the most popular database management systems (DBMS) nowadays. Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before. It was first introduced by Ted Codd in 1970 [[1]](#1). Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS. Micorosft followed with its own products such as SQLServer and Access. Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge. [[2]](#2)
 
 Relationally storing data first and foremost means that every piece of unique information ideally is stored only once in our database and then referenced multiple times to wherever it is required to be. This referencing works with so-called primary keys (PK) and foreign keys (FK), where the latter serves as a pointer to the actual information. The following example describes such a relationally linked data structure utilizing a merchant use case.
 
-<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="500"/> </p>
+<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="60%"/> </p>
 <h6 align="center">Possible Entity-Relationship Diagram of a Merchant's Database</h6>
 
 Each box in this entity-relationship diagram (ERD) represents an *entity*, which is in practice nothing else than a table where each row describes a distinct tuple. The listed attributes in the boxes correspond to the columns of the table, also known as *attributes*. The connecting lines specify the *relationships* between the entities. The relationships also indicate *cardinality*. A customer, for instance, can place zero or any amount of orders. Each order contains at least one line item. A supplier, on the other hand, delivers one or more products, while each product belongs to exactly one category. Finally, a product can occur zero or many times in the great list of line items.
@@ -39,7 +64,7 @@ On the other hand, can the rigidness of relational DBMS also be seen as an advan
 
 With rising trends in amounts and connections of data, the classic relational database management systems seemed not to be the ideal choice. In the field of mathematics, graph theory was already established and algorithms to assess networks of connected nodes became more and more popular. The core business model of emerging companies such as Twitter or Facebook was and still is based on data that can be represented ideally as graphs. For instance, think of friendship relations among people as shown in the figure below. Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them. The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
-<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="600"/> </p>
+<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
 
 Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [Neo4j](https://neo4j.com/). Other than in relational DBMS, Neo4j allows heterogeneous sets of attributes on both nodes and relationships. This implies that there is also no database schema to be specified beforehand. One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database [[11]](#11).
@@ -51,9 +76,7 @@ Although it is technically possible to always use a relational DBMS when working
 On the other hand, graph-based DBMS also bear certain disadvantages. First, there is no unified query language to work with and the ones that exist rather unknown due to their recency. This can have a major impact on real-world applications as companies and the developers working for them most probably prefer the technology that they already know and will be able to support in the long run. Furthermore, the high degree of flexibility due to the absence of a schema invokes the costs of missing referential integrity and normalization. This makes graph-based DBMS less suitable for high integrity systems as they exist in the financial industry for example [[14]](#14).
 
 
-
 # Query Languages
-
 The communication language for relational DBMS is called *Structured Query Language* (SQL). Although each DBMS has its own slightly different SQL implementation, so-called dialects, the language follows a standard that is broadly known among developers and database engineers. SQL statements can be structured into three subdivisions, namely Data Definition Language (DDL), Data Manipulation Language (DML) and Data Control Language (DCL)[[15]](#15). The following table specified the associated database operations for each subdivision.
 
 Subdivision | Database Operations
@@ -124,7 +147,7 @@ Following the advice of repeated statement executions will lead to many differen
 
 The measurements for each benchmark in `goddbbench` include the extrema (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  For all metrics except the latter, the time unit is given in microseconds (μs).
 
-## Setup
+## System Setup
 Three components are required in order to use `goddbench`. These are:
 - Docker to run the DBMS instances. Technically, these instances can also run somewhere else as long as the IP address and port number is known.
 - The programming language `Go` to execute the tool.
@@ -176,7 +199,7 @@ go run godbbench.go # should print "Available subcommands: ..."
 ```
 
 ## Running Benchmarks
-Once the system setup was completed, the first benchmarks can be executed. There are two possibilities to run benchmarks. The *synthetic mode* includes the execution of a few default CRUD statements with a single generic entity. The other possibility would be the *custom script mode* which executes whatever is specified in an externally provided script file. Both modes allow so-called *statement substitution* which is best explained with the examples provided in the following chapter.
+Once the system setup was completed, the first benchmarks can be executed. There are two possibilities to run benchmarks. The *synthetic mode* includes the execution of a few default so-called *Create-Read-Update-Delete (CRUD)* statements with a single generic entity. The other possibility would be the *custom script mode* which executes whatever is specified in an externally provided script file. Both modes allow so-called *statement substitution* which is best explained with the examples provided in the following chapter.
 
 ### Synthetic Mode
 When no custom script is passed to the argument `--script`, synthetic statements are executed. So far these include very basic CRUD operations on one single (generic) entity with random values. Taking the example of PostgreSQL, the synthetic script looks like the following (similar implementation in MySQL and Neo4j adapters).
@@ -217,7 +240,7 @@ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass
 
 The benchmark results will directly be printed to your console as visualized below.
 
-<p align="center"> <img src="./docs/assets/cmd_synthetic_postgres.gif"/> </p>
+<p align="center"> <img src="./docs/assets/cmd_synthetic_postgres.gif" width="100%"/> </p>
 <h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
@@ -234,7 +257,7 @@ Finally, the following command will create a static `HTML` page that can be open
 go run godbbench.go createcharts --dataFile "./merged.csv"
 ````
 
-With help of the concatenation sign `&&`, all these commands can be combined and executed at once as shown below.
+With help of the concatenation sign `&&` all these commands can be combined and executed at once as shown below.
 
 ```console
 go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 100 --writecsv "neo4j.csv" \
@@ -244,25 +267,58 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
-<p align="center"> <img src="./docs/assets/cmd_concatenated_commands.gif"/> </p>
+<p align="center"> <img src="./docs/assets/cmd_concatenated_commands.gif" width="100%"/> </p>
 <h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
 
+The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
 
 ### Custom Script Mode
+Since the variety and quality of the synthetic benchmarks are limited to a few basic operations, it is much more recommended to test the database systems with custom scripts. This allows to not only account for a use case-specific data scenario but also to test more realistic and thus often more complex CRUD operations. 
+
+Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts.
+
+The second custom script example is called [`employees`](./scripts/employees/). Measured on the number of entities it seems to be less complex than the `merchant` script as it holds only one entity representing employees of a company. However, it introduces a recursive relationship that models the organisational hierarchy, commonly known as the chain of command. The image below represents this data scenario in both relational and graph-based.
+
+<p align="center"> <img src="./docs/assets/employees_schema.drawio.svg" width="100%"/> </p>
+<h6 align="center">Relational and Graph-Based Representation of Organsational Hierchary</h6>
+
+Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*. In a later chapter, this script will showcase the benchmarking with several different multiplicities and its results will be interpreted.
+
+Custom scripts require certain annotations correctly render statements into individual benchmark tasks.
+
+```code
+\benchmark <once/loop>  [<0-1>]  \name  <A-Za-z0-9>
+           ─────┬─────   ──┬──          ─────┬─────
+                │          │                 └─ Benchmark identifier: 
+                │          │                    Just a name or label for the benchmark.
+                │          │                    Important for subsequent result analysis.
+                │          │
+                │          └─ Multiplicity share:
+                │             Percental amount of iterations in relation to the specified 
+                │             multiplicity. Only relevant when looping.
+                │
+                └─ Case of recurrence:
+                   Keyword "once" will execute the benchmark only one time, regardless of 
+                   the specified multiplicity. Useful for setup and teardown statements.
+````
 
 
 ### Result Visulazation
 - Evaluation Criteria (Performance)
 
+![](https://badgen.net/badge/TODO/*****/red)
+
 ### Further Automation using Bash Script
+![](https://badgen.net/badge/TODO/*****/red)
 
-
-## Showcase `employees`
+## Showcase
 All benchmarks are conducted on a MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM).
 
-
+![](https://badgen.net/badge/TODO/*****/red)
 
 # Discussion
+
+![](https://badgen.net/badge/TODO/*****/red)
 
 A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
 
