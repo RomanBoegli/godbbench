@@ -91,11 +91,13 @@ The fundamentally different paradigm in graph-based DBMS requires different comm
 
 The two languages SQL and Cypher exhibit significant differences in their statement formulation, as the following examples show. 
 
-SQL | Cypher
-:---|:------
-`SELECT * FROM Customer c`<br/>`WHERE c.Age >= 18`| `MATCH (c:Customer)`<br/>`WHERE c.Age > 18`<br/>`RETURN c;`
+```sql
+-- SQL
+SELECT * FROM Customer c WHERE c.Age >= 18
 
-<h6 align="center">SQL vs. Cypher: Querying Adults</h6>
+-- Cyper
+MATCH (c:Customer) WHERE c.Age > 18 RETURN c;
+```
 
 The simple selection of a set of customers seems in both languages natural. It is important to understand, however, that the SQL statement addresses a specific entity, i.e. table, called `Customer`, while the Cypher version matches all nodes in with the label `Customer`.
 
@@ -275,16 +277,7 @@ The collected results after that the concatenated statements have created only p
 ### Custom Script Mode
 Since the variety and quality of the synthetic benchmarks are limited to a few basic operations, it is much more recommended to test the database systems with custom scripts. This allows to not only account for a use case-specific data scenario but also to test more realistic and thus often more complex CRUD operations. 
 
-Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts.
-
-The second custom script example is called [`employees`](./scripts/employees/). Measured on the number of entities it seems to be less complex than the `merchant` script as it holds only one entity representing employees of a company. However, it introduces a recursive relationship that models the organisational hierarchy, commonly known as the chain of command. The image below represents this data scenario in both relational and graph-based.
-
-<p align="center"> <img src="./docs/assets/employees_schema.drawio.svg" width="100%"/> </p>
-<h6 align="center">Relational and Graph-Based Representation of Organsational Hierchary</h6>
-
-Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*. In a later chapter, this script will showcase the benchmarking with several different multiplicities and its results will be interpreted.
-
-Custom scripts require certain annotations correctly render statements into individual benchmark tasks.
+Custom scripts require certain annotations to correctly render statements into individual benchmark tasks. Everything below such an annotation, e.g. various SQL statements delimmited with a semicolon, define a single benchmark. These annotations must follow a strict pattern which is explained below.
 
 ```code
 \benchmark <once/loop>  [<0-1>]  \name  <A-Za-z0-9>
@@ -302,6 +295,46 @@ Custom scripts require certain annotations correctly render statements into indi
                    the specified multiplicity. Useful for setup and teardown statements.
 ````
 
+ In case of a looping benchmark, the (collection of) statement(s) subsummized below a given annoation will be executed as many times as defined with the specified multiplicity share and the at invocation time provided `--iter` amount. The fictive script example below exemplifies this.
+
+ ```sql
+-- INIT
+\benchmark once \name setup
+-- start of benchmark 'setup'
+DROP TABLE IF EXISTS mytable;
+CREATE TABLE mytable (myId INT PRIMARY KEY, myName VARCHAR(20));
+-- end of benchmark 'setup', will be executed one single time
+
+-- INSERTS
+\benchmark loop 0.75 \name inserts
+-- start of benchmark 'inserts'
+INSERT INTO mytable (myId, myName) VALUES( {{.Iter}}, '{{call .RandString 5 20 }}');
+-- end of benchmark 'inserts'
+
+-- SELECTS
+\benchmark loop 1.0 \name selects
+-- start of benchmark 'selects'
+SELECT * FROM mytable WHERE myName LIKE '%{{call .RandString 1 10 }}%';
+-- end of benchmark 'selects'
+```
+
+Using the example script above, the entire benchmarking procedere consists of three benchmark tasks, namely `setup`, `inserts` and `selects`. To start it, the following command would be necessary.
+
+````console
+go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password \
+                             --iter 1000  \
+                             --script "../path/to/scripts/myscript.sql"
+````
+
+The multiplicity in this command is set on `1'000` using the `--iter` option. This results in the following number of excutions per benchmark.
+
+Benchmark | Executions | Reason
+:---------|:--------------------:|:---------
+`setup` | 1 | Single benchmark (`once` annoation)
+`inserts` | 750 | Looping benchmark with multiplicity ration of 75%
+`selects` | 1'000 | Looping benchmark with multiplicity ration of 100%
+
+Further examples can be found in the [script folder](./scripts/) of this project.
 
 ### Result Visulazation
 - Evaluation Criteria (Performance)
@@ -312,17 +345,52 @@ Custom scripts require certain annotations correctly render statements into indi
 ![](https://badgen.net/badge/TODO/*****/red)
 
 ## Showcase
-All benchmarks are conducted on a MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM).
+Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts. However, this script will be disregarded during the showcase.
 
-![](https://badgen.net/badge/TODO/*****/red)
+The second custom script example is called [`employees`](./scripts/employees/). Measured on the number of entities it seems to be less complex than the `merchant` script as it holds only one entity representing employees of a company. However, it introduces a recursive relationship that models the organisational hierarchy, commonly known as the chain of command. The image below represents this data scenario in both relational and graph-based.
 
-# Discussion
+<p align="center"> <img src="./docs/assets/employees_schema.drawio.svg" width="100%"/> </p>
+<h6 align="center">Relational and Graph-Based Representation of Organsational Hierchary</h6>
+
+Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*. As relational and graph-based DBMS should be able to handle this data scenario, it provides a more fair challenge to them. Therefore, this script will showcase the benchmarking with several different multiplicities in this chapter, directly followed by the result discussion.
+
+### System Specifications
+All benchmarks are conducted on a [MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM)](https://everymac.com/systems/apple/macbook_pro/specs/macbook-pro-core-i7-2.8-quad-core-13-mid-2019-touch-bar-specs.html). The three databases at focus (MySQL, PostgreSQL and Neo4j) were setup with Docker exactly as documented in an earlier chapter. The images used are the official database images which are available for download in the Docker Hub. No improvements or modifications have been made to these images. Additionally, no other applications were running during the benchmarking process except Docker and a terminal window.
+
+### Script Strategy
+The `employees` script for all three focused DBMSs can be found in this folder. It is structured into the following parts.
+
+Part | Benchmark | Tasks 
+:----|-----------|----------------
+0    | `initialize` | Drop all possibly existing data and recreate the root node called "BigBoss" 
+1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of iterations equals 100% of the specified multiplicity.
+2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified multiplicity.
+3    |`create_index` | Creating a so-called *BTREE* index on the entity's relationship indicator (i.e. foreign key in relational DBMS, resp. relationship itself in graph-based DBMS).
+4 | `clear_cach` | All cached data is discarded.
+5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.
+6 | `clean` | Complete removal of existing data and index information.
+
+
+The chosen multiplicities for this benchmarking procedure are defined as $\{ 10, 100, 1'000, 10'000 \}$. The reason why this series was not continued to an even higher order of repetitions lies in the computational power limitations of the chosen hardware.
+
+### Results
+
+
+
+# Conclusion
 
 ![](https://badgen.net/badge/TODO/*****/red)
 
 A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
 
 It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19). 
+
+- concurrent connections
+
+- Customization and Tuning of DMBS
+
+- Higher order of multiplicities
+
 
 
 # Acknowledgements
