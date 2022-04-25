@@ -209,13 +209,15 @@ When no custom script is passed to the argument `--script`, synthetic statements
 ```SQL
 -- synthetic INSERT
 INSERT INTO godbbench.generic (genericId, name, balance, description) 
-    VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999}}, '{{call .RandString 0 100 }}' );
+VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999}}, '{{call .RandString 0 100 }}' );
 
 -- synthetic SELECT
 SELECT * FROM godbbench.Generic WHERE GenericId = {{.Iter}};
 
 -- synthetic UPDATE
-UPDATE godbbench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999}} WHERE GenericId = {{.Iter}};
+UPDATE godbbench.Generic 
+SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999}} 
+WHERE GenericId = {{.Iter}};
 
 -- synthetic DELETE
 DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};
@@ -268,7 +270,7 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 && go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password \
                                 --iter 100 --writecsv "postgres.csv" \
 && go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password \
-                         --iter 100 --writecsv "mysql.csv" \
+                             --iter 100 --writecsv "mysql.csv" \
 && go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
@@ -313,13 +315,13 @@ CREATE TABLE mytable (myId INT PRIMARY KEY, myName VARCHAR(20));
 \benchmark loop 0.75 \name inserts
 -- start of benchmark 'inserts'
 INSERT INTO mytable (myId, myName) VALUES( {{.Iter}}, '{{call .RandString 5 20 }}');
--- end of benchmark 'inserts'
+-- end of benchmark 'inserts', will be executed <75% of given multiplicity> times
 
 -- SELECTS
 \benchmark loop 1.0 \name selects
 -- start of benchmark 'selects'
 SELECT * FROM mytable WHERE myName LIKE '%{{call .RandString 1 10 }}%';
--- end of benchmark 'selects'
+-- end of benchmark 'selects', will be executed <100% of given multiplicity> times
 ```
 
 Using the example script above, the entire benchmarking procedere consists of three benchmark tasks, namely `setup`, `inserts` and `selects`. To start it, the following command would be necessary.
