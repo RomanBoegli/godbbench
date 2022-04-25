@@ -237,7 +237,8 @@ Declaration | Substitution
 In order to run the synthetic CRUD benchmarks with a multiplicity of 1'000 against the running PostgreSQL Docker instance, execute the following statement.
 
 ````console
-go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000
+go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password \
+                             --iter 1000
 ````
 
 The benchmark results will directly be printed to your console as visualized below.
@@ -250,7 +251,7 @@ Alternatively, the synthetic benchmarks that should be executed can also be name
 After several runs on various DBMS and with different multiplicities, the different result files located in the same folder can be merged into one single file using the following command.
 
 ```console
-go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
+go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv"
 ````
 
 Finally, the following command will create a static `HTML` page that can be opened using any web browser that visualized the merged result.
@@ -262,9 +263,12 @@ go run godbbench.go createcharts --dataFile "./merged.csv"
 With help of the concatenation sign `&&` all these commands can be combined and executed at once as shown below.
 
 ```console
-go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 100 --writecsv "neo4j.csv" \
-&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 100 --writecsv "postgres.csv" \
-&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 100 --writecsv "mysql.csv" \
+go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password \
+                          --iter 100 --writecsv "neo4j.csv" \
+&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password \
+                                --iter 100 --writecsv "postgres.csv" \
+&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password \
+                         --iter 100 --writecsv "mysql.csv" \
 && go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
@@ -295,7 +299,7 @@ Custom scripts require certain annotations to correctly render statements into i
                    the specified multiplicity. Useful for setup and teardown statements.
 ````
 
- In case of a looping benchmark, the (collection of) statement(s) subsummized below a given annoation will be executed as many times as defined with the specified multiplicity share and the at invocation time provided `--iter` amount. The fictive script example below exemplifies this.
+In the case of a looping benchmark, the (collection of) statement(s) subsumed below a given annotation will be executed as often as the specified multiplicity share of the provided `--iter` amount. The fictive script example below exemplifies this.
 
  ```sql
 -- INIT
@@ -330,7 +334,7 @@ The multiplicity in this command is set on `1'000` using the `--iter` option. Th
 
 Benchmark | Executions | Reason
 :---------|:--------------------:|:---------
-`setup` | 1 | Single benchmark (`once` annoation)
+`setup` | 1 | Single benchmark due to `once` annoation
 `inserts` | 750 | Looping benchmark with multiplicity ration of 75%
 `selects` | 1'000 | Looping benchmark with multiplicity ration of 100%
 
