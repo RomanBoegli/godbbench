@@ -1,7 +1,39 @@
 <p align="center"> <img src="./docs/assets/logo.svg" width="300"/> </p>
 
 
->This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see [this presentation](https://romanboegli.github.io/godbbench/).
+>*This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see [this presentation](https://romanboegli.github.io/godbbench/)*.
+
+
+</br>
+
+**Table of Contents**
+
+- [Abstract](#abstract)
+- [Relational Database Systems](#relational-database-systems)
+- [Graph-Based Database Systems](#graph-based-database-systems)
+- [Query Languages](#query-languages)
+- [Benchmark](#benchmark)
+  * [General Considerations](#general-considerations)
+    + [Domain-Specific](#domain-specific)
+    + [Repeated Execution](#repeated-execution)
+    + [Geometric Mean](#geometric-mean)
+  * [System Setup](#system-setup)
+    + [Docker](#docker)
+    + [Go](#go)
+    + [Source Code of Tool](#source-code-of-tool)
+  * [Running Benchmarks](#running-benchmarks)
+    + [Synthetic Mode](#synthetic-mode)
+    + [Statement Substitutions](#statement-substitutions)
+    + [Custom Script Mode](#custom-script-mode)
+    + [Result Visualisation](#result-visualisation)
+    + [Further Automation](#further-automation)
+  * [Showcase](#showcase)
+    + [System Specifications](#system-specifications)
+    + [Script Strategy](#script-strategy)
+    + [Results](#results)
+- [Conclusion](#conclusion)
+- [Acknowledgements](#acknowledgements)
+- [References](#references)
 
 
 </br>
@@ -16,13 +48,13 @@ The main part is dedicated to a setup and execution of a benchmarking test. The 
 
 Finally, the benchmarking results are consolidated and interpreted. The findings will be discussed alongside concrete recommendations in order to facilitate future decisions on the given database paradigm.
 
-# Relational Database Systems
 
+# Relational Database Systems
 Relational databases belong to the most popular database management systems (DBMS) nowadays. Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before. It was first introduced by Ted Codd in 1970 [[1]](#1). Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS. Micorosft followed with its own products such as SQLServer and Access. Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge. [[2]](#2)
 
 Relationally storing data first and foremost means that every piece of unique information ideally is stored only once in our database and then referenced multiple times to wherever it is required to be. This referencing works with so-called primary keys (PK) and foreign keys (FK), where the latter serves as a pointer to the actual information. The following example describes such a relationally linked data structure utilizing a merchant use case.
 
-<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="500"/> </p>
+<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="60%"/> </p>
 <h6 align="center">Possible Entity-Relationship Diagram of a Merchant's Database</h6>
 
 Each box in this entity-relationship diagram (ERD) represents an *entity*, which is in practice nothing else than a table where each row describes a distinct tuple. The listed attributes in the boxes correspond to the columns of the table, also known as *attributes*. The connecting lines specify the *relationships* between the entities. The relationships also indicate *cardinality*. A customer, for instance, can place zero or any amount of orders. Each order contains at least one line item. A supplier, on the other hand, delivers one or more products, while each product belongs to exactly one category. Finally, a product can occur zero or many times in the great list of line items.
@@ -39,7 +71,7 @@ On the other hand, can the rigidness of relational DBMS also be seen as an advan
 
 With rising trends in amounts and connections of data, the classic relational database management systems seemed not to be the ideal choice. In the field of mathematics, graph theory was already established and algorithms to assess networks of connected nodes became more and more popular. The core business model of emerging companies such as Twitter or Facebook was and still is based on data that can be represented ideally as graphs. For instance, think of friendship relations among people as shown in the figure below. Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them. The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
-<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="600"/> </p>
+<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
 
 Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [Neo4j](https://neo4j.com/). Other than in relational DBMS, Neo4j allows heterogeneous sets of attributes on both nodes and relationships. This implies that there is also no database schema to be specified beforehand. One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database [[11]](#11).
@@ -51,9 +83,7 @@ Although it is technically possible to always use a relational DBMS when working
 On the other hand, graph-based DBMS also bear certain disadvantages. First, there is no unified query language to work with and the ones that exist rather unknown due to their recency. This can have a major impact on real-world applications as companies and the developers working for them most probably prefer the technology that they already know and will be able to support in the long run. Furthermore, the high degree of flexibility due to the absence of a schema invokes the costs of missing referential integrity and normalization. This makes graph-based DBMS less suitable for high integrity systems as they exist in the financial industry for example [[14]](#14).
 
 
-
 # Query Languages
-
 The communication language for relational DBMS is called *Structured Query Language* (SQL). Although each DBMS has its own slightly different SQL implementation, so-called dialects, the language follows a standard that is broadly known among developers and database engineers. SQL statements can be structured into three subdivisions, namely Data Definition Language (DDL), Data Manipulation Language (DML) and Data Control Language (DCL)[[15]](#15). The following table specified the associated database operations for each subdivision.
 
 Subdivision | Database Operations
@@ -68,11 +98,13 @@ The fundamentally different paradigm in graph-based DBMS requires different comm
 
 The two languages SQL and Cypher exhibit significant differences in their statement formulation, as the following examples show. 
 
-SQL | Cypher
-:---|:------
-`SELECT * FROM Customer c`<br/>`WHERE c.Age >= 18`| `MATCH (c:Customer)`<br/>`WHERE c.Age > 18`<br/>`RETURN c;`
+```sql
+-- SQL
+SELECT * FROM Customer c WHERE c.Age >= 18
 
-<h6 align="center">SQL vs. Cypher: Querying Adults</h6>
+-- Cyper
+MATCH (c:Customer) WHERE c.Age > 18 RETURN c;
+```
 
 The simple selection of a set of customers seems in both languages natural. It is important to understand, however, that the SQL statement addresses a specific entity, i.e. table, called `Customer`, while the Cypher version matches all nodes in with the label `Customer`.
 
@@ -124,11 +156,11 @@ Following the advice of repeated statement executions will lead to many differen
 
 The measurements for each benchmark in `goddbbench` include the extrema (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  For all metrics except the latter, the time unit is given in microseconds (μs).
 
-## Setup
+## System Setup
 Three components are required in order to use `goddbench`. These are:
 - Docker to run the DBMS instances. Technically, these instances can also run somewhere else as long as the IP address and port number is known.
 - The programming language `Go` to execute the tool.
-- The source code of `goddbbench`
+- The source code of Tool
 
 The following subchapter will give further insights into the setup process.
 
@@ -149,10 +181,13 @@ docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/pass
 
 Docker will automatically download the required images, set up and start the containers. This is required as `godbbench` expects these DBMS to be up and running at the specified ports. 
 
-To remove all existing containers and the associated volumes again, use the following two commands.
+To remove the DB containers and the associated volumes again, use the following command.
 
 ```console
-docker rm -f $(docker ps -a -q) && docker volume rm $(docker volume ls -q)
+docker rm -f $(docker ps -a | grep gobench-mysql | cut -f 1 -d ' ') && \
+docker rm -f $(docker ps -a | grep gobench-postgres | cut -f 1 -d ' ') && \
+docker rm -f $(docker ps -a | grep gobench-neo4j | cut -f 1 -d ' ') && \
+docker volume prune -f
 ```
 
 ### Go
@@ -162,7 +197,7 @@ Download the suitable installer for the latest version on the [project's homepag
 go version # should print something like "go version go1...."
 ```
 
-### Source Code of `godbbench`
+### Source Code of Tool
 Either download this GitHub repository manually as ZIP file and extract it on your computer. In case [`git`](https://git-scm.com/downloads) is installed on your system, navigate to the desired storage location in your file system using the terminal and execute the following command.
 
 ```console
@@ -176,7 +211,7 @@ go run godbbench.go # should print "Available subcommands: ..."
 ```
 
 ## Running Benchmarks
-Once the system setup was completed, the first benchmarks can be executed. There are two possibilities to run benchmarks. The *synthetic mode* includes the execution of a few default CRUD statements with a single generic entity. The other possibility would be the *custom script mode* which executes whatever is specified in an externally provided script file. Both modes allow so-called *statement substitution* which is best explained with the examples provided in the following chapter.
+Once the system setup was completed, the first benchmarks can be executed. There are two possibilities to run benchmarks. The *synthetic mode* includes the execution of a few default so-called *Create-Read-Update-Delete (CRUD)* statements with a single generic entity. The other possibility would be the *custom script mode* which executes whatever is specified in an externally provided script file. Both modes allow so-called *statement substitution* which is best explained with the examples provided in the following chapter.
 
 ### Synthetic Mode
 When no custom script is passed to the argument `--script`, synthetic statements are executed. So far these include very basic CRUD operations on one single (generic) entity with random values. Taking the example of PostgreSQL, the synthetic script looks like the following (similar implementation in MySQL and Neo4j adapters).
@@ -184,13 +219,15 @@ When no custom script is passed to the argument `--script`, synthetic statements
 ```SQL
 -- synthetic INSERT
 INSERT INTO godbbench.generic (genericId, name, balance, description) 
-    VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999}}, '{{call .RandString 0 100 }}' );
+VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandIntBetween 0 9999999}}, '{{call .RandString 0 100 }}' );
 
 -- synthetic SELECT
 SELECT * FROM godbbench.Generic WHERE GenericId = {{.Iter}};
 
 -- synthetic UPDATE
-UPDATE godbbench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999}} WHERE GenericId = {{.Iter}};
+UPDATE godbbench.Generic 
+SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandIntBetween 0 9999999}} 
+WHERE GenericId = {{.Iter}};
 
 -- synthetic DELETE
 DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};
@@ -215,17 +252,18 @@ In order to run the synthetic CRUD benchmarks with a multiplicity of 1'000 again
 go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000
 ````
 
-The benchmark results will directly be printed to your console as visualized below.
+The benchmark results will directly be printed to your console as shown in the video below.
 
-<p align="center"> <img src="./docs/assets/cmd_synthetic_postgres.gif"/> </p>
+https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-80aa-52e0397b1b40.mp4
 <h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
+
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
 
 After several runs on various DBMS and with different multiplicities, the different result files located in the same folder can be merged into one single file using the following command.
 
 ```console
-go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
+go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv"
 ````
 
 Finally, the following command will create a static `HTML` page that can be opened using any web browser that visualized the merged result.
@@ -234,7 +272,7 @@ Finally, the following command will create a static `HTML` page that can be open
 go run godbbench.go createcharts --dataFile "./merged.csv"
 ````
 
-With help of the concatenation sign `&&`, all these commands can be combined and executed at once as shown below.
+With help of the concatenation sign `&&` all these commands can be combined and executed at once as shown below.
 
 ```console
 go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 100 --writecsv "neo4j.csv" \
@@ -244,29 +282,133 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
-<p align="center"> <img src="./docs/assets/cmd_concatenated_commands.gif"/> </p>
+https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 <h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
 
+The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
 
 ### Custom Script Mode
+Since the variety and quality of the synthetic benchmarks are limited to a few basic operations, it is much more recommended to test the database systems with custom scripts. This allows to not only account for a use case-specific data scenario but also to test more realistic and thus often more complex CRUD operations. 
 
+Custom scripts require certain annotations to correctly render statements into individual benchmark tasks. Everything below such an annotation, e.g. various SQL statements delimmited with a semicolon, define a single benchmark. These annotations must follow a strict pattern which is explained below.
 
-### Result Visulazation
+```code
+\benchmark <once/loop>  [<0-1>]  \name  <A-Za-z0-9>
+           ─────┬─────   ──┬──          ─────┬─────
+                │          │                 └─ Benchmark identifier: 
+                │          │                    Just a name or label for the benchmark.
+                │          │                    Important for subsequent result analysis.
+                │          │
+                │          └─ Multiplicity share:
+                │             Percental amount of iterations in relation to the specified 
+                │             multiplicity. Only relevant when looping.
+                │
+                └─ Case of recurrence:
+                   Keyword "once" will execute the benchmark only one time, regardless of 
+                   the specified multiplicity. Useful for setup and teardown statements.
+````
+
+In the case of a looping benchmark, the (collection of) statement(s) subsumed below a given annotation will be executed as often as the specified multiplicity share of the provided `--iter` amount. The fictive script example below exemplifies this.
+
+ ```sql
+-- INIT
+\benchmark once \name setup
+-- start of benchmark 'setup'
+DROP TABLE IF EXISTS mytable;
+CREATE TABLE mytable (myId INT PRIMARY KEY, myName VARCHAR(20));
+-- end of benchmark 'setup', will be executed one single time
+
+-- INSERTS
+\benchmark loop 0.75 \name inserts
+-- start of benchmark 'inserts'
+INSERT INTO mytable (myId, myName) VALUES( {{.Iter}}, '{{call .RandString 5 20 }}');
+-- end of benchmark 'inserts', will be executed <75% of given multiplicity> times
+
+-- SELECTS
+\benchmark loop 1.0 \name selects
+-- start of benchmark 'selects'
+SELECT * FROM mytable WHERE myName LIKE '%{{call .RandString 1 10 }}%';
+-- end of benchmark 'selects', will be executed <100% of given multiplicity> times
+```
+
+Using the example script above, the entire benchmarking procedere consists of three benchmark tasks, namely `setup`, `inserts` and `selects`. To start it, the following command would be necessary.
+
+````console
+go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password \
+                             --iter 1000  \
+                             --script "../path/to/scripts/myscript.sql"
+````
+
+The multiplicity in this command is set on `1'000` using the `--iter` option. This results in the following number of excutions per benchmark.
+
+Benchmark | Executions | Reason
+:---------|:--------------------:|:---------
+`setup` | 1 | Single benchmark due to `once` annoation
+`inserts` | 750 | Looping benchmark with multiplicity ration of 75%
+`selects` | 1'000 | Looping benchmark with multiplicity ration of 100%
+
+Further examples can be found in the [script folder](./scripts/) of this project.
+
+### Result Visualisation
 - Evaluation Criteria (Performance)
 
-### Further Automation using Bash Script
+![](https://badgen.net/badge/TODO/*****/red)
+
+### Further Automation
+
+![](https://badgen.net/badge/TODO/*****/red)
+
+https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
+<h6 align="center">Automation Bash Script Usage</h6>
+
+## Showcase
+Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts. However, this script will be disregarded during the showcase.
+
+The second custom script example is called [`employees`](./scripts/employees/). Measured on the number of entities it seems to be less complex than the `merchant` script as it holds only one entity representing employees of a company. However, it introduces a recursive relationship that models the organisational hierarchy, commonly known as the chain of command. The image below represents this data scenario in both relational and graph-based.
+
+<p align="center"> <img src="./docs/assets/employees_schema.svg" width="60%"/> </p>
+<h6 align="center">Relational and Graph-Based Representation of Organsational Hierchary</h6>
+
+Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*. As relational and graph-based DBMS should be able to handle this data scenario, it provides a more fair challenge to them. Therefore, this script will showcase the benchmarking with several different multiplicities in this chapter, directly followed by the result discussion.
+
+### System Specifications
+All benchmarks are conducted on a [MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM)](https://everymac.com/systems/apple/macbook_pro/specs/macbook-pro-core-i7-2.8-quad-core-13-mid-2019-touch-bar-specs.html). The three databases at focus (MySQL, PostgreSQL and Neo4j) were setup with Docker exactly as documented in an earlier chapter. The images used are the official database images which are available for download in the Docker Hub. No improvements or modifications have been made to these images. Additionally, no other applications were running during the benchmarking process except Docker and a terminal window.
+
+### Script Strategy
+The `employees` script for all three focused DBMSs can be found in this folder. It is structured into the following parts.
+
+Part | Benchmark | Tasks 
+:----|-----------|----------------
+0    | `initialize` | Drop all possibly existing data and recreate the root node called "BigBoss" 
+1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of iterations equals 100% of the specified multiplicity.
+2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified multiplicity.
+3    |`create_index` | Creating a so-called *BTREE* index on the entity's relationship indicator (i.e. foreign key in relational DBMS, resp. relationship itself in graph-based DBMS).
+4 | `clear_cach` | All cached data is discarded.
+5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.
+6 | `clean` | Complete removal of existing data and index information.
+
+The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 100, 1'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations.
 
 
-## Showcase `employees`
-All benchmarks are conducted on a MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM).
+### Results
 
 
+![](https://badgen.net/badge/TODO/*****/red)
 
-# Discussion
+# Conclusion
+
+![](https://badgen.net/badge/TODO/*****/red)
 
 A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
 
 It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19). 
+
+- concurrent connections
+
+- Customization and Tuning of DMBS
+
+- Higher order of multiplicities
+
 
 
 # Acknowledgements
