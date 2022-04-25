@@ -245,11 +245,11 @@ In order to run the synthetic CRUD benchmarks with a multiplicity of 1'000 again
 go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000
 ````
 
-The benchmark results will directly be printed to your console as visualized below.
+The benchmark results will directly be printed to your console as shown in the video below.
 
-
-[![](./docs/assets/cmd_synthetic_postgres_thumbnail.png)](./docs/assets/cmd_synthetic_postgres.mp4)
+https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-80aa-52e0397b1b40.mp4
 <h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
+
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
 
@@ -275,7 +275,7 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
-[![](./docs/assets/cmd_concatenated_commands_thumbnail.png)](./docs/assets/cmd_concatenated_commands.mp4)
+https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 <h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
 
 The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
@@ -349,6 +349,9 @@ Further examples can be found in the [script folder](./scripts/) of this project
 
 ### Further Automation using Bash Script
 ![](https://badgen.net/badge/TODO/*****/red)
+
+https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
+<h6 align="center">Automation Bash Script Usage</h6>
 
 ## Showcase
 Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts. However, this script will be disregarded during the showcase.
