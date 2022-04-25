@@ -174,10 +174,13 @@ docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/pass
 
 Docker will automatically download the required images, set up and start the containers. This is required as `godbbench` expects these DBMS to be up and running at the specified ports. 
 
-To remove all existing containers and the associated volumes again, use the following two commands.
+To remove the DB containers and the associated volumes again, use the following command.
 
 ```console
-docker rm -f $(docker ps -a -q) && docker volume rm $(docker volume ls -q)
+docker rm -f $(docker ps -a | grep gobench-mysql | cut -f 1 -d ' ') && \
+docker rm -f $(docker ps -a | grep gobench-postgres | cut -f 1 -d ' ') && \
+docker rm -f $(docker ps -a | grep gobench-neo4j | cut -f 1 -d ' ') && \
+docker volume prune -f
 ```
 
 ### Go
@@ -377,7 +380,7 @@ Part | Benchmark | Tasks
 6 | `clean` | Complete removal of existing data and index information.
 
 
-The chosen multiplicities for this benchmarking procedure are defined as $\{ 10, 100, 1'000, 10'000 \}$. The reason why this series was not continued to an even higher order of repetitions lies in the computational power limitations of the chosen hardware.
+The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 100, 1'000, 10'000 }`. The reason why this series was not continued to an even higher order of repetitions lies in the computational power limitations of the chosen hardware.
 
 ### Results
 
