@@ -86,14 +86,11 @@ On the other hand, graph-based DBMS also bear certain disadvantages. First, ther
 # Query Languages
 The communication language for relational DBMS is called *Structured Query Language* (SQL). Although each DBMS has its own slightly different SQL implementation, so-called dialects, the language follows a standard that is broadly known among developers and database engineers. SQL statements can be structured into three subdivisions, namely Data Definition Language (DDL), Data Manipulation Language (DML) and Data Control Language (DCL)[[15]](#15). The following table specified the associated database operations for each subdivision.
 
-
-<h6 align="center">SQL Subdivision & Database Operations</h6>
 Subdivision | Database Operations
 :-----------|:--------------------------------
 DDL         | `CREATE`, `ALTER`, `DROP`, `TRUNCATE`
 DML         | `SELECT`, `INSERT`, `UPDATE`, `DELETE`
 DCL         | `GRANT`, `REVOKE`, `COMMIT`, `ROLLBACK`
-
 
 The fundamentally different paradigm in graph-based DBMS requires different communication languages. Neo4j for example implemented the expressive and compact language called *Cypher* which has a close affinity with the common graph representation habit. This facilitates the programmatic interaction with property graphs. Other languages are *[SPARQL](https://www.w3.org/TR/rdf-sparql-query/)* or *[Gremlin](https://github.com/tinkerpop/gremlin/wiki)*  which are, however, not further discussed in this work. 
 
@@ -255,6 +252,7 @@ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass
 The benchmark results will directly be printed to your console as shown in the video below.
 
 <h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
+
 https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-80aa-52e0397b1b40.mp4
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
@@ -282,6 +280,7 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 ```
 
 <h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
+
 https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 
 The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
@@ -358,6 +357,7 @@ Further examples can be found in the [script folder](./scripts/) of this project
 ![](https://badgen.net/badge/TODO/*****/red)
 
 <h6 align="center">Automation Bash Script Usage</h6>
+
 https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
 
 ## Showcase
