@@ -358,7 +358,7 @@ Two examples of custom scripts already exist in this repository. The first is na
 
 The second custom script example is called [`employees`](./scripts/employees/). Measured on the number of entities it seems to be less complex than the `merchant` script as it holds only one entity representing employees of a company. However, it introduces a recursive relationship that models the organisational hierarchy, commonly known as the chain of command. The image below represents this data scenario in both relational and graph-based.
 
-<p align="center"> <img src="./docs/assets/employees_schema.drawio.svg" width="100%"/> </p>
+<p align="center"> <img src="./docs/assets/employees_schema.svg" width="60%"/> </p>
 <h6 align="center">Relational and Graph-Based Representation of Organsational Hierchary</h6>
 
 Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*. As relational and graph-based DBMS should be able to handle this data scenario, it provides a more fair challenge to them. Therefore, this script will showcase the benchmarking with several different multiplicities in this chapter, directly followed by the result discussion.
