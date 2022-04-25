@@ -21,7 +21,7 @@ CREATE BTREE INDEX index_boss FOR (r:BOSS_OF) ON (r.id);
 \benchmark once \name clear_cache
 Call db.clearQueryCaches();
 
-// SELECT 1
+// SELECT 2
 \benchmark loop 1.0 \name select_after_index
 MATCH (boss)-[r:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 
