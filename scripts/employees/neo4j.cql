@@ -15,7 +15,6 @@ MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 
 // INDEX
 \benchmark once \name create_index
-CREATE BTREE INDEX index_employeeId FOR (n:employee) ON (n.employeeId);
 CREATE BTREE INDEX index_boss FOR (r:BOSS_OF) ON (r.id);
 
 // CACHE
