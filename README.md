@@ -266,7 +266,7 @@ go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv"
 Finally, the following command will create a static `HTML` page that can be opened using any web browser that visualized the merged result.
 
 ```console
-go run godbbench.go createcharts --dataFile "./merged.csv"
+go run godbbench.go createcharts --dataFile "./merged.csv" # creates 'charts.html' 
 ````
 
 With help of the concatenation sign `&&` all these commands can be combined and executed at once as shown below.
@@ -348,7 +348,13 @@ Benchmark | Executions | Reason
 Further examples can be found in the [script folder](./scripts/) of this project.
 
 ### Result Visualisation
-- Evaluation Criteria (Performance)
+When the performance results of a conducted benchmarking have been redirected into a CSV file and merged one can immediately create a set of charts in order to analyze the results visually. The command used to accomplish this is `go run godbbench.go createcharts ...` and was already introduce at the end of chapter [Synthetic Mode](#synthetic-mode).
+
+<h6 align="center">Example of Merged Results</h6>
+<p align="center"> <img src="./docs/assets/csvfile.svg" width="100%"/> </p>
+
+![](https://badgen.net/badge/TODO/**explain_metrics***/red)
+
 
 ![](https://badgen.net/badge/TODO/*****/red)
 
