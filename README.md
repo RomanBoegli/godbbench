@@ -1,8 +1,12 @@
 <p align="center"> <img src="./docs/assets/logo.svg" width="300"/> </p>
 
 
->This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see [this presentation](https://romanboegli.github.io/godbbench/).
+>*This project was created during the database seminar at the Eastern Switzerland University of Applied Science as part of the MSE Computer Science program. To receive an overview, please see [this presentation](https://romanboegli.github.io/godbbench/)*.
 
+
+</br>
+
+**Table of Contents**
 
 - [Abstract](#abstract)
 - [Relational Database Systems](#relational-database-systems)
@@ -21,10 +25,13 @@
     + [Synthetic Mode](#synthetic-mode)
     + [Statement Substitutions](#statement-substitutions)
     + [Custom Script Mode](#custom-script-mode)
-    + [Result Visulazation](#result-visulazation)
-    + [Further Automation using Bash Script](#further-automation-using-bash-script)
+    + [Result Visualisation](#result-visualisation)
+    + [Further Automation](#further-automation)
   * [Showcase](#showcase)
-- [Discussion](#discussion)
+    + [System Specifications](#system-specifications)
+    + [Script Strategy](#script-strategy)
+    + [Results](#results)
+- [Conclusion](#conclusion)
 - [Acknowledgements](#acknowledgements)
 - [References](#references)
 
@@ -342,12 +349,13 @@ Benchmark | Executions | Reason
 
 Further examples can be found in the [script folder](./scripts/) of this project.
 
-### Result Visulazation
+### Result Visualisation
 - Evaluation Criteria (Performance)
 
 ![](https://badgen.net/badge/TODO/*****/red)
 
-### Further Automation using Bash Script
+### Further Automation
+
 ![](https://badgen.net/badge/TODO/*****/red)
 
 https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
@@ -385,6 +393,7 @@ The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 
 ### Results
 
 
+![](https://badgen.net/badge/TODO/*****/red)
 
 # Conclusion
 
