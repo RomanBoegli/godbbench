@@ -16,7 +16,7 @@
   * [System Setup](#system-setup)
     + [Docker](#docker)
     + [Go](#go)
-    + [Source Code of `godbbench`](#source-code-of--godbbench-)
+    + [Source Code of Tool](#source-code-of-tool)
   * [Running Benchmarks](#running-benchmarks)
     + [Synthetic Mode](#synthetic-mode)
     + [Statement Substitutions](#statement-substitutions)
@@ -153,7 +153,7 @@ The measurements for each benchmark in `goddbbench` include the extrema (i.e. mi
 Three components are required in order to use `goddbench`. These are:
 - Docker to run the DBMS instances. Technically, these instances can also run somewhere else as long as the IP address and port number is known.
 - The programming language `Go` to execute the tool.
-- The source code of `goddbbench`
+- The source code of Tool
 
 The following subchapter will give further insights into the setup process.
 
@@ -190,7 +190,7 @@ Download the suitable installer for the latest version on the [project's homepag
 go version # should print something like "go version go1...."
 ```
 
-### Source Code of `godbbench`
+### Source Code of Tool
 Either download this GitHub repository manually as ZIP file and extract it on your computer. In case [`git`](https://git-scm.com/downloads) is installed on your system, navigate to the desired storage location in your file system using the terminal and execute the following command.
 
 ```console
