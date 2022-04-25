@@ -54,8 +54,8 @@ Relational databases belong to the most popular database management systems (DBM
 
 Relationally storing data first and foremost means that every piece of unique information ideally is stored only once in our database and then referenced multiple times to wherever it is required to be. This referencing works with so-called primary keys (PK) and foreign keys (FK), where the latter serves as a pointer to the actual information. The following example describes such a relationally linked data structure utilizing a merchant use case.
 
-<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="60%"/> </p>
 <h6 align="center">Possible Entity-Relationship Diagram of a Merchant's Database</h6>
+<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="60%"/> </p>
 
 Each box in this entity-relationship diagram (ERD) represents an *entity*, which is in practice nothing else than a table where each row describes a distinct tuple. The listed attributes in the boxes correspond to the columns of the table, also known as *attributes*. The connecting lines specify the *relationships* between the entities. The relationships also indicate *cardinality*. A customer, for instance, can place zero or any amount of orders. Each order contains at least one line item. A supplier, on the other hand, delivers one or more products, while each product belongs to exactly one category. Finally, a product can occur zero or many times in the great list of line items.
 
@@ -71,8 +71,8 @@ On the other hand, can the rigidness of relational DBMS also be seen as an advan
 
 With rising trends in amounts and connections of data, the classic relational database management systems seemed not to be the ideal choice. In the field of mathematics, graph theory was already established and algorithms to assess networks of connected nodes became more and more popular. The core business model of emerging companies such as Twitter or Facebook was and still is based on data that can be represented ideally as graphs. For instance, think of friendship relations among people as shown in the figure below. Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them. The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
-<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
+<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 
 Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [Neo4j](https://neo4j.com/). Other than in relational DBMS, Neo4j allows heterogeneous sets of attributes on both nodes and relationships. This implies that there is also no database schema to be specified beforehand. One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database [[11]](#11).
 
@@ -86,13 +86,14 @@ On the other hand, graph-based DBMS also bear certain disadvantages. First, ther
 # Query Languages
 The communication language for relational DBMS is called *Structured Query Language* (SQL). Although each DBMS has its own slightly different SQL implementation, so-called dialects, the language follows a standard that is broadly known among developers and database engineers. SQL statements can be structured into three subdivisions, namely Data Definition Language (DDL), Data Manipulation Language (DML) and Data Control Language (DCL)[[15]](#15). The following table specified the associated database operations for each subdivision.
 
+
+<h6 align="center">SQL Subdivision & Database Operations</h6>
 Subdivision | Database Operations
 :-----------|:--------------------------------
 DDL         | `CREATE`, `ALTER`, `DROP`, `TRUNCATE`
 DML         | `SELECT`, `INSERT`, `UPDATE`, `DELETE`
 DCL         | `GRANT`, `REVOKE`, `COMMIT`, `ROLLBACK`
 
-<h6 align="center">SQL Subdivision & Database Operations</h6>
 
 The fundamentally different paradigm in graph-based DBMS requires different communication languages. Neo4j for example implemented the expressive and compact language called *Cypher* which has a close affinity with the common graph representation habit. This facilitates the programmatic interaction with property graphs. Other languages are *[SPARQL](https://www.w3.org/TR/rdf-sparql-query/)* or *[Gremlin](https://github.com/tinkerpop/gremlin/wiki)*  which are, however, not further discussed in this work. 
 
@@ -122,7 +123,6 @@ MATCH (c:Customer)-[:MAKES]->(p:Purchase)
 RETURN c.Name, SUM(p.Total) AS TotalOrderValue 
 ORDER BY TotalOrderValue DESC
 ```
-<h6 align="center">SQL vs. Cypher: Querying Top Customers based on Revenue</h6>
 
 The SQL approach involves joining the `Purchase` entity via the explicitly stated mapping key `CustomerId`. Furthermore, the usage of the aggregation function `SUM`requires the subsequent `GROUP BY` clause to become a valid statement. In Cypher, however, joining is done using the (attributed) arrow clause `-->` which simply indicates a relationship and no grouping clause is required in order to benefit from aggregation functions.
 
@@ -151,8 +151,8 @@ Each benchmark performed with `goddbbench` requires the indication of the number
 ### Geometric Mean
 Following the advice of repeated statement executions will lead to many different time measurements. In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers. A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[18]](#18). It is defined as followed:
 
-<p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
 <h6 align="center">Geometric Mean</h6>
+<p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
 
 The measurements for each benchmark in `goddbbench` include the extrema (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  For all metrics except the latter, the time unit is given in microseconds (μs).
 
@@ -254,9 +254,8 @@ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass
 
 The benchmark results will directly be printed to your console as shown in the video below.
 
-https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-80aa-52e0397b1b40.mp4
 <h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
-
+https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-80aa-52e0397b1b40.mp4
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
 
@@ -282,8 +281,8 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
-https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 <h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
+https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 
 The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
 
@@ -358,8 +357,8 @@ Further examples can be found in the [script folder](./scripts/) of this project
 
 ![](https://badgen.net/badge/TODO/*****/red)
 
-https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
 <h6 align="center">Automation Bash Script Usage</h6>
+https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
 
 ## Showcase
 Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts. However, this script will be disregarded during the showcase.
