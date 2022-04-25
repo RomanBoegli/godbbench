@@ -242,13 +242,13 @@ Declaration | Substitution
 In order to run the synthetic CRUD benchmarks with a multiplicity of 1'000 against the running PostgreSQL Docker instance, execute the following statement.
 
 ````console
-go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password \
-                             --iter 1000
+go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000
 ````
 
 The benchmark results will directly be printed to your console as visualized below.
 
-<p align="center"> <img src="./docs/assets/cmd_synthetic_postgres.gif" width="100%"/> </p>
+
+[![](./docs/assets/cmd_synthetic_postgres_thumbnail.png)](./docs/assets/cmd_synthetic_postgres.mp4)
 <h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
@@ -268,17 +268,14 @@ go run godbbench.go createcharts --dataFile "./merged.csv"
 With help of the concatenation sign `&&` all these commands can be combined and executed at once as shown below.
 
 ```console
-go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password \
-                          --iter 100 --writecsv "neo4j.csv" \
-&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password \
-                                --iter 100 --writecsv "postgres.csv" \
-&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password \
-                             --iter 100 --writecsv "mysql.csv" \
+go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass password --iter 100 --writecsv "neo4j.csv" \
+&& go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 100 --writecsv "postgres.csv" \
+&& go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user root --pass password --iter 100 --writecsv "mysql.csv" \
 && go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv" \
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
-<p align="center"> <img src="./docs/assets/cmd_concatenated_commands.gif" width="100%"/> </p>
+[![](./docs/assets/cmd_concatenated_commands_thumbnail.png)](./docs/assets/cmd_concatenated_commands.mp4)
 <h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
 
 The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
@@ -379,8 +376,8 @@ Part | Benchmark | Tasks
 5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.
 6 | `clean` | Complete removal of existing data and index information.
 
+The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 100, 1'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations.
 
-The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 100, 1'000, 10'000 }`. The reason why this series was not continued to an even higher order of repetitions lies in the computational power limitations of the chosen hardware.
 
 ### Results
 

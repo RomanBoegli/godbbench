@@ -31,5 +31,4 @@ MATCH (boss)-[r:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
     MATCH (n) DETACH DELETE n;
     Call db.clearQueryCaches();
 :commit;
-DROP INDEX ON :employee(employeeId);
 DROP INDEX ON :BOSS_OF(id);
