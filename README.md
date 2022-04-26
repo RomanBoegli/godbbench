@@ -395,8 +395,8 @@ Each interation of a benchmark is timed in order to measure its performance. As 
 
 The file serves as a basis for any kind of subsequent data analysis or visualisation routines. One routine is already implemented in `godbbench` and can be invoked using the `createcharts` command. Most of the metrics are specified with the time unit of *microseconds*, that is `1` second (s) equals `1'000'0000` microseconds (μs). The following table explains the meaning of all available columns in this file. 
 
-Column           | Definition           
------------------|---------------------
+Column / Metric  | Definition           
+:----------------|:---------------------
 `system`         | Name of testes DBMS
 `multiplicity`   | Number of iterations specified at invocation time.
 `name`           | The benchmark's name.
@@ -411,8 +411,9 @@ Column           | Definition       
 
 The current implementation of the automated data visualisation using `createcharts` command only accounts for the metrics `arithMean (μs)`, `geoMean (μs)`, `ops/s` and `μs/op` for each benchmark (column `name`). The X-axsis represents the available multiplicities and the actual values are dynamically projected on the Y-axsis. The command argument `--type` also allows to alternate between a bar or a line chart, as illustrated below. Additionally, the charts introduce a few interaction possibilities as demonstrated in the animation below.
 
-<h6 align="center">Interactive Bar Chart</h6>
+<h6 align="center">Chart Interaction Options</h6>
 
+https://user-images.githubusercontent.com/22320200/165250355-89a74627-ea88-4d60-a458-b3ab55d10427.mp4
 
 
 ### Further Automation
