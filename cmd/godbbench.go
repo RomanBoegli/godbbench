@@ -70,7 +70,7 @@ func main() {
 		// Flags to generate charts
 		createChartFlags = pflag.NewFlagSet("createcharts", pflag.ExitOnError)
 		dataFile         = createChartFlags.String("dataFile", "../tmp/merged.csv", "path to source data file, assumes headers")
-		charttype        = createChartFlags.String("charttype", "line", "default is 'line', alternative is 'bar'")
+		chartType        = createChartFlags.String("chartType", "line", "alternative is \"bar\"")
 	)
 
 	defaultFlags.Usage = func() {
@@ -121,7 +121,7 @@ func main() {
 		if err := createChartFlags.Parse(os.Args[2:]); err != nil {
 			log.Fatalf("failed to parse postgres flags: %v", err)
 		}
-		CreateCharts(*dataFile, *charttype)
+		CreateCharts(*dataFile, *chartType)
 		os.Exit(0)
 	default:
 		if err := defaultFlags.Parse(os.Args[1:]); err != nil {
@@ -207,14 +207,7 @@ func main() {
 			// run the particular benchmark
 			results := benchmark.Run(bencher, b, *iter, *threads)
 
-			// execution in ms for mode once
-			μsPerOp := float64(results.Duration.Microseconds())
-
-			// execution in ns/op for mode loop
-			if b.Type == benchmark.TypeLoop {
-				μsPerOp /= float64(int64(*iter))
-			}
-
+			μsPerOp := float64(results.Duration.Microseconds() / int64(results.TotalExecutionCount))
 			summary = append(summary, []string{
 				system,
 				fmt.Sprint(*iter),
@@ -390,7 +383,7 @@ func getBasicChart(title string, subtitle string, xAxisLabel string, yAxisLabel 
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
 		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1100px", Height: "450px"}),
-		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle}),
+		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle, Left: "center", Top: "0%"}),
 		charts.WithLegendOpts(opts.Legend{Show: true, Y: "30", SelectedMode: "multiple", ItemWidth: 20}),
 		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#318BFF", "#23B12A"}),
 		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
