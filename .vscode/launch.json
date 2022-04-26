@@ -7,7 +7,7 @@
         {
             "description": "set",
             "id": "set",
-            "options": ["employees", "merchant"],
+            "options": ["employees", "merchant", "synthetic"],
             "type":"pickString"
         }, 
         {
@@ -40,7 +40,7 @@
                     , "--threads", "${input:threads}"
                     , "--keep", "true"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/mysql.sql"
-                    , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_mysql_${input:iter}.csv"
+                    , "--writecsv", "${workspaceFolder}/tmp/results/${input:set}/mysql_${input:iter}.csv"
                 ],
             "internalConsole": true
         },
@@ -57,6 +57,7 @@
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
                     , "--threads", "${input:threads}"
+                    , "--writecsv", "${workspaceFolder}/tmp/results/synthetic/mysql_${input:iter}.csv"
                 ],
             "internalConsole": true
         },
@@ -75,7 +76,7 @@
                     , "--threads", "${input:threads}"
                     , "--keep", "true"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/postgres.sql"
-                    , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_postgres_${input:iter}.csv"
+                    , "--writecsv", "${workspaceFolder}/tmp/results/${input:set}/postgres_${input:iter}.csv"
                 ],
             "internalConsole": true
         },
@@ -92,6 +93,7 @@
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
                     , "--threads", "${input:threads}"
+                    , "--writecsv", "${workspaceFolder}/tmp/results/synthetic/postgres_${input:iter}.csv"
                 ],
             "internalConsole": true 
         },
@@ -110,7 +112,7 @@
                     , "--threads", "${input:threads}"
                     , "--keep", "true"
                     , "--script", "${workspaceFolder}/scripts/${input:set}/neo4j.cql"
-                    , "--writecsv", "${workspaceFolder}/tmp/results-${input:set}/result_${input:set}_neo4j_${input:iter}.csv"
+                    , "--writecsv", "${workspaceFolder}/tmp/results/${input:set}/neo4j_${input:iter}.csv"
                 ],
             "internalConsole": true 
         },
@@ -127,6 +129,7 @@
                     , "--pass", "password"
                     , "--iter", "${input:iter}"
                     , "--threads", "${input:threads}"
+                    , "--writecsv", "${workspaceFolder}/tmp/results/synthetic/result_neo4j_${input:iter}.csv"
                 ],
             "internalConsole": true 
         },
