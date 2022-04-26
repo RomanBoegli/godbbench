@@ -348,15 +348,72 @@ Benchmark | Executions | Reason
 Further examples can be found in the [script folder](./scripts/) of this project.
 
 ### Result Visualisation
-When the performance results of a conducted benchmarking have been redirected into a CSV file and merged one can immediately create a set of charts in order to analyze the results visually. The command used to accomplish this is `go run godbbench.go createcharts ...` and was already introduce at the end of chapter [Synthetic Mode](#synthetic-mode).
+Each interation of a benchmark is timed in order to measure its performance. As seen before, the individual results can be saved as CSV files and merged into one single file. The following excerpt exemplifies what such a merged result file could look like.
 
-<h6 align="center">Example of Merged Results</h6>
-<p align="center"> <img src="./docs/assets/csvfile.svg" width="100%"/> </p>
+```code
+┌───────────┬───────────────┬──────────┬─────────────┬─────────────┬─────────────────┬───────────────┬───────────┬───────────┬────────┬────────┐
+│ system    │ multiplicity  │ name     │ executions  │ total (μs)  │ arithMean (μs)  │ geoMean (μs)  │ min (μs)  │ max (μs)  │ ops/s  │ μs/op  │
+├───────────┼───────────────┼──────────┼─────────────┼─────────────┼─────────────────┼───────────────┼───────────┼───────────┼────────┼────────┤
+│ mysql     │ 10            │ inserts  │ 10          │ 20435       │ 19431           │ 20799         │ 16618     │ 19902     │ 489    │ 2043   │
+│ mysql     │ 10            │ selects  │ 10          │ 11682       │ 8637            │ 8950          │ 4639      │ 11309     │ 855    │ 1168   │
+│ mysql     │ 10            │ updates  │ 10          │ 16845       │ 14353           │ 15115         │ 9305      │ 16435     │ 593    │ 1684   │
+│ mysql     │ 10            │ deletes  │ 10          │ 19017       │ 16020           │ 16881         │ 9961      │ 18783     │ 525    │ 1901   │
+│ mysql     │ 100           │ inserts  │ 100         │ 160652      │ 17733           │ 10315         │ 1912      │ 111225    │ 622    │ 1606   │
+│ mysql     │ 100           │ selects  │ 100         │ 44790       │ 3577            │ 2494          │ 976       │ 29640     │ 2232   │ 447    │
+│ mysql     │ 100           │ updates  │ 100         │ 122012      │ 13576           │ 11685         │ 2141      │ 33193     │ 819    │ 1220   │
+│ mysql     │ 100           │ deletes  │ 100         │ 65382       │ 6182            │ 5818          │ 2144      │ 13177     │ 1529   │ 653    │
+│ mysql     │ 1000          │ inserts  │ 1000        │ 789239      │ 11274           │ 10586         │ 3417      │ 38472     │ 1267   │ 789    │
+│ mysql     │ 1000          │ selects  │ 1000        │ 314366      │ 4120            │ 3301          │ 870       │ 33581     │ 3180   │ 314    │
+│ mysql     │ 1000          │ updates  │ 1000        │ 773601      │ 10667           │ 9631          │ 2210      │ 46906     │ 1292   │ 773    │
+│ mysql     │ 1000          │ deletes  │ 1000        │ 490949      │ 6960            │ 6632          │ 2232      │ 19029     │ 2036   │ 490    │
+│ neo4j     │ 10            │ inserts  │ 10          │ 195612      │ 173451          │ 183267        │ 110071    │ 195053    │ 51     │ 19561  │
+│ neo4j     │ 10            │ selects  │ 10          │ 45374       │ 33205           │ 33367         │ 16483     │ 45277     │ 220    │ 4537   │
+│ neo4j     │ 10            │ updates  │ 10          │ 105883      │ 100145          │ 107301        │ 96661     │ 105207    │ 94     │ 10588  │
+│ neo4j     │ 10            │ deletes  │ 10          │ 35309       │ 25401           │ 25780         │ 14108     │ 35218     │ 283    │ 3530   │
+│ neo4j     │ 100           │ inserts  │ 100         │ 833858      │ 95858           │ 77052         │ 15691     │ 329898    │ 119    │ 8338   │
+│ neo4j     │ 100           │ selects  │ 100         │ 685079      │ 73109           │ 63719         │ 14835     │ 192135    │ 145    │ 6850   │
+│ neo4j     │ 100           │ updates  │ 100         │ 608159      │ 66402           │ 56629         │ 13099     │ 180347    │ 164    │ 6081   │
+│ neo4j     │ 100           │ deletes  │ 100         │ 541592      │ 55821           │ 49806         │ 13646     │ 140613    │ 184    │ 5415   │
+│ neo4j     │ 1000          │ inserts  │ 1000        │ 3482636     │ 50148           │ 45613         │ 8727      │ 248238    │ 287    │ 3482   │
+│ neo4j     │ 1000          │ selects  │ 1000        │ 3873064     │ 55643           │ 51104         │ 10384     │ 192788    │ 258    │ 3873   │
+│ neo4j     │ 1000          │ updates  │ 1000        │ 3393816     │ 49276           │ 45709         │ 11202     │ 153225    │ 294    │ 3393   │
+│ neo4j     │ 1000          │ deletes  │ 1000        │ 3097136     │ 44314           │ 40621         │ 8770      │ 169153    │ 322    │ 3097   │
+│ postgres  │ 10            │ inserts  │ 10          │ 42880       │ 30977           │ 30125         │ 5821      │ 42170     │ 233    │ 4288   │
+│ postgres  │ 10            │ selects  │ 10          │ 37178       │ 26828           │ 27351         │ 14140     │ 36999     │ 268    │ 3717   │
+│ postgres  │ 10            │ updates  │ 10          │ 35324       │ 25311           │ 22674         │ 2688      │ 35163     │ 283    │ 3532   │
+│ postgres  │ 10            │ deletes  │ 10          │ 38104       │ 24445           │ 19879         │ 2685      │ 37997     │ 262    │ 3810   │
+│ postgres  │ 100           │ inserts  │ 100         │ 97908       │ 10035           │ 4393          │ 1489      │ 80063     │ 1021   │ 979    │
+│ postgres  │ 100           │ selects  │ 100         │ 109397      │ 10711           │ 3847          │ 879       │ 75002     │ 914    │ 1093   │
+│ postgres  │ 100           │ updates  │ 100         │ 110818      │ 11724           │ 6630          │ 1845      │ 59777     │ 902    │ 1108   │
+│ postgres  │ 100           │ deletes  │ 100         │ 89923       │ 10452           │ 5117          │ 1042      │ 64316     │ 1112   │ 899    │
+│ postgres  │ 1000          │ inserts  │ 1000        │ 787422      │ 10420           │ 5762          │ 852       │ 94569     │ 1269   │ 787    │
+│ postgres  │ 1000          │ selects  │ 1000        │ 316667      │ 3745            │ 2029          │ 564       │ 129437    │ 3157   │ 316    │
+│ postgres  │ 1000          │ updates  │ 1000        │ 680765      │ 8696            │ 4890          │ 864       │ 77583     │ 1468   │ 680    │
+│ postgres  │ 1000          │ deletes  │ 1000        │ 492111      │ 6595            │ 4086          │ 915       │ 78401     │ 2032   │ 492    │
+└───────────┴───────────────┴──────────┴─────────────┴─────────────┴─────────────────┴───────────────┴───────────┴───────────┴────────┴────────┘
+````
 
-![](https://badgen.net/badge/TODO/**explain_metrics***/red)
+The file serves as a basis for any kind of subsequent data analysis or visualisation routines. One routine is already implemented in `godbbench` and can be invoked using the `createcharts` command. Most of the metrics are specified with the time unit of *microseconds*, that is `1` second (s) equals `1'000'0000` microseconds (μs). The following table explains the meaning of all available columns in this file. 
+
+Column           | Definition           
+-----------------|---------------------
+`system`         | Name of testes DBMS
+`multiplicity`   | Number of iterations specified at invocation time.
+`name`           | The benchmark's name.
+`executions`     | Number of executions the given benchmark was performed under consideration of the annotated multiplicity share.
+`total (μs)`     | Total amount of microseconds spend for all executions of the given benchmark.
+`arithMean (μs)` | Average execution time microseconds calculated using the aithmetic mean.
+`geoMean (μs)`   | Average execution time microseconds calculated using the geometric mean.
+`min (μs)`       | Fastest single execution.
+`max (μs)`       | Slowest single execution.
+`ops/s`          | Operations per second which equals `executions` divided by `total (μs)`. This is the only metric in this collection where high values are considered as good.
+`μs/op`          | Microseconds per operation which equals `total (μs)` divided by `executions`.
+
+The current implementation of the automated data visualisation using `createcharts` command only accounts for the metrics `arithMean (μs)`, `geoMean (μs)`, `ops/s` and `μs/op` for each benchmark (column `name`). The X-axsis represents the available multiplicities and the actual values are dynamically projected on the Y-axsis. The command argument `--type` also allows to alternate between a bar or a line chart, as illustrated below. Additionally, the charts introduce a few interaction possibilities as demonstrated in the animation below.
+
+<h6 align="center">Interactive Bar Chart</h6>
 
 
-![](https://badgen.net/badge/TODO/*****/red)
 
 ### Further Automation
 
