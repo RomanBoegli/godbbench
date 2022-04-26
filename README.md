@@ -304,11 +304,12 @@ Custom scripts require certain annotations to correctly render statements into i
                 └─ Case of recurrence:
                    Keyword "once" will execute the benchmark only one time, regardless of 
                    the specified multiplicity. Useful for setup and teardown statements.
-````
+```
 
 In the case of a looping benchmark, the (collection of) statement(s) subsumed below a given annotation will be executed as often as the specified multiplicity share of the provided `--iter` amount. The fictive script example below exemplifies this.
 
- ```sql
+
+```sql
 -- INIT
 \benchmark once \name setup
 -- start of benchmark 'setup'
@@ -391,7 +392,7 @@ Each interation of a benchmark is timed in order to measure its performance. As 
 │ postgres  │ 1000          │ updates  │ 1000        │ 680765      │ 8696            │ 4890          │ 864       │ 77583     │ 1468   │ 680    │
 │ postgres  │ 1000          │ deletes  │ 1000        │ 492111      │ 6595            │ 4086          │ 915       │ 78401     │ 2032   │ 492    │
 └───────────┴───────────────┴──────────┴─────────────┴─────────────┴─────────────────┴───────────────┴───────────┴───────────┴────────┴────────┘
-````
+```
 
 The file serves as a basis for any kind of subsequent data analysis or visualisation routines. One routine is already implemented in `godbbench` and can be invoked using the `createcharts` command. Most of the metrics are specified with the time unit of *microseconds*, that is `1` second (s) equals `1'000'0000` microseconds (μs). The following table explains the meaning of all available columns in this file. 
 
