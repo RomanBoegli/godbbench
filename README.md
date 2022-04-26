@@ -419,7 +419,13 @@ https://user-images.githubusercontent.com/22320200/165250355-89a74627-ea88-4d60-
 
 ### Further Automation
 
-![](https://badgen.net/badge/TODO/*****/red)
+So far it was shown several times how `godbbench` can be used to perform benchmarks against a DBMS using synthetic or custom-created statements and a specified amount of iterations. This must then be repeated for each DBMS and multiplicity which is tedious. Therefore this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
+
+```console
+bash benchmark.sh # use PowerShell when working on Windows
+```
+
+After it has started, it will loop over the provided multiplicities and run the benchmarks for all three supported DBMSs. In the end, the individual result files will be merged and immediately rendered into the mentioned charts. The following video demonstrates this.
 
 <h6 align="center">Automation Bash Script Usage</h6>
 
@@ -455,7 +461,6 @@ The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 
 
 
 ### Results
-
 
 ![](https://badgen.net/badge/TODO/*****/red)
 
