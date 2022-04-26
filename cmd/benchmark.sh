@@ -89,7 +89,7 @@ go run $godbbench_main_path mergecsv \
 echo -e "\nCREATE CHARTS"
 go run $godbbench_main_path createcharts \
     --dataFile "${result_base_path}/${script_set}/merged_results.csv" \
-    --charttype $chart_type
+    --chartType $chart_type
 
 echo $(for i in $(seq 1 50); do printf "#"; done) 
 echo -e "\nTOTAL RUN TIME: " $(expr `date +%s` - $start_time) s
