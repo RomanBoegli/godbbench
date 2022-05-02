@@ -11,6 +11,8 @@ import (
 	"os/signal"
 	"path/filepath"
 	"reflect"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -338,7 +340,7 @@ func CreateCharts(dataFile string, charttype string) {
 	}
 
 	systems := unique(df.Select([]string{"system"}).Records())
-	mults := unique(df.Select([]string{"multiplicity"}).Records())
+	mults, _ := castToIntArray(unique(df.Select([]string{"multiplicity"}).Records()))
 	names := unique(df.Select([]string{"name"}).Records())
 
 	page := components.NewPage()
@@ -422,4 +424,17 @@ func unique(table [][]string) []string {
 		}
 	}
 	return list
+}
+
+func castToIntArray(sa []string) ([]int, error) {
+	si := make([]int, 0, len(sa))
+	for _, a := range sa {
+		i, err := strconv.Atoi(a)
+		if err != nil {
+			return si, err
+		}
+		si = append(si, i)
+	}
+	sort.Ints(si[:])
+	return si, nil
 }
