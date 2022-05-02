@@ -100,7 +100,7 @@ The two languages SQL and Cypher exhibit significant differences in their statem
 -- SQL
 SELECT * FROM Customer c WHERE c.Age >= 18
 
--- Cyper
+-- Cypher
 MATCH (c:Customer) WHERE c.Age > 18 RETURN c;
 ```
 
@@ -115,7 +115,7 @@ FROM Customer c INNER JOIN Purchase p on c.CustomerId = p.CustomerId
 GROUP BY c.CustomerId, c.Name 
 ORDER BY SUM(p.Total) DESC
 
--- Cyper
+-- Cypher
 MATCH (c:Customer)-[:MAKES]->(p:Purchase)
 RETURN c.Name, SUM(p.Total) AS TotalOrderValue 
 ORDER BY TotalOrderValue DESC
@@ -231,7 +231,7 @@ DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};
 ```
 
 ### Statement Substitutions
-Obviously, these statements above seem not to respect the SQL standard. The declarations embraced with double curly brackets will be substituted right before the statement is passed to the DBMS. This allows to dynamically create random queries without specifying thousands of structurally identical SQL statements. All possible substitution commands are listed in the following table.
+Obviously, these statements above seem not to respect the SQL standard. The declarations embraced with double curly brackets (e.g. `{{ example }}`) will be substituted using the [golang template engine](https://pkg.go.dev/text/template) right before the statement is passed to the DBMS. This allows to dynamically create random queries without specifying thousands of structurally identical SQL statements. All possible substitution commands are listed in the following table.
 
 Declaration | Substitution
 :-----------|:------------
@@ -474,7 +474,7 @@ It should be obvious that the measured performance for a given benchmark depends
 
 - concurrent connections
 
-- Customization and Tuning of DMBS
+- Customization and Tuning of DMBS (Strictly using the default configs of the DBMS?)
 
 - Higher order of multiplicities
 
@@ -483,6 +483,7 @@ It should be obvious that the measured performance for a given benchmark depends
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
 
+Also, attention should drawn to other database benchmarking tools out there in the open-source space. For instance [sysbench](https://github.com/akopytov/sysbench) or [hammerdb](https://github.com/TPC-Council/HammerDB). They are based on a similiar usability approach and may provide more sophisticated funcionalities for a given use case. The project [pgbench-tools](https://github.com/gregs1104/pgbench-tools), for instance, focuses excusively on PostgreSQL. They are defenitely worth to be elaborated.
 
 # References
 

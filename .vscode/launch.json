@@ -153,7 +153,7 @@
             "program": "${workspaceFolder}/cmd/godbbench.go",
             "args": ["createcharts"
                     , "--dataFile","${workspaceFolder}/tmp/results/${input:set}/merged.csv"
-                    , "--charttype","bar"
+                    , "--chartType","bar"
             ],
             "internalConsole": true
         }

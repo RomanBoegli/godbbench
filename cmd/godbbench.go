@@ -382,10 +382,10 @@ func getBasicChart(title string, subtitle string, xAxisLabel string, yAxisLabel 
 
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1100px", Height: "450px"}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1000px", Height: "450px"}),
 		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle, Left: "center", Top: "0%"}),
 		charts.WithLegendOpts(opts.Legend{Show: true, Y: "30", SelectedMode: "multiple", ItemWidth: 20}),
-		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#318BFF", "#23B12A"}),
+		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#25A62B", "#2F6792"}),
 		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
 		//charts.WithXAxisOpts(opts.XAxis{AxisLabel: &opts.AxisLabel{Show: true, Rotate: 0, FontSize: "9", Interval: "0"}}), // has a bug
 		charts.WithToolboxOpts(opts.Toolbox{Show: true, Right: "10%", Feature: &opts.ToolBoxFeature{
@@ -397,7 +397,6 @@ func getBasicChart(title string, subtitle string, xAxisLabel string, yAxisLabel 
 		charts.WithYAxisOpts(opts.YAxis{Name: yAxisLabel}),
 		charts.WithDataZoomOpts(opts.DataZoom{Type: "slider", Start: 0, End: 100}),
 	)
-
 	return bar
 }
 
