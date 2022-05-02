@@ -100,7 +100,7 @@ Query adult customers
 -- SQL
 SELECT * FROM Customer c WHERE c.Age >= 18
 
--- Cyper
+-- Cypher
 MATCH (c:Customer) WHERE c.Age > 18 RETURN c;
 ```
 
@@ -112,7 +112,7 @@ SELECT c.CustomerId, c.Name, SUM(p.Total) FROM Customer c
 INNER JOIN Purchase p on c.CustomerId = p.CustomerId 
 GROUP BY c.CustomerId, c.Name ORDER BY SUM(p.Total) DESC
 
--- Cyper
+-- Cypher
 MATCH (c:Customer)-[:MAKES]->(p:Purchase)
 RETURN c.Name, SUM(p.Total) AS TotalOrderValue ORDER BY TotalOrderValue DESC
 ```
@@ -263,16 +263,16 @@ Relationships in graph-based DBs are first-class citizen that can hold informati
 Show all subordinates of an employee (tree queries)
 
 ```SQL
--- use WITH RECURISON notation in Postgres (similar in MySQL)
+-- use WITH RECURISON notation in PostgresSQL (similar in MySQL)
 WITH RECURSIVE hierarchy AS (
-    SELECT employeeId, firstname, boss_id, 0 AS level 
+    SELECT employee_id, first_name, boss_id, 0 AS level 
     FROM employee 
     WHERE employeeId = {{.Iter}}
   UNION ALL 
-    SELECT e.employeeId, e.firstname, e.boss_id, hierarchy.level + 1 AS level 
-    FROM employee e JOIN hierarchy ON e.boss_id = hierarchy.employeeId 
+    SELECT e.employee_id, e.first_name, e.boss_id, hierarchy.level + 1 AS level 
+    FROM employee e JOIN hierarchy ON e.boss_id = hierarchy.employee_id 
 ) SELECT * FROM hierarchy;
-INSERT INTO employee (firstname, boss_id, salary) VALUES ('BigBoss', null, 999999);
+INSERT INTO employee (first_name, boss_id, salary) VALUES ('BigBoss', null, 999999);
 
 -- simpler query using Cypher
 MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;

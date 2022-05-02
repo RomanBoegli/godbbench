@@ -5,29 +5,29 @@ CREATE DATABASE godbbench;
 USE godbbench;
 START TRANSACTION;
   CREATE TABLE employee (
-    employeeId SERIAL PRIMARY KEY,
-    firstname varchar(50) NOT NULL,
-    boss_id INT NULL REFERENCES employee(employeeId),
+    employee_id SERIAL PRIMARY KEY,
+    first_name varchar(50) NOT NULL,
+    boss_id INT NULL REFERENCES employee(employee_id),
     salary INT NULL
   );
-  INSERT INTO employee (firstname, boss_id, salary) VALUES ('BigBoss', null, 999999);
+  INSERT INTO employee (first_name, boss_id, salary) VALUES ('BigBoss', null, 999999);
 COMMIT;
 
 -- INSERT
 \benchmark loop 1.0 \name insert_employee
-SET @fk := (SELECT employeeId FROM godbbench.employee ORDER BY RAND() LIMIT 1);
-INSERT INTO godbbench.employee (firstname, boss_id, salary) VALUES ('{{call .RandString 3 50 }}', @fk, {{call .RandIntBetween 10000 500000 }});
+SET @fk := (SELECT employee_id FROM godbbench.employee ORDER BY RAND() LIMIT 1);
+INSERT INTO godbbench.employee (first_name, boss_id, salary) VALUES ('{{call .RandString 3 50 }}', @fk, {{call .RandIntBetween 10000 500000 }});
 
 -- SELECT 1
 \benchmark loop 1.0 \name select_before_index
 WITH RECURSIVE hierarchy AS (
-    SELECT employeeId, firstname, boss_id, 0 AS level 
+    SELECT employee_id, first_name, boss_id, 0 AS level 
     FROM godbbench.employee 
-    WHERE employeeId = {{.Iter}} 
+    WHERE employee_id = {{.Iter}} 
     UNION ALL 
-    SELECT e.employeeId, e.firstname, e.boss_id, hierarchy.level + 1 AS level 
+    SELECT e.employee_id, e.first_name, e.boss_id, hierarchy.level + 1 AS level 
     FROM godbbench.employee e 
-    JOIN hierarchy ON e.boss_id = hierarchy.employeeId 
+    JOIN hierarchy ON e.boss_id = hierarchy.employee_id 
     ) 
 SELECT * FROM hierarchy;
 
@@ -44,13 +44,13 @@ FLUSH TABLES;
 -- SELECT 2
 \benchmark loop 1.0 \name select_after_index
 WITH RECURSIVE hierarchy AS (
-    SELECT employeeId, firstname, boss_id, 0 AS level 
+    SELECT employee_id, first_name, boss_id, 0 AS level 
     FROM godbbench.employee 
-    WHERE employeeId = {{.Iter}} 
+    WHERE employee_id = {{.Iter}} 
     UNION ALL 
-    SELECT e.employeeId, e.firstname, e.boss_id, hierarchy.level + 1 AS level 
+    SELECT e.employee_id, e.first_name, e.boss_id, hierarchy.level + 1 AS level 
     FROM godbbench.employee e 
-    JOIN hierarchy ON e.boss_id = hierarchy.employeeId 
+    JOIN hierarchy ON e.boss_id = hierarchy.employee_id 
     ) 
 SELECT * FROM hierarchy;
 

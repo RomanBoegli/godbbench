@@ -39,10 +39,10 @@ func NewPostgres(host string, port int, user, password string, maxOpenConns int)
 // Benchmarks returns the individual benchmark statements for the postgres db.
 func (p *Postgres) Benchmarks() []benchmark.Benchmark {
 	return []benchmark.Benchmark{
-		{Name: "inserts", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO godbbench.Generic (GenericId, Name, Balance, Description) VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandInt64}}, '{{call .RandString 0 100 }}' );"},
-		{Name: "selects", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "SELECT * FROM godbbench.Generic WHERE GenericId = {{.Iter}};"},
-		{Name: "updates", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "UPDATE godbbench.Generic SET Name = '{{call .RandString 3 10 }}', Balance = {{call .RandInt64}} WHERE GenericId = {{.Iter}};"},
-		{Name: "deletes", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};"},
+		{Name: "inserts", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "INSERT INTO godbbench.generic (generic_id, name, balance, description) VALUES( {{.Iter}}, '{{call .RandString 3 10 }}', {{call .RandInt64}}, '{{call .RandString 0 100 }}' );"},
+		{Name: "selects", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "SELECT * FROM godbbench.generic WHERE generic_id = {{.Iter}};"},
+		{Name: "updates", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "UPDATE godbbench.generic SET name = '{{call .RandString 3 10 }}', balance = {{call .RandInt64}} WHERE generic_id = {{.Iter}};"},
+		{Name: "deletes", Type: benchmark.TypeLoop, IterRatio: 1.0, Stmt: "DELETE FROM godbbench.generic WHERE generic_id = {{.Iter}};"},
 	}
 }
 
@@ -51,17 +51,17 @@ func (p *Postgres) Setup() {
 	if _, err := p.db.Exec("CREATE SCHEMA IF NOT EXISTS godbbench"); err != nil {
 		log.Fatalf("failed to create schema: %v\n", err)
 	}
-	if _, err := p.db.Exec("CREATE TABLE IF NOT EXISTS godbbench.Generic (GenericId INT PRIMARY KEY, Name VARCHAR(10), Balance DECIMAL, Description VARCHAR(100));"); err != nil {
+	if _, err := p.db.Exec("CREATE TABLE IF NOT EXISTS godbbench.generic (generic_id INT PRIMARY KEY, name VARCHAR(10), balance DECIMAL, description VARCHAR(100));"); err != nil {
 		log.Fatalf("failed to create table: %v\n", err)
 	}
-	if _, err := p.db.Exec("TRUNCATE godbbench.Generic;"); err != nil {
+	if _, err := p.db.Exec("TRUNCATE godbbench.generic;"); err != nil {
 		log.Fatalf("failed to truncate table: %v\n", err)
 	}
 }
 
 // Cleanup removes all remaining benchmarking data.
 func (p *Postgres) Cleanup(closeConnection bool) {
-	if _, err := p.db.Exec("DROP TABLE IF EXISTS godbbench.Generic CASCADE;"); err != nil {
+	if _, err := p.db.Exec("DROP TABLE IF EXISTS godbbench.generic CASCADE;"); err != nil {
 		log.Printf("failed to drop table: %v\n", err)
 	}
 	if _, err := p.db.Exec("DROP SCHEMA IF EXISTS godbbench CASCADE;"); err != nil {

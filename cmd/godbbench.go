@@ -11,6 +11,8 @@ import (
 	"os/signal"
 	"path/filepath"
 	"reflect"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -70,7 +72,7 @@ func main() {
 		// Flags to generate charts
 		createChartFlags = pflag.NewFlagSet("createcharts", pflag.ExitOnError)
 		dataFile         = createChartFlags.String("dataFile", "../tmp/merged.csv", "path to source data file, assumes headers")
-		charttype        = createChartFlags.String("charttype", "line", "default is 'line', alternative is 'bar'")
+		chartType        = createChartFlags.String("chartType", "line", "alternative is \"bar\"")
 	)
 
 	defaultFlags.Usage = func() {
@@ -121,7 +123,7 @@ func main() {
 		if err := createChartFlags.Parse(os.Args[2:]); err != nil {
 			log.Fatalf("failed to parse postgres flags: %v", err)
 		}
-		CreateCharts(*dataFile, *charttype)
+		CreateCharts(*dataFile, *chartType)
 		os.Exit(0)
 	default:
 		if err := defaultFlags.Parse(os.Args[1:]); err != nil {
@@ -207,14 +209,7 @@ func main() {
 			// run the particular benchmark
 			results := benchmark.Run(bencher, b, *iter, *threads)
 
-			// execution in ms for mode once
-			μsPerOp := float64(results.Duration.Microseconds())
-
-			// execution in ns/op for mode loop
-			if b.Type == benchmark.TypeLoop {
-				μsPerOp /= float64(int64(*iter))
-			}
-
+			μsPerOp := float64(results.Duration.Microseconds() / int64(results.TotalExecutionCount))
 			summary = append(summary, []string{
 				system,
 				fmt.Sprint(*iter),
@@ -345,7 +340,7 @@ func CreateCharts(dataFile string, charttype string) {
 	}
 
 	systems := unique(df.Select([]string{"system"}).Records())
-	mults := unique(df.Select([]string{"multiplicity"}).Records())
+	mults, _ := castToIntArray(unique(df.Select([]string{"multiplicity"}).Records()))
 	names := unique(df.Select([]string{"name"}).Records())
 
 	page := components.NewPage()
@@ -389,10 +384,10 @@ func getBasicChart(title string, subtitle string, xAxisLabel string, yAxisLabel 
 
 	bar := charts.NewBar()
 	bar.SetGlobalOptions(
-		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1100px", Height: "450px"}),
-		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle}),
+		charts.WithInitializationOpts(opts.Initialization{PageTitle: "Charts", Width: "1000px", Height: "450px"}),
+		charts.WithTitleOpts(opts.Title{Title: title, Subtitle: subtitle, Left: "center", Top: "0%"}),
 		charts.WithLegendOpts(opts.Legend{Show: true, Y: "30", SelectedMode: "multiple", ItemWidth: 20}),
-		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#318BFF", "#23B12A"}),
+		charts.WithColorsOpts(opts.Colors{"#E16F0C", "#25A62B", "#2F6792"}),
 		charts.WithYAxisOpts(opts.YAxis{AxisLabel: &opts.AxisLabel{Show: true, Formatter: "{value}"}}),
 		//charts.WithXAxisOpts(opts.XAxis{AxisLabel: &opts.AxisLabel{Show: true, Rotate: 0, FontSize: "9", Interval: "0"}}), // has a bug
 		charts.WithToolboxOpts(opts.Toolbox{Show: true, Right: "10%", Feature: &opts.ToolBoxFeature{
@@ -404,7 +399,6 @@ func getBasicChart(title string, subtitle string, xAxisLabel string, yAxisLabel 
 		charts.WithYAxisOpts(opts.YAxis{Name: yAxisLabel}),
 		charts.WithDataZoomOpts(opts.DataZoom{Type: "slider", Start: 0, End: 100}),
 	)
-
 	return bar
 }
 
@@ -430,4 +424,17 @@ func unique(table [][]string) []string {
 		}
 	}
 	return list
+}
+
+func castToIntArray(sa []string) ([]int, error) {
+	si := make([]int, 0, len(sa))
+	for _, a := range sa {
+		i, err := strconv.Atoi(a)
+		if err != nil {
+			return si, err
+		}
+		si = append(si, i)
+	}
+	sort.Ints(si[:])
+	return si, nil
 }

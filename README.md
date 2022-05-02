@@ -54,8 +54,8 @@ Relational databases belong to the most popular database management systems (DBM
 
 Relationally storing data first and foremost means that every piece of unique information ideally is stored only once in our database and then referenced multiple times to wherever it is required to be. This referencing works with so-called primary keys (PK) and foreign keys (FK), where the latter serves as a pointer to the actual information. The following example describes such a relationally linked data structure utilizing a merchant use case.
 
-<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="60%"/> </p>
 <h6 align="center">Possible Entity-Relationship Diagram of a Merchant's Database</h6>
+<p align="center"> <img src="./docs/assets/merchanterd.drawio.svg" width="60%"/> </p>
 
 Each box in this entity-relationship diagram (ERD) represents an *entity*, which is in practice nothing else than a table where each row describes a distinct tuple. The listed attributes in the boxes correspond to the columns of the table, also known as *attributes*. The connecting lines specify the *relationships* between the entities. The relationships also indicate *cardinality*. A customer, for instance, can place zero or any amount of orders. Each order contains at least one line item. A supplier, on the other hand, delivers one or more products, while each product belongs to exactly one category. Finally, a product can occur zero or many times in the great list of line items.
 
@@ -71,8 +71,8 @@ On the other hand, can the rigidness of relational DBMS also be seen as an advan
 
 With rising trends in amounts and connections of data, the classic relational database management systems seemed not to be the ideal choice. In the field of mathematics, graph theory was already established and algorithms to assess networks of connected nodes became more and more popular. The core business model of emerging companies such as Twitter or Facebook was and still is based on data that can be represented ideally as graphs. For instance, think of friendship relations among people as shown in the figure below. Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them. The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
-<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
+<p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 
 Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[10]](#10). Graph-based database systems overcome these limitations as they store such graph-based information natively. A popular implementation of such a system is [Neo4j](https://neo4j.com/). Other than in relational DBMS, Neo4j allows heterogeneous sets of attributes on both nodes and relationships. This implies that there is also no database schema to be specified beforehand. One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database [[11]](#11).
 
@@ -92,8 +92,6 @@ DDL         | `CREATE`, `ALTER`, `DROP`, `TRUNCATE`
 DML         | `SELECT`, `INSERT`, `UPDATE`, `DELETE`
 DCL         | `GRANT`, `REVOKE`, `COMMIT`, `ROLLBACK`
 
-<h6 align="center">SQL Subdivision & Database Operations</h6>
-
 The fundamentally different paradigm in graph-based DBMS requires different communication languages. Neo4j for example implemented the expressive and compact language called *Cypher* which has a close affinity with the common graph representation habit. This facilitates the programmatic interaction with property graphs. Other languages are *[SPARQL](https://www.w3.org/TR/rdf-sparql-query/)* or *[Gremlin](https://github.com/tinkerpop/gremlin/wiki)*  which are, however, not further discussed in this work. 
 
 The two languages SQL and Cypher exhibit significant differences in their statement formulation, as the following examples show. 
@@ -102,7 +100,7 @@ The two languages SQL and Cypher exhibit significant differences in their statem
 -- SQL
 SELECT * FROM Customer c WHERE c.Age >= 18
 
--- Cyper
+-- Cypher
 MATCH (c:Customer) WHERE c.Age > 18 RETURN c;
 ```
 
@@ -117,12 +115,11 @@ FROM Customer c INNER JOIN Purchase p on c.CustomerId = p.CustomerId
 GROUP BY c.CustomerId, c.Name 
 ORDER BY SUM(p.Total) DESC
 
--- Cyper
+-- Cypher
 MATCH (c:Customer)-[:MAKES]->(p:Purchase)
 RETURN c.Name, SUM(p.Total) AS TotalOrderValue 
 ORDER BY TotalOrderValue DESC
 ```
-<h6 align="center">SQL vs. Cypher: Querying Top Customers based on Revenue</h6>
 
 The SQL approach involves joining the `Purchase` entity via the explicitly stated mapping key `CustomerId`. Furthermore, the usage of the aggregation function `SUM`requires the subsequent `GROUP BY` clause to become a valid statement. In Cypher, however, joining is done using the (attributed) arrow clause `-->` which simply indicates a relationship and no grouping clause is required in order to benefit from aggregation functions.
 
@@ -151,8 +148,8 @@ Each benchmark performed with `goddbbench` requires the indication of the number
 ### Geometric Mean
 Following the advice of repeated statement executions will lead to many different time measurements. In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers. A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[18]](#18). It is defined as followed:
 
-<p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
 <h6 align="center">Geometric Mean</h6>
+<p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
 
 The measurements for each benchmark in `goddbbench` include the extrema (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  For all metrics except the latter, the time unit is given in microseconds (μs).
 
@@ -234,7 +231,7 @@ DELETE FROM godbbench.Generic WHERE GenericId = {{.Iter}};
 ```
 
 ### Statement Substitutions
-Obviously, these statements above seem not to respect the SQL standard. The declarations embraced with double curly brackets will be substituted right before the statement is passed to the DBMS. This allows to dynamically create random queries without specifying thousands of structurally identical SQL statements. All possible substitution commands are listed in the following table.
+Obviously, these statements above seem not to respect the SQL standard. The declarations embraced with double curly brackets (e.g. `{{ example }}`) will be substituted using the [golang template engine](https://pkg.go.dev/text/template) right before the statement is passed to the DBMS. This allows to dynamically create random queries without specifying thousands of structurally identical SQL statements. All possible substitution commands are listed in the following table.
 
 Declaration | Substitution
 :-----------|:------------
@@ -254,9 +251,9 @@ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass
 
 The benchmark results will directly be printed to your console as shown in the video below.
 
-https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-80aa-52e0397b1b40.mp4
 <h6 align="center">Example of Synthetic Benchmarks against PostgreSQL</h6>
 
+https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-80aa-52e0397b1b40.mp4
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
 
@@ -269,7 +266,7 @@ go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv"
 Finally, the following command will create a static `HTML` page that can be opened using any web browser that visualized the merged result.
 
 ```console
-go run godbbench.go createcharts --dataFile "./merged.csv"
+go run godbbench.go createcharts --dataFile "./merged.csv" # creates 'charts.html' 
 ````
 
 With help of the concatenation sign `&&` all these commands can be combined and executed at once as shown below.
@@ -282,8 +279,9 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 && go run godbbench.go createcharts --dataFile "./merged.csv"
 ```
 
-https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 <h6 align="center">Example of Concatenated Synthetic Benchmarks</h6>
+
+https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 
 The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
 
@@ -306,11 +304,12 @@ Custom scripts require certain annotations to correctly render statements into i
                 └─ Case of recurrence:
                    Keyword "once" will execute the benchmark only one time, regardless of 
                    the specified multiplicity. Useful for setup and teardown statements.
-````
+```
 
 In the case of a looping benchmark, the (collection of) statement(s) subsumed below a given annotation will be executed as often as the specified multiplicity share of the provided `--iter` amount. The fictive script example below exemplifies this.
 
- ```sql
+
+```sql
 -- INIT
 \benchmark once \name setup
 -- start of benchmark 'setup'
@@ -350,16 +349,88 @@ Benchmark | Executions | Reason
 Further examples can be found in the [script folder](./scripts/) of this project.
 
 ### Result Visualisation
-- Evaluation Criteria (Performance)
+Each interation of a benchmark is timed in order to measure its performance. As seen before, the individual results can be saved as CSV files and merged into one single file. The following excerpt exemplifies what such a merged result file could look like.
 
-![](https://badgen.net/badge/TODO/*****/red)
+```code
+┌───────────┬───────────────┬──────────┬─────────────┬─────────────┬─────────────────┬───────────────┬───────────┬───────────┬────────┬────────┐
+│ system    │ multiplicity  │ name     │ executions  │ total (μs)  │ arithMean (μs)  │ geoMean (μs)  │ min (μs)  │ max (μs)  │ ops/s  │ μs/op  │
+├───────────┼───────────────┼──────────┼─────────────┼─────────────┼─────────────────┼───────────────┼───────────┼───────────┼────────┼────────┤
+│ mysql     │ 10            │ inserts  │ 10          │ 20435       │ 19431           │ 20799         │ 16618     │ 19902     │ 489    │ 2043   │
+│ mysql     │ 10            │ selects  │ 10          │ 11682       │ 8637            │ 8950          │ 4639      │ 11309     │ 855    │ 1168   │
+│ mysql     │ 10            │ updates  │ 10          │ 16845       │ 14353           │ 15115         │ 9305      │ 16435     │ 593    │ 1684   │
+│ mysql     │ 10            │ deletes  │ 10          │ 19017       │ 16020           │ 16881         │ 9961      │ 18783     │ 525    │ 1901   │
+│ mysql     │ 100           │ inserts  │ 100         │ 160652      │ 17733           │ 10315         │ 1912      │ 111225    │ 622    │ 1606   │
+│ mysql     │ 100           │ selects  │ 100         │ 44790       │ 3577            │ 2494          │ 976       │ 29640     │ 2232   │ 447    │
+│ mysql     │ 100           │ updates  │ 100         │ 122012      │ 13576           │ 11685         │ 2141      │ 33193     │ 819    │ 1220   │
+│ mysql     │ 100           │ deletes  │ 100         │ 65382       │ 6182            │ 5818          │ 2144      │ 13177     │ 1529   │ 653    │
+│ mysql     │ 1000          │ inserts  │ 1000        │ 789239      │ 11274           │ 10586         │ 3417      │ 38472     │ 1267   │ 789    │
+│ mysql     │ 1000          │ selects  │ 1000        │ 314366      │ 4120            │ 3301          │ 870       │ 33581     │ 3180   │ 314    │
+│ mysql     │ 1000          │ updates  │ 1000        │ 773601      │ 10667           │ 9631          │ 2210      │ 46906     │ 1292   │ 773    │
+│ mysql     │ 1000          │ deletes  │ 1000        │ 490949      │ 6960            │ 6632          │ 2232      │ 19029     │ 2036   │ 490    │
+│ neo4j     │ 10            │ inserts  │ 10          │ 195612      │ 173451          │ 183267        │ 110071    │ 195053    │ 51     │ 19561  │
+│ neo4j     │ 10            │ selects  │ 10          │ 45374       │ 33205           │ 33367         │ 16483     │ 45277     │ 220    │ 4537   │
+│ neo4j     │ 10            │ updates  │ 10          │ 105883      │ 100145          │ 107301        │ 96661     │ 105207    │ 94     │ 10588  │
+│ neo4j     │ 10            │ deletes  │ 10          │ 35309       │ 25401           │ 25780         │ 14108     │ 35218     │ 283    │ 3530   │
+│ neo4j     │ 100           │ inserts  │ 100         │ 833858      │ 95858           │ 77052         │ 15691     │ 329898    │ 119    │ 8338   │
+│ neo4j     │ 100           │ selects  │ 100         │ 685079      │ 73109           │ 63719         │ 14835     │ 192135    │ 145    │ 6850   │
+│ neo4j     │ 100           │ updates  │ 100         │ 608159      │ 66402           │ 56629         │ 13099     │ 180347    │ 164    │ 6081   │
+│ neo4j     │ 100           │ deletes  │ 100         │ 541592      │ 55821           │ 49806         │ 13646     │ 140613    │ 184    │ 5415   │
+│ neo4j     │ 1000          │ inserts  │ 1000        │ 3482636     │ 50148           │ 45613         │ 8727      │ 248238    │ 287    │ 3482   │
+│ neo4j     │ 1000          │ selects  │ 1000        │ 3873064     │ 55643           │ 51104         │ 10384     │ 192788    │ 258    │ 3873   │
+│ neo4j     │ 1000          │ updates  │ 1000        │ 3393816     │ 49276           │ 45709         │ 11202     │ 153225    │ 294    │ 3393   │
+│ neo4j     │ 1000          │ deletes  │ 1000        │ 3097136     │ 44314           │ 40621         │ 8770      │ 169153    │ 322    │ 3097   │
+│ postgres  │ 10            │ inserts  │ 10          │ 42880       │ 30977           │ 30125         │ 5821      │ 42170     │ 233    │ 4288   │
+│ postgres  │ 10            │ selects  │ 10          │ 37178       │ 26828           │ 27351         │ 14140     │ 36999     │ 268    │ 3717   │
+│ postgres  │ 10            │ updates  │ 10          │ 35324       │ 25311           │ 22674         │ 2688      │ 35163     │ 283    │ 3532   │
+│ postgres  │ 10            │ deletes  │ 10          │ 38104       │ 24445           │ 19879         │ 2685      │ 37997     │ 262    │ 3810   │
+│ postgres  │ 100           │ inserts  │ 100         │ 97908       │ 10035           │ 4393          │ 1489      │ 80063     │ 1021   │ 979    │
+│ postgres  │ 100           │ selects  │ 100         │ 109397      │ 10711           │ 3847          │ 879       │ 75002     │ 914    │ 1093   │
+│ postgres  │ 100           │ updates  │ 100         │ 110818      │ 11724           │ 6630          │ 1845      │ 59777     │ 902    │ 1108   │
+│ postgres  │ 100           │ deletes  │ 100         │ 89923       │ 10452           │ 5117          │ 1042      │ 64316     │ 1112   │ 899    │
+│ postgres  │ 1000          │ inserts  │ 1000        │ 787422      │ 10420           │ 5762          │ 852       │ 94569     │ 1269   │ 787    │
+│ postgres  │ 1000          │ selects  │ 1000        │ 316667      │ 3745            │ 2029          │ 564       │ 129437    │ 3157   │ 316    │
+│ postgres  │ 1000          │ updates  │ 1000        │ 680765      │ 8696            │ 4890          │ 864       │ 77583     │ 1468   │ 680    │
+│ postgres  │ 1000          │ deletes  │ 1000        │ 492111      │ 6595            │ 4086          │ 915       │ 78401     │ 2032   │ 492    │
+└───────────┴───────────────┴──────────┴─────────────┴─────────────┴─────────────────┴───────────────┴───────────┴───────────┴────────┴────────┘
+```
+
+The file serves as a basis for any kind of subsequent data analysis or visualisation routines. One routine is already implemented in `godbbench` and can be invoked using the `createcharts` command. Most of the metrics are specified with the time unit of *microseconds*, that is `1` second (s) equals `1'000'0000` microseconds (μs). The following table explains the meaning of all available columns in this file. 
+
+Column / Metric  | Definition           
+:----------------|:---------------------
+`system`         | Name of testes DBMS
+`multiplicity`   | Number of iterations specified at invocation time.
+`name`           | The benchmark's name.
+`executions`     | Number of executions the given benchmark was performed under consideration of the annotated multiplicity share.
+`total (μs)`     | Total amount of microseconds spend for all executions of the given benchmark.
+`arithMean (μs)` | Average execution time microseconds calculated using the aithmetic mean.
+`geoMean (μs)`   | Average execution time microseconds calculated using the geometric mean.
+`min (μs)`       | Fastest single execution.
+`max (μs)`       | Slowest single execution.
+`ops/s`          | Operations per second which equals `executions` divided by `total (μs)`. This is the only metric in this collection where high values are considered as good.
+`μs/op`          | Microseconds per operation which equals `total (μs)` divided by `executions`.
+
+The current implementation of the automated data visualisation using `createcharts` command only accounts for the metrics `arithMean (μs)`, `geoMean (μs)`, `ops/s` and `μs/op` for each benchmark (column `name`). The X-axsis represents the available multiplicities and the actual values are dynamically projected on the Y-axsis. The command argument `--type` also allows to alternate between a bar or a line chart, as illustrated below. Additionally, the charts introduce a few interaction possibilities as demonstrated in the animation below.
+
+<h6 align="center">Chart Interaction Options</h6>
+
+https://user-images.githubusercontent.com/22320200/165250355-89a74627-ea88-4d60-a458-b3ab55d10427.mp4
+
 
 ### Further Automation
+So far it was shown several times how `godbbench` can be used to perform benchmarks against a DBMS using synthetic or custom-created statements and a specified amount of iterations. This must then be repeated for each DBMS and multiplicity which is tedious. Therefore this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
 
-![](https://badgen.net/badge/TODO/*****/red)
+```console
+bash benchmark.sh # use PowerShell when working on Windows
+```
+
+After it has started, it will loop over the provided multiplicities and run the benchmarks for all three supported DBMSs. In the end, the individual result files will be merged and immediately rendered into the mentioned charts. The following video demonstrates this.
+
+<h6 align="center">Automation Bash Script Usage</h6>
 
 https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
-<h6 align="center">Automation Bash Script Usage</h6>
+
+Optionally, the script is also able to set-up and tear-down the dockerized database instances before respectively after each multiplicity iteration. This ensures equal container conditions for each benchmarking procedure. 
 
 ## Showcase
 Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts. However, this script will be disregarded during the showcase.
@@ -387,13 +458,15 @@ Part | Benchmark | Tasks
 5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.
 6 | `clean` | Complete removal of existing data and index information.
 
-The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 100, 1'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations.
-
+The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 50, 100, 500, 1'000, 5'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations. The inclusion of these atypical middle steps `{50, 500, 5'000}` serves the purpose of having more data points. The number of threads used for all these iterations was set to `15`.
 
 ### Results
+This chapter briefly summarizes the most expressive results received from the above showcase. The complete analysis can be found either as bar or line charts on [this page](https://romanboegli.github.io/godbbench/showcase-results/index.html). The complete data set with all metrics is also available for download as a [ZIP archive](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip).
+
 
 
 ![](https://badgen.net/badge/TODO/*****/red)
+
 
 # Conclusion
 
@@ -401,11 +474,11 @@ The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 
 
 A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
 
-It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19). 
+It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19).
 
 - concurrent connections
 
-- Customization and Tuning of DMBS
+- Customization and Tuning of DMBS (Strictly using the default configs of the DBMS?)
 
 - Higher order of multiplicities
 
@@ -414,6 +487,7 @@ It should be obvious that the measured performance for a given benchmark depends
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
 
+Also, attention should drawn to other database benchmarking tools out there in the open-source space. For instance [sysbench](https://github.com/akopytov/sysbench) or [hammerdb](https://github.com/TPC-Council/HammerDB). They are based on a similiar usability approach and may provide more sophisticated funcionalities for a given use case. The project [pgbench-tools](https://github.com/gregs1104/pgbench-tools), for instance, focuses excusively on PostgreSQL. They are defenitely worth to be elaborated.
 
 # References
 
