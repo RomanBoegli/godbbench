@@ -461,12 +461,16 @@ Part | Benchmark | Tasks
 The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 50, 100, 500, 1'000, 5'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations. The inclusion of these atypical middle steps `{50, 500, 5'000}` serves the purpose of having more data points. The number of threads used for all these iterations was set to `15`.
 
 ### Results
-This chapter briefly summarizes the most expressive results received from the above showcase. The complete analysis can be found either as bar or line charts on [this page](https://romanboegli.github.io/godbbench/showcase-results/index.html). The complete data set with all metrics is also available for download as a [ZIP archive](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip).
+This chapter briefly summarizes the most expressive results received from the above showcase benchmark script `employees`. All visualizations can be found either as bar or line charts on [this page](https://romanboegli.github.io/godbbench/showcase-results/index.html). The complete data set is also available for download as a [ZIP archive](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip).
 
+The benchmark `insert_employee` clearly shows the inferiority of Neo4j compared to the relational database systems when looking at the microseconds used per operation. Both MySQL and PostgreSQL attest to much more performance in the data creation discipline.
+![](/docs/assets/showcase_insert.png)
 
+Moving on to the first selection benchmark, namely `select_before_index`, the results become less obvious. This time, the Y-Axis of the chart represents the operations per second. Thus, higher values testify higher performance. The two relational databases again consistently outperform Neo4j in all order of multiplicities. PostgreSQL is slightly slower than MySQL except for the runs with `100`, `500` and `10000` iterations.  
+![](/docs/assets/showcase_selectbefore.png)
 
-![](https://badgen.net/badge/TODO/*****/red)
-
+The second selection benchmark `select_after_index` performed the identical task but with antecedent index creation. The introduction of the index affected the MySQL database more than it did with PostgreSQL and makes MySQL a clear winner in this benchmark. Neo4j on the other hand remains in the third place. It must be mentioned, however, that its operations per second values increased overall multiplicities which serve as evidence that the index at least had an accelerating effect as well.
+![](/docs/assets/showcase_selectafter.png)
 
 # Conclusion
 
@@ -487,7 +491,7 @@ It should be obvious that the measured performance for a given benchmark depends
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
 
-Also, attention should drawn to other database benchmarking tools out there in the open-source space. For instance [sysbench](https://github.com/akopytov/sysbench) or [hammerdb](https://github.com/TPC-Council/HammerDB). They are based on a similiar usability approach and may provide more sophisticated funcionalities for a given use case. The project [pgbench-tools](https://github.com/gregs1104/pgbench-tools), for instance, focuses excusively on PostgreSQL. They are defenitely worth to be elaborated.
+Also, attention should drawn to other database benchmarking tools out there in the open-source space. For instance [sysbench](https://github.com/akopytov/sysbench) or [hammerdb](https://github.com/TPC-Council/HammerDB). They are based on a similiar usability approach and may provide more sophisticated funcionalities for a given use case. The project [pgbench-tools](https://github.com/gregs1104/pgbench-tools), for instance, focuses excusively on PostgreSQL.
 
 # References
 
