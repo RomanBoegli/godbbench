@@ -418,7 +418,6 @@ https://user-images.githubusercontent.com/22320200/165250355-89a74627-ea88-4d60-
 
 
 ### Further Automation
-
 So far it was shown several times how `godbbench` can be used to perform benchmarks against a DBMS using synthetic or custom-created statements and a specified amount of iterations. This must then be repeated for each DBMS and multiplicity which is tedious. Therefore this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
 
 ```console
@@ -430,6 +429,8 @@ After it has started, it will loop over the provided multiplicities and run the 
 <h6 align="center">Automation Bash Script Usage</h6>
 
 https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
+
+Optionally, the script is also able to set-up and tear-down the dockerized database instances before respectively after each multiplicity iteration. This ensures equal container conditions for each benchmarking procedure. 
 
 ## Showcase
 Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts. However, this script will be disregarded during the showcase.
@@ -457,12 +458,18 @@ Part | Benchmark | Tasks
 5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.
 6 | `clean` | Complete removal of existing data and index information.
 
-The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 100, 1'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations.
-
+The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 50, 100, 500, 1'000, 5'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations. The inclusion of these atypical middle steps `{50, 500, 5'000}` serves the purpose of having more data points. The number of threads used for all these iterations was set to `15`.
 
 ### Results
 
+Summary | Bar Chart | Line Chart | Raw Data
+---|---|----|----
+[Link](https://romanboegli.github.io/justatest/showcase-results/index.html) | [Link](https://romanboegli.github.io/justatest/showcase-results/pages/charts_bar.html) | [Link](https://romanboegli.github.io/justatest/showcase-results/pages/charts_line.html) | [Link](https://romanboegli.github.io/justatest/showcase-results/DATA.zip)  
+
+
+
 ![](https://badgen.net/badge/TODO/*****/red)
+
 
 # Conclusion
 
@@ -470,7 +477,7 @@ The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 
 
 A data schema in a relational DBMS should not directly be translated into a graph-based DBMS, as there might be entities which dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database. 
 
-It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19). 
+It should be obvious that the measured performance for a given benchmark depends on the system environment that it was executed in. In real-world scenarios are many more influencial factors such as network topology and latency, provided hardware as well as software. Thus it must be mentionned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[19]](#19).
 
 - concurrent connections
 
