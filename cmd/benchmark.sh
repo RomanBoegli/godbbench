@@ -9,13 +9,14 @@
 
 # general
 HOST="127.0.0.1"
-MULTIPLICITIES=("10" "100" "1000" "10000")
+MULTIPLICITIES=("10" "50" "100" "500" "1000" "5000" "10000")
 THREADS=15
 PATH_TO_CLI="./godbbench.go"
 SCRIPT_BASE_PATH="../scripts"
 SCRIPT_SET="employees"
 RESULT_BASE_PATH="../tmp/results"
 CHART_TYPE="line"
+USE_DOCKER=true
 
 # mysql
 MYSQL_PORT="3306"
@@ -43,6 +44,14 @@ for MULT in "${MULTIPLICITIES[@]}"; do
     echo $(for i in $(seq 1 50); do printf "_"; done) 
     echo -e "\nITERATIONS: ${MULT}"
     
+    if $USE_DOCKER; then
+        echo -e "\nBUILD DOCKER ENV"
+        docker run --name gobench-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql && \
+            docker run --name gobench-postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres && \
+            docker run --name gobench-neo4j -p7474:7474 -p7687:7687 -e NEO4J_AUTH=neo4j/password -d neo4j
+        sleep 15
+    fi
+
     echo -e "\nTEST MYSQL"
     go run $PATH_TO_CLI mysql \
         --host $HOST \
@@ -75,6 +84,15 @@ for MULT in "${MULTIPLICITIES[@]}"; do
         --threads $THREADS \
         --script "${SCRIPT_BASE_PATH}/${SCRIPT_SET}/postgres.sql" \
         --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/postgres_${MULT}.csv"
+    
+    if $USE_DOCKER; then
+        echo -e "\nREMOVE DOCKER ENV"
+        docker rm -f $(docker ps -a | grep gobench-mysql | cut -f 1 -d ' ') && \
+            docker rm -f $(docker ps -a | grep gobench-postgres | cut -f 1 -d ' ') && \
+            docker rm -f $(docker ps -a | grep gobench-neo4j | cut -f 1 -d ' ') && \
+            docker volume prune -f
+        sleep 5
+    fi
 done
 
 echo -e "\n"
