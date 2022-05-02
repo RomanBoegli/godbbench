@@ -464,12 +464,15 @@ The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 
 This chapter briefly summarizes the most expressive results received from the above showcase benchmark script `employees`. All visualizations can be found either as bar or line charts on [this page](https://romanboegli.github.io/godbbench/showcase-results/index.html). The complete data set is also available for download as a [ZIP archive](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip).
 
 The benchmark `insert_employee` clearly shows the inferiority of Neo4j compared to the relational database systems when looking at the microseconds used per operation. Both MySQL and PostgreSQL attest to much more performance in the data creation discipline.
+
 ![](/docs/assets/showcase_insert.png)
 
 Moving on to the first selection benchmark, namely `select_before_index`, the results become less obvious. This time, the Y-Axis of the chart represents the operations per second. Thus, higher values testify higher performance. The two relational databases again consistently outperform Neo4j in all order of multiplicities. PostgreSQL is slightly slower than MySQL except for the runs with `100`, `500` and `10000` iterations.  
+
 ![](/docs/assets/showcase_selectbefore.png)
 
 The second selection benchmark `select_after_index` performed the identical task but with antecedent index creation. The introduction of the index affected the MySQL database more than it did with PostgreSQL and makes MySQL a clear winner in this benchmark. Neo4j on the other hand remains in the third place. It must be mentioned, however, that its operations per second values increased overall multiplicities which serve as evidence that the index at least had an accelerating effect as well.
+
 ![](/docs/assets/showcase_selectafter.png)
 
 # Conclusion
