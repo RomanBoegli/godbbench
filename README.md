@@ -464,8 +464,7 @@ The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 
 
 Summary | Bar Chart | Line Chart | Raw Data
 ---|---|----|----
-[Link](https://romanboegli.github.io/justatest/showcase-results/index.html) | [Link](https://romanboegli.github.io/justatest/showcase-results/pages/charts_bar.html) | [Link](https://romanboegli.github.io/justatest/showcase-results/pages/charts_line.html) | [Link](https://romanboegli.github.io/justatest/showcase-results/DATA.zip)  
-
+[Link](https://romanboegli.github.io/godbbench/showcase-results/index.html) | [Link](https://romanboegli.github.io/godbbench/showcase-results/pages/charts_bar.html) | [Link](https://romanboegli.github.io/godbbench/showcase-results/pages/charts_line.html) | [Link](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip)  
 
 
 ![](https://badgen.net/badge/TODO/*****/red)
