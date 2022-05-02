@@ -9,7 +9,7 @@
 
 # general
 HOST="127.0.0.1"
-MULTIPLICITIES=("10" "20")
+MULTIPLICITIES=("10" "100" "1000" "10000")
 THREADS=15
 PATH_TO_CLI="./godbbench.go"
 SCRIPT_BASE_PATH="../scripts"
