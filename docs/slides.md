@@ -312,7 +312,7 @@ Generating a `chart.html` file to visualize
 - microseconds per operation (the lower the better) 
 
 
-![drop-shadow width:700px](./assets/charts.png)
+![drop-shadow width:600px](./assets/charts.png)
 
 ----
 
