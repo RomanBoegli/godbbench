@@ -7,31 +7,30 @@
 #### VARIABLES #####
 ####################
 
-script_set="employees"
-
 # general
-db_host="127.0.0.1"
-MULTIPLICITIES=("10" "100" "1000")
-threads=15
-godbbench_main_path="./godbbench.go"
-script_base_path="../scripts"
-result_base_path="../tmp/results"
-chart_type="line"
+HOST="127.0.0.1"
+MULTIPLICITIES=("10" "20")
+THREADS=15
+PATH_TO_CLI="./godbbench.go"
+SCRIPT_BASE_PATH="../scripts"
+SCRIPT_SET="employees"
+RESULT_BASE_PATH="../tmp/results"
+CHART_TYPE="line"
 
 # mysql
-mysql_port="3306"
-mysql_user="root"
-mysql_pass="password"
+MYSQL_PORT="3306"
+MYSQL_USER="root"
+MYSQL_PASS="password"
 
 # neo4j
-neo_port="7687"
-neo_user="neo4j"
-neo_pass="password"
+NEO_PORT="7687"
+NEO_USER="neo4j"
+NEO_PASS="password"
 
 # postgres
-postgres_port="5432"
-postgres_user="postgres"
-postgres_pass="password"
+POSTGRES_PORT="5432"
+POSTGRES_USER="postgres"
+POSTGRES_PASS="password"
 
 
 ########################
@@ -45,51 +44,51 @@ for MULT in "${MULTIPLICITIES[@]}"; do
     echo -e "\nITERATIONS: ${MULT}"
     
     echo -e "\nTEST MYSQL"
-    go run $godbbench_main_path mysql \
-        --host $db_host \
-        --port $mysql_port \
-        --user $mysql_user \
-        --pass $mysql_pass \
+    go run $PATH_TO_CLI mysql \
+        --host $HOST \
+        --port $MYSQL_PORT \
+        --user $MYSQL_USER \
+        --pass $MYSQL_PASS \
         --iter $MULT \
-        --threads $threads \
-        --script "${script_base_path}/${script_set}/mysql.sql" \
-        --writecsv "${result_base_path}/${script_set}/mysql_${MULT}.csv"
+        --threads $THREADS \
+        --script "${SCRIPT_BASE_PATH}/${SCRIPT_SET}/mysql.sql" \
+        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/mysql_${MULT}.csv"
 
     echo -e "\nTEST NEO4J"
-    go run $godbbench_main_path neo4j \
-        --host $db_host \
-        --port $neo_port \
-        --user $neo_user \
-        --pass $neo_pass \
+    go run $PATH_TO_CLI neo4j \
+        --host $HOST \
+        --port $NEO_PORT \
+        --user $NEO_USER \
+        --pass $NEO_PASS \
         --iter $MULT \
-        --threads $threads \
-        --script "${script_base_path}/${script_set}/neo4j.cql" \
-        --writecsv "${result_base_path}/${script_set}/neo4j_${MULT}.csv"
+        --threads $THREADS \
+        --script "${SCRIPT_BASE_PATH}/${SCRIPT_SET}/neo4j.cql" \
+        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/neo4j_${MULT}.csv"
 
     echo -e "\nTEST POSTGRES"
-    go run $godbbench_main_path postgres \
-        --host $db_host \
-        --port $postgres_port \
-        --user $postgres_user \
-        --pass $postgres_pass \
+    go run $PATH_TO_CLI postgres \
+        --host $HOST \
+        --port $POSTGRES_PORT \
+        --user $POSTGRES_USER \
+        --pass $POSTGRES_PASS \
         --iter $MULT \
-        --threads $threads \
-        --script "${script_base_path}/${script_set}/postgres.sql" \
-        --writecsv "${result_base_path}/${script_set}/postgres_${MULT}.csv"
+        --threads $THREADS \
+        --script "${SCRIPT_BASE_PATH}/${SCRIPT_SET}/postgres.sql" \
+        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/postgres_${MULT}.csv"
 done
 
 echo -e "\n"
 echo $(for i in $(seq 1 50); do printf "#"; done) 
 
 echo -e "\nMERGE RESULTS"
-go run $godbbench_main_path mergecsv \
-    --rootDir "${result_base_path}/${script_set}" \
-    --targetFile "${result_base_path}/${script_set}/merged_results.csv" 
+go run $PATH_TO_CLI mergecsv \
+    --rootDir "${RESULT_BASE_PATH}/${SCRIPT_SET}" \
+    --targetFile "${RESULT_BASE_PATH}/${SCRIPT_SET}/merged_results.csv" 
 
 echo -e "\nCREATE CHARTS"
-go run $godbbench_main_path createcharts \
-    --dataFile "${result_base_path}/${script_set}/merged_results.csv" \
-    --chartType $chart_type
+go run $PATH_TO_CLI createcharts \
+    --dataFile "${RESULT_BASE_PATH}/${SCRIPT_SET}/merged_results.csv" \
+    --chartType $CHART_TYPE
 
 echo $(for i in $(seq 1 50); do printf "#"; done) 
 echo -e "\nTOTAL RUN TIME: " $(expr `date +%s` - $start_time) s
