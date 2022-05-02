@@ -461,10 +461,8 @@ Part | Benchmark | Tasks
 The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 50, 100, 500, 1'000, 5'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations. The inclusion of these atypical middle steps `{50, 500, 5'000}` serves the purpose of having more data points. The number of threads used for all these iterations was set to `15`.
 
 ### Results
+This chapter briefly summarizes the most expressive results received from the above showcase. The complete analysis can be found either as bar or line charts on [this page](https://romanboegli.github.io/godbbench/showcase-results/index.html). The complete data set with all metrics is also available for download as a [ZIP archive](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip).
 
-Summary | Bar Chart | Line Chart | Raw Data
----|---|----|----
-[Link](https://romanboegli.github.io/godbbench/showcase-results/index.html) | [Link](https://romanboegli.github.io/godbbench/showcase-results/pages/charts_bar.html) | [Link](https://romanboegli.github.io/godbbench/showcase-results/pages/charts_line.html) | [Link](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip)  
 
 
 ![](https://badgen.net/badge/TODO/*****/red)
