@@ -448,7 +448,7 @@ All benchmarks are conducted on a [MacBook Pro (2019, 2.8 GHz Quad-Core Intel Co
 The `employees` script for all three focused DBMSs can be found in [this folder](./scripts/employees/). It is structured into the following parts.
 
 Part | Benchmark | Tasks 
-:----|-----------|----------------
+:----|:-----------|:----------------
 0    | `initialize` | Drop all possibly existing data and recreate the root node called "BigBoss" 
 1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of iterations equals 100% of the specified multiplicity.
 2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified multiplicity.
@@ -484,6 +484,8 @@ Furthermore, it should be obvious that the measured performance for a given benc
 Last but not least, two important aspects were ignored in this project due to simplicity. The first one concerns the DBMS customization and tuning. The goal of `godbbench` was primarily to provide an easily accessible and broadly employable tool for database benchmarking tasks. Dockerized containers with standard database images provided the most lightweight approach for testing and demonstration. In practice, however, DBMS configurations must not be neglected as it heavily influences the efficiency based on a given data scenario. The second ignored aspect concerns concurrent connections.
 
 The showcased benchmark demonstrated that Neo4j has room for improvement in comparison to the well-established MySQL and PostgreSQL. It must be said, however, that performance is by far not the only criteria for an implementation decision in the real world. Other factors such as the software engineer's experiences, corporate code of practice or operating costs play as well an important role in this decision process.
+
+Future work on this project may include the implementation of further database adaptors as well as the mentioned missing features such as concurrent connections. Work may also be invested in the creation of more sophisticated custom scripts, as they form the core of a benchmark.
 
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
