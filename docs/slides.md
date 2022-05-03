@@ -52,10 +52,10 @@ th { display:none;}
 
 - Relational DBMS vs. Graph-Based DBMS
 - Tool `godbbench`
-  * Synthetic Script & Substitution
-  * Custom Scripts (`merchant`, `employees`)
-  * Automation  
-  * Result Analysis
+  - Synthetic Script & Substitution
+  - Custom Scripts (`merchant`, `employees`)
+  - Further Automation  
+  - Result Analysis
 - Showcase `employees`
 - Conclusion & Future Work
 
@@ -290,7 +290,7 @@ MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
 
 <!-- backgroundColor: white -->
 
-# Automation
+# Further Automation
 
 ```ps
 $ bash bashscript.sh
@@ -301,7 +301,7 @@ $ bash bashscript.sh
 
 ----
 
-![bg 95% drop-shadow](./assets/showcase.gif)
+![bg 95% drop-shadow](./assets/cmd_automation_script.gif)
 
 ----
 
@@ -363,7 +363,7 @@ Part | Benchmark | Tasks
 
 # Conclusion
 
-- `godbbench` is a broadly employable tool for automated DB benchmarks
+- `godbbench` is a broadly employable tool for automatized DB benchmarks
 - It is difficult to fairly compare fundamentally different DBMS paradigms
 - Showcase revealed the superiority of MySQL & PostgreSQL over Neo4j 
 in the given scenario
