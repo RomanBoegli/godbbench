@@ -17,6 +17,7 @@
     + [Domain-Specific](#domain-specific)
     + [Repeated Execution](#repeated-execution)
     + [Geometric Mean](#geometric-mean)
+    + [Further Considerations](#further-considerations)
   * [System Setup](#system-setup)
     + [Docker](#docker)
     + [Go](#go)
@@ -40,7 +41,7 @@
 </br>
 
 # Abstract
-The goal of this project is to analyze the differences between relational and graph-based database management systems. The representatives used as concrete implementation of these two paradigms will be PostgreSQL (relational) and Neo4j (graph-based).
+The goal of this project is to analyze the differences between relational and graph-based database management systems. The representatives used as concrete implementation of these two paradigms will be MySQL & PostgreSQL (relational) and Neo4j (graph-based).
 
 The first part of this work will elaborate on the background of these technologies with a focus on the history, popular use cases, as well as (dis)advantages. Furthermore, the key differences will be outlined in the applicable query languages, namely SQL and Cypher.
 
@@ -50,7 +51,9 @@ Finally, the benchmarking results are consolidated and interpreted. The findings
 
 
 # Relational Database Systems
-Relational databases belong to the most popular database management systems (DBMS) nowadays. Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before. It was first introduced by Ted Codd in 1970 [[1]](#1). Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS. Micorosft followed with its own products such as SQLServer and Access. Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge [[2]](#2).
+Relational databases belong to the most popular database management systems (DBMS) nowadays. Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before. It was first introduced by Ted Codd in 1970 [[1]](#1). Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS. Micorosft followed with its own products such as SQLServer and Access. Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge [[2]](#2). 
+
+Nowadays, the term *post-relational* DBMS is also used for these types of DB systems to emphasize the fact that data storing techniques are not exclusively constrained to relationally linked tables. Data may also be stored in other forms, for instance, JSON, key-value-pairs or document-oriented. Since these alternative storage approaches may not at all or only partially work with SQL, the term *NoSQL* evolved. Thus, its meaning can be interpreted literally (*"No SQL"*) or as *"Not Only SQL"*. For the sake of simplicity, however, this project continues to use the term *relational* in this context.
 
 Relationally storing data first and foremost means that every piece of unique information ideally is stored only once in our database and then referenced multiple times to wherever it is required to be. This referencing works with so-called primary keys (PK) and foreign keys (FK), where the latter serves as a pointer to the actual information. The following example describes such a relationally linked data structure utilizing a merchant use case.
 
@@ -67,8 +70,8 @@ Once a database has been initiated with a schema, one can start storing and quer
 
 On the other hand, can the rigidness of relational DBMS also be seen as an advantage. Every software engineer that is responsible for implementing the business logic and presentation layer for an application appreciates a definite and rather complete definition of the data ensemble. Little schema changes are often followed by major source code changes which can be costly.
 
-# Graph-Based Database Systems
 
+# Graph-Based Database Systems
 With rising trends in amounts and connections of data, the classic relational database management systems seemed not to be the ideal choice. In the field of mathematics, graph theory was already established and algorithms to assess networks of connected nodes became more and more popular. The core business model of emerging companies such as Twitter or Facebook was and still is based on data that can be represented ideally as graphs. For instance, think of friendship relations among people as shown in the figure below. Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them. The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
 <h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
@@ -152,6 +155,9 @@ Following the advice of repeated statement executions will lead to many differen
 <p align="center"> <img src="./docs/assets/geometricmean.svg" width="250"/> </p>
 
 The measurements for each benchmark in `goddbbench` include the extrema (i.e. minimum and maximum time), the arithmetic and geographic mean, the time per operation as well as the number of operations per second.  For all metrics except the latter, the time unit is given in microseconds (μs).
+
+### Further Considerations
+The stated considerations up to now only scratch the surface in the field of database benchmarking. What about different deployment settings (e.g. on-premise vs. cloud), concurrent connections or running background jobs, just to name a few. The consideration of these aspects will not facilitate the process of a representational database benchmarking test. Therefore it might be helpful to consult the industry-standard database benchmarks developed by the [Transaction Processing Council (TPC)](https://www.tpc.org/). Scalzo (2018) elucidates these standards [[13]](#13).
 
 ## System Setup
 Three components are required in order to use `goddbench`. These are:
@@ -479,7 +485,7 @@ Relational and graph-based DBMSs have fundamental differences that aggravate the
 
 First of all, a data schema in a relational DBMS should not directly be translated into a graph-based DBMS as there might be entities which are dispensable as the information they hold is modeled using the attributed relationships among nodes. The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/guide-importing-data-and-etl/) nicely illustrates this using the famous Northwind database.
 
-Furthermore, it should be obvious that the measured performance for a given benchmark depends on the embedding system environment. In real-world scenarios are many more influential factors such as network topology and latency, provided hardware as well as software. Thus it must be mentioned that the containerized approach choosen in this work using Docker also influenced the obtained measurements [[13]](#13).
+Furthermore, it should be obvious that the measured performance for a given benchmark depends on the embedding system environment. In real-world scenarios are many more influential factors such as network topology and latency, provided hardware as well as software. Thus it must be mentioned that the containerized approach choosen in this work using Docker also influenced the obtained measurements [[14]](#14).
 
 Last but not least, two important aspects were ignored in this project due to simplicity. The first one concerns the DBMS customization and tuning. The goal of `godbbench` was primarily to provide an easily accessible and broadly employable tool for database benchmarking tasks. Dockerized containers with standard database images provided the most lightweight approach for testing and demonstration. In practice, however, DBMS configurations must not be neglected as it heavily influences the efficiency based on a given data scenario. The second ignored aspect concerns concurrent connections.
 
@@ -490,7 +496,7 @@ Future work on this project may include the implementation of further database a
 # Acknowledgements
 Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench). His project served as a basis for this work.
 
-Also, attention should drawn to other database benchmarking tools out there in the open-source space. For instance [sysbench](https://github.com/akopytov/sysbench) or [hammerdb](https://github.com/TPC-Council/HammerDB). They are based on a similiar usability approach and may provide more sophisticated funcionalities for a given use case. The project [pgbench](https://www.postgresql.org/docs/current/pgbench.html), for instance, focuses excusively on PostgreSQL.
+Also, attention should drawn to other database benchmarking tools out there in the open-source space. For instance [sysbench](https://github.com/akopytov/sysbench), [Phoronix Test Suite](http://www.phoronix-test-suite.com/) or [hammerdb](https://github.com/TPC-Council/HammerDB). They are based on a similiar usability approach and may provide more sophisticated funcionalities for a given use case. The project [pgbench](https://www.postgresql.org/docs/current/pgbench.html), for instance, focuses excusively on PostgreSQL. The Cookbook by Chauhan & Kumar (2017) is a great source to be consulted when working with Phoronix [[15]](#15).
 
 # References
 <a id="1">[1]</a> Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-642-59412-0_16
@@ -517,4 +523,8 @@ Also, attention should drawn to other database benchmarking tools out there in t
 
 <a id="12">[12]</a> Fleming, P. J., & Wallace, J. J. (1986). How not to lie with statistics: The correct way to summarize benchmark results. Communications of the ACM, 29(3), 218–221. https://doi.org/10.1145/5666.5673
 
-<a id="13">[13]</a> Turner-Trauring, I. (2021, May 12). Docker can slow down your code and distort your benchmarks. Python=>Speed. https://pythonspeed.com/articles/docker-performance-overhead/
+<a id="13">[13]</a> Scalzo, B. (2018). Database Benchmarking and Stress Testing: An Evidence-Based Approach to Decisions on Architecture and Technology. Springer Science+Business Media, LLC.
+
+<a id="14">[14]</a> Turner-Trauring, I. (2021, May 12). Docker can slow down your code and distort your benchmarks. Python=>Speed. https://pythonspeed.com/articles/docker-performance-overhead/
+
+<a id="15">[15]</a> Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
