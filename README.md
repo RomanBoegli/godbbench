@@ -453,7 +453,7 @@ Part | Benchmark | Tasks
 1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of iterations equals 100% of the specified multiplicity.
 2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified multiplicity.
 3    |`create_index` | Creating a so-called *BTREE* index on the entity's relationship indicator (i.e. foreign key in relational DBMS, resp. relationship itself in graph-based DBMS).
-4 | `clear_cach` | All cached data is discarded.
+4 | `clear_cache` | All cached data is discarded.
 5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.
 6 | `clean` | Complete removal of existing data and index information.
 
