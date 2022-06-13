@@ -274,7 +274,6 @@ WITH RECURSIVE hierarchy AS (
     SELECT e.employee_id, e.first_name, e.boss_id, hierarchy.level + 1 AS level 
     FROM employee e JOIN hierarchy ON e.boss_id = hierarchy.employee_id 
 ) SELECT * FROM hierarchy;
-INSERT INTO employee (first_name, boss_id, salary) VALUES ('BigBoss', null, 999999);
 
 -- simpler query using Cypher
 MATCH (boss)-[:BOSS_OF*1..]->(sub) WHERE boss.employeeId={{.Iter}} RETURN sub;
