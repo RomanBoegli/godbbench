@@ -21,7 +21,7 @@
   * [System Setup](#system-setup)
     + [Docker](#docker)
     + [Go](#go)
-    + [Source Code of `godbbench`](#source-code-of-tool)
+    + [Source Code of `godbbench`](#source-code-of-godbbench)
   * [Running Benchmarks](#running-benchmarks)
     + [Synthetic Mode](#synthetic-mode)
     + [Statement Substitutions](#statement-substitutions)
