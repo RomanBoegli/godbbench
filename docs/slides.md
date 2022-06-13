@@ -156,8 +156,8 @@ $ go run godbbench.go mysql --host 127.0.0.1 --port 3306 --user "root" \
 ```ps
 # run statemets of custom script against Postgres, save results in file
 $ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user "postgres" \
-        --pass "password" --iter 100 --script "./path/to/mysql.sql" \
-        --writecsv "./path/to/results/mysql.csv"
+        --pass "password" --iter 100 --script "./path/to/postgres.sql" \
+        --writecsv "./path/to/results/postgres.csv"
 ```
 
 ```ps
@@ -203,7 +203,7 @@ table { font-size:0.83em;  min-width: 110%; }
 
 Declaration | Substitution
 :---------|:------------
-`{{.Iter}}`| Counter that starts with 1 and ends with the specified multiplicity<br/>of the given benchmark.
+`{{.Iter}}`| Counter that starts with 1 and ends with the specified iteration count<br/>of the given benchmark.
 `{{call .RandInt64}}`|Returns a random non-negative value of type [Int64](https://pkg.go.dev/builtin#int64).
 `{{call .RandFloat64}}`|Returns a random value within the interval [0.0,1.0) as [Float64](https://pkg.go.dev/builtin#float64).
 `{{call .RandIntBetween 1 42}}`| Returns a random integer between 1 and 42 ([Int32](https://pkg.go.dev/builtin#int32)).
@@ -333,8 +333,8 @@ table { font-size:0.7em;  min-width: 100%; }
 Part | Benchmark | Tasks 
 :----|:-----------|:----------------
 0    | `initialize` | Drop all possibly existing data and recreate the root node called "BigBoss" 
-1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of iterations equals 100% of the specified multiplicity.
-2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified multiplicity.
+1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of iterations equals 100% of the specified iteration count.
+2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified iteration count.
 3    |`create_index` | Creating a so-called *BTREE* index on the entity's relationship indicator (i.e. foreign key in relational DBMS, resp. relationship itself in graph-based DBMS).
 4 | `clear_cache` | All cached data is discarded.
 5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.

@@ -9,7 +9,7 @@
 
 # general
 HOST="127.0.0.1"
-MULTIPLICITIES=("10" "50" "100" "500" "1000" "5000" "10000")
+ITERATIONCOUNT=("10" "50" "100" "500" "1000" "5000" "10000")
 THREADS=15
 PATH_TO_CLI="./godbbench.go"
 SCRIPT_BASE_PATH="../scripts"
@@ -40,9 +40,9 @@ POSTGRES_PASS="password"
 
 start_time=`date +%s`
 echo -e "\nSTART BENCHMARKING...\n"
-for MULT in "${MULTIPLICITIES[@]}"; do
+for ITERC in "${ITERATIONCOUNT[@]}"; do
     echo $(for i in $(seq 1 50); do printf "_"; done) 
-    echo -e "\nITERATIONS: ${MULT}"
+    echo -e "\nITERATIONS: ${ITERC}"
     
     if $USE_DOCKER; then
         echo -e "\nBUILD DOCKER ENV"
@@ -58,10 +58,10 @@ for MULT in "${MULTIPLICITIES[@]}"; do
         --port $MYSQL_PORT \
         --user $MYSQL_USER \
         --pass $MYSQL_PASS \
-        --iter $MULT \
+        --iter $ITERC \
         --threads $THREADS \
         --script "${SCRIPT_BASE_PATH}/${SCRIPT_SET}/mysql.sql" \
-        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/mysql_${MULT}.csv"
+        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/mysql_${ITERC}.csv"
 
     echo -e "\nTEST NEO4J"
     go run $PATH_TO_CLI neo4j \
@@ -69,10 +69,10 @@ for MULT in "${MULTIPLICITIES[@]}"; do
         --port $NEO_PORT \
         --user $NEO_USER \
         --pass $NEO_PASS \
-        --iter $MULT \
+        --iter $ITERC \
         --threads $THREADS \
         --script "${SCRIPT_BASE_PATH}/${SCRIPT_SET}/neo4j.cql" \
-        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/neo4j_${MULT}.csv"
+        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/neo4j_${ITERC}.csv"
 
     echo -e "\nTEST POSTGRES"
     go run $PATH_TO_CLI postgres \
@@ -80,10 +80,10 @@ for MULT in "${MULTIPLICITIES[@]}"; do
         --port $POSTGRES_PORT \
         --user $POSTGRES_USER \
         --pass $POSTGRES_PASS \
-        --iter $MULT \
+        --iter $ITERC \
         --threads $THREADS \
         --script "${SCRIPT_BASE_PATH}/${SCRIPT_SET}/postgres.sql" \
-        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/postgres_${MULT}.csv"
+        --writecsv "${RESULT_BASE_PATH}/${SCRIPT_SET}/postgres_${ITERC}.csv"
     
     if $USE_DOCKER; then
         echo -e "\nREMOVE DOCKER ENV"

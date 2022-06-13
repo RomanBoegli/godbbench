@@ -31,7 +31,7 @@ import (
 )
 
 var (
-	hheaders = []string{"system", "multiplicity", "name", "executions", "total (μs)", "arithMean (μs)", "geoMean (μs)", "min (μs)", "max (μs)", "ops/s", "μs/op"}
+	hheaders = []string{"system", "iteration count", "name", "executions", "total (μs)", "arithMean (μs)", "geoMean (μs)", "min (μs)", "max (μs)", "ops/s", "μs/op"}
 )
 
 func main() {
@@ -340,14 +340,14 @@ func CreateCharts(dataFile string, charttype string) {
 	}
 
 	systems := unique(df.Select([]string{"system"}).Records())
-	mults, _ := castToIntArray(unique(df.Select([]string{"multiplicity"}).Records()))
+	mults, _ := castToIntArray(unique(df.Select([]string{"iteration count"}).Records()))
 	names := unique(df.Select([]string{"name"}).Records())
 
 	page := components.NewPage()
 
 	for c1, name := range names {
 		for c2, metric := range []string{"arithMean (μs)", "geoMean (μs)", "ops/s", "μs/op"} {
-			chart := getBasicChart(fmt.Sprintf("Chart %v.%v: %v", c1+1, c2, name), "", "multiplicity", metric)
+			chart := getBasicChart(fmt.Sprintf("Chart %v.%v: %v", c1+1, c2, name), "", "iteration count", metric)
 			chart.SetXAxis(mults)
 			for _, system := range systems {
 				data := df.

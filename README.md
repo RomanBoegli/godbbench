@@ -146,7 +146,7 @@ One key feature of `goddbbench` is the allowance of custom database scripts. Thi
 ### Repeated Execution
 Relational as well as graph-based DBMS improve the performance by design using execution plans and cached information. Therefore a single execution of a single query is hardly meaningful. The database should rather be stressed with thousands of statement executions, for instance querying the purchasing history of customers based on their randomly chosen identification number. This not only simulates real-world requirements on the DBMS, it also allows the system to *warm-up* and mitigates the benefits of cached information [[4]](#4).
 
-Each benchmark performed with `goddbbench` requires the indication of the number of iterations, also called *multiplicity*. Usually, these value series follow the pattern of $10^x$. 
+Each benchmark performed with `goddbbench` requires the indication of the number of iterations, i.e. the *iteration count*. Usually, these value series follow the pattern of $10^x$. 
 
 ### Geometric Mean
 Following the advice of repeated statement executions will lead to many different time measurements. In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers. A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[12]](#12). It is defined as followed:
@@ -241,7 +241,7 @@ Obviously, these statements above seem not to respect the SQL standard. The decl
 
 Declaration | Substitution
 :-----------|:------------
-`{{.Iter}}`| Counter that starts with 1 and ends with the specified multiplicity of the given benchmark.
+`{{.Iter}}`| Counter that starts with 1 and ends with the specified iteration count of the given benchmark.
 `{{call .RandInt64}}`|Returns a random non-negative value of type [Int64](https://pkg.go.dev/builtin#int64).
 `{{call .RandFloat64}}`|Returns a random value within the interval [0.0,1.0) as [Float64](https://pkg.go.dev/builtin#float64).
 `{{call .RandIntBetween 1 42}}`| Returns a random integer between 1 and 42. Input values must be a valid [Int32](https://pkg.go.dev/builtin#int32).
@@ -249,7 +249,7 @@ Declaration | Substitution
 `{{call .RandString 1 9}}`| Returns a random string with a length between 1 and 9 characters.
 `{{call .RandDate}}`|Returns a random date as string (yyyy-MM-dd) between `1970-01-01` and `2023-01-01`.
 
-In order to run the synthetic CRUD benchmarks with a multiplicity of 1'000 against the running PostgreSQL Docker instance, execute the following statement.
+In order to run the synthetic CRUD benchmarks with an iteration count of 1'000 against the running PostgreSQL Docker instance, execute the following statement.
 
 ````console
 go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass password --iter 1000
@@ -263,7 +263,7 @@ https://user-images.githubusercontent.com/22320200/165149101-499ac3a6-a5d2-46c1-
 
 Alternatively, the synthetic benchmarks that should be executed can also be named explicitly using the `--run` flag. This allows to only run the ones that are of interest in the given situation (e.g. `--run "inserts selects"`). The benchmark results can also be saved as CSV file by specifying a storage location, e.g. `--writecsv "./results.csv"`.
 
-After several runs on various DBMS and with different multiplicities, the different result files located in the same folder can be merged into one single file using the following command.
+After several runs on various DBMS and with different iteration counts, the different result files located in the same folder can be merged into one single file using the following command.
 
 ```console
 go run godbbench.go mergecsv --rootDir "." --targetFile "./merged.csv"
@@ -289,7 +289,7 @@ go run godbbench.go neo4j --host 127.0.0.1 --port 7687 --user neo4j --pass passw
 
 https://user-images.githubusercontent.com/22320200/165149157-eb6ac0ec-3cdb-4c4b-905a-b87fa9444dd2.mp4
 
-The collected results after that the concatenated statements have created only provide a performance comparison on one single multiplicity, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
+The collected results after that the concatenated statements have created only provide a performance comparison on one single iteration count, i.e. 1'000. One would have to extend or repeat it with higher orders of iterations, for instance 10'000, 100'000 and so forth.
 
 ### Custom Script Mode
 Since the variety and quality of the synthetic benchmarks are limited to a few basic operations, it is much more recommended to test the database systems with custom scripts. This allows to not only account for a use case-specific data scenario but also to test more realistic and thus often more complex CRUD operations. 
@@ -303,16 +303,16 @@ Custom scripts require certain annotations to correctly render statements into i
                 │          │                    Just a name or label for the benchmark.
                 │          │                    Important for subsequent result analysis.
                 │          │
-                │          └─ Multiplicity share:
-                │             Percental amount of iterations in relation to the specified 
-                │             multiplicity. Only relevant when looping.
+                │          └─ Scale factor:
+                │             Scale factor expressed as percentage to the specified 
+                │             iteration count. Only relevant when looping.
                 │
                 └─ Case of recurrence:
                    Keyword "once" will execute the benchmark only one time, regardless of 
-                   the specified multiplicity. Useful for setup and teardown statements.
+                   the specified iteration count. Useful for setup and teardown statements.
 ```
 
-In the case of a looping benchmark, the (collection of) statement(s) subsumed below a given annotation will be executed as often as the specified multiplicity share of the provided `--iter` amount. The fictive script example below exemplifies this.
+In the case of a looping benchmark, the (collection of) statement(s) subsumed below a given annotation will be executed as often as the specified scale factor of the provided `--iter` amount. The fictive script example below exemplifies this.
 
 
 ```sql
@@ -327,13 +327,13 @@ CREATE TABLE mytable (myId INT PRIMARY KEY, myName VARCHAR(20));
 \benchmark loop 0.75 \name inserts
 -- start of benchmark 'inserts'
 INSERT INTO mytable (myId, myName) VALUES( {{.Iter}}, '{{call .RandString 5 20 }}');
--- end of benchmark 'inserts', will be executed <75% of given multiplicity> times
+-- end of benchmark 'inserts', will be executed <75% of given iteration count> times
 
 -- SELECTS
 \benchmark loop 1.0 \name selects
 -- start of benchmark 'selects'
 SELECT * FROM mytable WHERE myName LIKE '%{{call .RandString 1 10 }}%';
--- end of benchmark 'selects', will be executed <100% of given multiplicity> times
+-- end of benchmark 'selects', will be executed <100% of given iteration count> times
 ```
 
 Using the example script above, the entire benchmarking procedere consists of three benchmark tasks, namely `setup`, `inserts` and `selects`. To start it, the following command would be necessary.
@@ -344,13 +344,13 @@ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass
                              --script "../path/to/scripts/myscript.sql"
 ````
 
-The multiplicity in this command is set on `1'000` using the `--iter` option. This results in the following number of excutions per benchmark.
+The iteration count in this command is set on `1'000` using the `--iter` option. This results in the following number of excutions per benchmark.
 
 Benchmark | Executions | Reason
 :---------|:--------------------:|:---------
 `setup` | 1 | Single benchmark due to `once` annoation
-`inserts` | 750 | Looping benchmark with multiplicity ration of 75%
-`selects` | 1'000 | Looping benchmark with multiplicity ration of 100%
+`inserts` | 750 | Looping benchmark with scale factor of 75%
+`selects` | 1'000 | Looping benchmark with scale factor of 100%
 
 Further examples can be found in the [script folder](./scripts/) of this project.
 
@@ -359,7 +359,7 @@ Each interation of a benchmark is timed in order to measure its performance. As 
 
 ```code
 ┌───────────┬───────────────┬──────────┬─────────────┬─────────────┬─────────────────┬───────────────┬───────────┬───────────┬────────┬────────┐
-│ system    │ multiplicity  │ name     │ executions  │ total (μs)  │ arithMean (μs)  │ geoMean (μs)  │ min (μs)  │ max (μs)  │ ops/s  │ μs/op  │
+│ system    │ iteration count  │ name     │ executions  │ total (μs)  │ arithMean (μs)  │ geoMean (μs)  │ min (μs)  │ max (μs)  │ ops/s  │ μs/op  │
 ├───────────┼───────────────┼──────────┼─────────────┼─────────────┼─────────────────┼───────────────┼───────────┼───────────┼────────┼────────┤
 │ mysql     │ 10            │ inserts  │ 10          │ 20435       │ 19431           │ 20799         │ 16618     │ 19902     │ 489    │ 2043   │
 │ mysql     │ 10            │ selects  │ 10          │ 11682       │ 8637            │ 8950          │ 4639      │ 11309     │ 855    │ 1168   │
@@ -405,9 +405,9 @@ The file serves as a basis for any kind of subsequent data analysis or visualisa
 Column / Metric  | Definition           
 :----------------|:---------------------
 `system`         | Name of testes DBMS
-`multiplicity`   | Number of iterations specified at invocation time.
+`iteration count`   | Number of iterations specified at invocation time.
 `name`           | The benchmark's name.
-`executions`     | Number of executions the given benchmark was performed under consideration of the annotated multiplicity share.
+`executions`     | Number of executions the given benchmark was performed under consideration of the annotated scale factor.
 `total (μs)`     | Total amount of microseconds spend for all executions of the given benchmark.
 `arithMean (μs)` | Average execution time microseconds calculated using the aithmetic mean.
 `geoMean (μs)`   | Average execution time microseconds calculated using the geometric mean.
@@ -416,26 +416,26 @@ Column / Metric  | Definition       
 `ops/s`          | Operations per second which equals `executions` divided by `total (μs)`. This is the only metric in this collection where high values are considered as good.
 `μs/op`          | Microseconds per operation which equals `total (μs)` divided by `executions`.
 
-The current implementation of the automated data visualisation using `createcharts` command only accounts for the metrics `arithMean (μs)`, `geoMean (μs)`, `ops/s` and `μs/op` for each benchmark (column `name`). The X-axsis represents the available multiplicities and the actual values are dynamically projected on the Y-axsis. The command argument `--type` also allows to alternate between a bar or a line chart, as illustrated below. Additionally, the charts introduce a few interaction possibilities as demonstrated in the animation below.
+The current implementation of the automated data visualisation using `createcharts` command only accounts for the metrics `arithMean (μs)`, `geoMean (μs)`, `ops/s` and `μs/op` for each benchmark (column `name`). The X-axsis represents the available iteration counts and the actual values are dynamically projected on the Y-axsis. The command argument `--type` also allows to alternate between a bar or a line chart, as illustrated below. Additionally, the charts introduce a few interaction possibilities as demonstrated in the animation below.
 
 <h6 align="center">Chart Interaction Options</h6>
 
 https://user-images.githubusercontent.com/22320200/166416480-0c8b49fc-ede3-40fb-9e5d-a245d8f6d551.mp4
 
 ### Further Automation
-So far it was shown several times how `godbbench` can be used to perform benchmarks against a DBMS using synthetic or custom-created statements and a specified amount of iterations. This must then be repeated for each DBMS and multiplicity which is tedious. Therefore this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
+So far it was shown several times how `godbbench` can be used to perform benchmarks against a DBMS using synthetic or custom-created statements and a specified amount of iterations. This must then be repeated for each DBMS and iteration count which is tedious. Therefore this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
 
 ```console
 bash benchmark.sh # use PowerShell when working on Windows
 ```
 
-After it has started, it will loop over the provided multiplicities and run the benchmarks for all three supported DBMSs. In the end, the individual result files will be merged and immediately rendered into the mentioned charts. The following video demonstrates this.
+After it has started, it will loop over the provided iteration counts and run the benchmarks for all three supported DBMSs. In the end, the individual result files will be merged and immediately rendered into the mentioned charts. The following video demonstrates this.
 
 <h6 align="center">Automation Bash Script Usage</h6>
 
 https://user-images.githubusercontent.com/22320200/165150973-483eafcf-9be0-4c8a-b6e4-ba19c21e9fa7.mp4
 
-Optionally, the script is also able to set-up and tear-down the dockerized database instances before respectively after each multiplicity iteration. This ensures equal container conditions for each benchmarking procedure. 
+Optionally, the script is also able to set-up and tear-down the dockerized database instances before respectively after each  iteration count batch. This ensures equal container conditions for each benchmarking procedure. 
 
 ## Showcase
 Two examples of custom scripts already exist in this repository. The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders. This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)). Alternations to this schema are rather unlikely which makes it legitimately rigid. Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS. The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts. However, this script will be disregarded during the showcase.
@@ -445,7 +445,7 @@ The second custom script example is called [`employees`](./scripts/employees/). 
 <p align="center"> <img src="./docs/assets/employees_schema.svg" width="60%"/> </p>
 <h6 align="center">Relational and Graph-Based Representation of Organsational Hierchary</h6>
 
-Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*. As relational and graph-based DBMS should be able to handle this data scenario, it provides a more fair challenge to them. Therefore, this script will showcase the benchmarking with several different multiplicities in this chapter, directly followed by the result discussion.
+Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*. As relational and graph-based DBMS should be able to handle this data scenario, it provides a more fair challenge to them. Therefore, this script will showcase the benchmarking with several different iteration counts in this chapter, directly followed by the result discussion.
 
 ### System Specifications
 All benchmarks are conducted on a [MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM)](https://everymac.com/systems/apple/macbook_pro/specs/macbook-pro-core-i7-2.8-quad-core-13-mid-2019-touch-bar-specs.html). The three databases at focus (MySQL, PostgreSQL and Neo4j) were setup with Docker exactly as documented in an earlier chapter. The images used are the official database images which are available for download in the [Docker Hub](https://hub.docker.com/search?q=). No improvements or modifications have been made to these images. Additionally, no other applications were running during the benchmarking process except Docker and a terminal window.
@@ -456,14 +456,14 @@ The `employees` script for all three focused DBMSs can be found in [this folder]
 Part | Benchmark | Tasks 
 :----|:-----------|:----------------
 0    | `initialize` | Drop all possibly existing data and recreate the root node called "BigBoss" 
-1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of iterations equals 100% of the specified multiplicity.
-2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified multiplicity.
+1    |`insert_employee` | Inserts further nodes that are connected to randomly chosen existing nodes. The number of executions equals 100% of the specified iteration count.
+2    |`select_before_index` | Subsequent query all existing nodes and return the node itself together with all its connected nodes (i.e. its subordinate employees). No index exists at this stage. The number of iterations equals 100% of the specified iteration count.
 3    |`create_index` | Creating a so-called *BTREE* index on the entity's relationship indicator (i.e. foreign key in relational DBMS, resp. relationship itself in graph-based DBMS).
 4 | `clear_cache` | All cached data is discarded.
 5 | `select_after_index` | The identical querying tasks as in Part 2 is repeated.
 6 | `clean` | Complete removal of existing data and index information.
 
-The chosen multiplicities for this benchmarking procedure are defined as `{ 10, 50, 100, 500, 1'000, 5'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations. The inclusion of these atypical middle steps `{50, 500, 5'000}` serves the purpose of having more data points. The number of threads used for all these iterations was set to `15`.
+The chosen iteration counts for this benchmarking procedure are defined as `{ 10, 50, 100, 500, 1'000, 5'000, 10'000 }`. The reason why this series was not continued to an even higher order of iterations lies in the fact of the chosen hardware and its computational power limitations. The inclusion of these atypical middle steps `{50, 500, 5'000}` serves the purpose of having more data points. The number of threads used for all these iterations was set to `15`.
 
 ### Results
 This chapter briefly summarizes the most expressive results received from the above showcase benchmark script `employees`. All visualizations can be found either as bar or line charts on [this page](https://romanboegli.github.io/godbbench/showcase-results/index.html). The complete data set is also available for download as a [ZIP archive](https://romanboegli.github.io/godbbench/showcase-results/DATA.zip).
@@ -472,11 +472,11 @@ The benchmark `insert_employee` clearly shows the inferiority of Neo4j compared 
 
 ![](/docs/assets/showcase_insert.png)
 
-Moving on to the first selection benchmark, namely `select_before_index`, the results become less obvious. This time, the Y-Axis of the chart represents the operations per second. Thus, higher values testify higher performance. The two relational databases again consistently outperform Neo4j in all order of multiplicities. PostgreSQL is slightly slower than MySQL except for the runs with `100`, `500` and `10000` iterations.  
+Moving on to the first selection benchmark, namely `select_before_index`, the results become less obvious. This time, the Y-Axis of the chart represents the operations per second. Thus, higher values testify higher performance. The two relational databases again consistently outperform Neo4j in all order of iteration counts. PostgreSQL is slightly slower than MySQL except for the runs with `100`, `500` and `10000` iterations. The inconsistent trend with increasing iteration counts can be explained with different execution plans that become applicable after a certain amount of records must be processed.
 
 ![](/docs/assets/showcase_selectbefore.png)
 
-The second selection benchmark `select_after_index` performed the identical selection task but with an antecedent index creation. The introduction of the index affected the MySQL database more positively than it did with PostgreSQL and thus makes MySQL a clear winner in this benchmark. Neo4j on the other hand remains in the third place. It must be mentioned, however, that its operations per second values slightly increased overall multiplicities which can be seen as an indication that the index at least had an accelerating effect.
+The second selection benchmark `select_after_index` performed the identical selection task but with an antecedent index creation. The introduction of the index affected the MySQL database more positively than it did with PostgreSQL and thus makes MySQL a clear winner in this benchmark. Neo4j on the other hand remains in the third place. It must be mentioned, however, that its operations per second values slightly increased overall iteration counts which can be seen as an indication that the index at least had an accelerating effect.
 
 ![](/docs/assets/showcase_selectafter.png)
 
