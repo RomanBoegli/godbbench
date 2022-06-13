@@ -21,7 +21,7 @@
   * [System Setup](#system-setup)
     + [Docker](#docker)
     + [Go](#go)
-    + [Source Code of Tool](#source-code-of-tool)
+    + [Source Code of `godbbench`](#source-code-of-tool)
   * [Running Benchmarks](#running-benchmarks)
     + [Synthetic Mode](#synthetic-mode)
     + [Statement Substitutions](#statement-substitutions)
@@ -200,7 +200,7 @@ Download the suitable installer for the latest version on the [project's homepag
 go version # should print something like "go version go1...."
 ```
 
-### Source Code of Tool
+### Source Code of `godbbench`
 Either download this GitHub repository manually as ZIP file and extract it on your computer. In case [`git`](https://git-scm.com/downloads) is installed on your system, navigate to the desired storage location in your file system using the terminal and execute the following command.
 
 ```console
