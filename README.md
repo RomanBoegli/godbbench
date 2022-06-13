@@ -420,7 +420,8 @@ The current implementation of the automated data visualisation using `createchar
 
 <h6 align="center">Chart Interaction Options</h6>
 
-https://user-images.githubusercontent.com/22320200/166416480-0c8b49fc-ede3-40fb-9e5d-a245d8f6d551.mp4
+https://user-images.githubusercontent.com/22320200/173423856-ec7158b7-3db0-4ee8-ae2f-25cf158abe9b.mp4
+
 
 ### Further Automation
 So far it was shown several times how `godbbench` can be used to perform benchmarks against a DBMS using synthetic or custom-created statements and a specified amount of iterations. This must then be repeated for each DBMS and iteration count which is tedious. Therefore this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
