@@ -163,7 +163,7 @@ The stated considerations up to now only scratch the surface in the field of dat
 Three components are required in order to use `goddbench`. These are:
 - Docker to run the DBMS instances. Technically, these instances can also run somewhere else as long as the IP address and port number is known.
 - The programming language `Go` to execute the tool.
-- The source code of Tool
+- The source code of `godbbench`, i.e. a clone of this repository.
 
 The following subchapter will give further insights into the setup process.
 
