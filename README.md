@@ -120,7 +120,7 @@ For instance, think of friendship relations among people as shown in the figure 
 Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them.
 The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
-<h6 align="center">Friendships as Weighted Graph [^3]</h6>
+<h6 align="center">Friendships as Weighted Graph [3]</h6>
 <p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 
 Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [^4].
