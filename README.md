@@ -60,7 +60,7 @@ Every computer science freshman will address this data storage paradigm in an ea
 It was first introduced by Ted Codd in 1970 [^1].
 Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS.
 Microsoft followed with its own products such as SQLServer and Access.
-Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge [[2]](#2).
+Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge [^2].
 
 Nowadays, the term *post-relational* DBMS is also used for these types of DB systems to emphasize the fact that data storing techniques are not exclusively constrained to relationally linked tables.
 Data may also be stored in other forms, for instance, JSON, key-value-pairs or document-oriented.
@@ -120,34 +120,34 @@ For instance, think of friendship relations among people as shown in the figure 
 Every person represents a node and the connecting lines (a.k.a. edges) indicate the friendship relations among them.
 The nodes are attributed be the person's name and the thickness of the edges describes, for instance, how close this friendship is.
 
-<h6 align="center">Friendships as Weighted Graph <a href="#3">[3]</a></h6>
+<h6 align="center">Friendships as Weighted Graph [^3]</h6>
 <p align="center"> <img src="./docs/assets/friendsgraph.svg" width="65%"/> </p>
 
-Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [[4]](#4).
+Capturing graph-based data domains in a relational DBMS invokes certain limitations regarding ease of querying, computational complexity, and efficiency [^4].
 Graph-based database systems overcome these limitations as they store such graph-based information natively.
 A popular implementation of such a system is [Neo4j](https://neo4j.com/).
 Other than in relational DBMS, Neo4j allows heterogeneous sets of attributes on both nodes and relationships.
 This implies that there is also no database schema to be specified beforehand.
-One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database [[5]](#5).
+One simply creates attributed nodes and the also attributed relationships among them in order to start working with a graph database [^5].
 
 One of the most remarkable advantages is the application of graph algorithms as they are uniquely well suited to reveal and understand patterns in highly connected datasets.
-Possible real-world problems may include uncovering vulnerable components in a network, discovering unseen dependencies, identifying bottlenecks, revealing communities based on behavior patterns, or specifying the cheapest route through a network [[6]](#6).
+Possible real-world problems may include uncovering vulnerable components in a network, discovering unseen dependencies, identifying bottlenecks, revealing communities based on behavior patterns, or specifying the cheapest route through a network [^6].
 
 Although it is technically possible to always use a relational DBMS when working with a highly connected data scenario, lots of work can be simplified using graph-based DBMS.
-This is especially appreciable when working with recursion, different result types or path-finding problems [[7]](#7).
+This is especially appreciable when working with recursion, different result types or path-finding problems [^7].
 The latter is especially useful in use cases such as direction finding for geographic applications, optimizations in supply chain systems, bottleneck determination in computer networks or fraud detection.
 
 On the other hand, graph-based DBMS also bear certain disadvantages.
 First, there is no unified query language to work with and the ones that exist rather unknown due to their recency.
 This can have a major impact on real-world applications as companies and the developers working for them most probably prefer the technology that they already know and will be able to support in the long run.
 Furthermore, the high degree of flexibility due to the absence of a schema invokes the costs of missing referential integrity and normalization.
-This makes graph-based DBMS less suitable for high integrity systems as they exist in the financial industry for example [[8]](#8).
+This makes graph-based DBMS less suitable for high integrity systems as they exist in the financial industry for example [^8].
 
 # Query Languages
 
 The communication language for relational DBMS is called *Structured Query Language* (SQL).
 Although each DBMS has its own slightly different SQL implementation, so-called dialects, the language follows a standard that is broadly known among developers and database engineers.
-SQL statements can be structured into three subdivisions, namely Data Definition Language (DDL), Data Manipulation Language (DML) and Data Control Language [DCL][[9]](#9).
+SQL statements can be structured into three subdivisions, namely Data Definition Language (DDL), Data Manipulation Language (DML) and Data Control Language [DCL][^9].
 The following table specified the associated database operations for each subdivision.
 
 Subdivision | Database Operations
@@ -203,13 +203,13 @@ Lastly, a whole showcase called `employees` is presented using further automatio
 ## General Considerations
 
 Benchmarking allows testing a system's performance in a controlled and repeatable manner.
-Reasons to conduct benchmarks may include system design, proofs of concepts, tuning, capacity planning, troubleshooting or marketing [[10]](#10).
+Reasons to conduct benchmarks may include system design, proofs of concepts, tuning, capacity planning, troubleshooting or marketing [^10].
 To conduct a thoughtful and unbiased benchmark, multiple points must be considered.
 This chapter will give an overview of the most important considerations alongside the argumentation of how these challenges are counteracted in `godbbench`.
 
 ### Domain-Specific
 
-The Benchmark Handbook by Jim Gray emphasizes the need for domain-specific benchmarks as the diversity of computer systems is huge [[11]](#11).
+The Benchmark Handbook by Jim Gray emphasizes the need for domain-specific benchmarks as the diversity of computer systems is huge [^11].
 Since each computer system is usually designed for a few domain-specific problems, there exists no global metric to measure the system performance for later comparison.
 Thus it is crucial also to work with domain-specific benchmarks in order to receive meaningful insights.
 Additionally, such benchmarks should meet four important criteria, namely:
@@ -231,7 +231,7 @@ Examples will be given in later chapters.
 Relational as well as graph-based DBMS improve the performance by design using execution plans and cached information.
 Therefore, a single execution of a single query is hardly meaningful.
 The database should rather be stressed with thousands of statement executions, for instance querying the purchasing history of customers based on their randomly chosen identification number.
-This not only simulates real-world requirements on the DBMS, it also allows the system to *warm-up* and mitigates the benefits of cached information [[4]](#4).
+This not only simulates real-world requirements on the DBMS, it also allows the system to *warm-up* and mitigates the benefits of cached information [^4].
 
 Each benchmark performed with `goddbbench` requires the indication of the number of iterations, i.e.\ the *iteration count*.
 Usually, these value series follow the pattern of $10^x$.
@@ -240,7 +240,7 @@ Usually, these value series follow the pattern of $10^x$.
 
 Following the advice of repeated statement executions will lead to different time measurements.
 In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers.
-A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to un-normalized data [[12]](#12).
+A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to un-normalized data [^12].
 It is defined as followed:
 
 <h6 align="center">Geometric Mean</h6>
@@ -255,7 +255,7 @@ The stated considerations up to now only scratch the surface in the field of dat
 What about different deployment settings (e.g.\ on-premise vs. cloud), concurrent connections or running background jobs, just to name a few.
 The consideration of these aspects will not facilitate the process of a representational database benchmarking test.
 Therefore, it might be helpful to consult the industry-standard database benchmarks developed by the [Transaction Processing Council (TPC)](https://www.tpc.org/).
-Scalzo (2018) elucidates these standards [[13]](#13).
+Scalzo (2018) elucidates these standards [^13].
 
 ## System Setup
 
@@ -677,7 +677,7 @@ The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/gui
 
 Furthermore, it should be obvious that the measured performance for a given benchmark depends on the embedding system environment.
 In real-world scenarios are many more influential factors such as network topology and latency, provided hardware as well as software.
-Thus, it must be mentioned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[14]](#14).
+Thus, it must be mentioned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [^14].
 
 Last but not least, two important aspects were ignored in this project due to simplicity.
 The first one concerns the DBMS customization and tuning.
@@ -702,36 +702,36 @@ Also, attention should be drawn to other database benchmarking tools out there i
 For instance [sysbench](https://github.com/akopytov/sysbench), [Phoronix Test Suite](http://www.phoronix-test-suite.com/) or [hammerdb](https://github.com/TPC-Council/HammerDB).
 They are based on a similar usability approach and may provide more sophisticated functionalities for a given use case.
 The project [pgbench](https://www.postgresql.org/docs/current/pgbench.html), for instance, focuses exclusively on PostgreSQL.
-The Cookbook by Chauhan & Kumar (2017) is a great source to be consulted when working with Phoronix [[15]](#15).
+The Cookbook by Chauhan & Kumar (2017) is a great source to be consulted when working with Phoronix [^15].
 
 # References
 
-[^1]: Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. <https://doi.org/10.1007/978-3-642-59412-0_16>
+[^1]: Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. [10.1007/978-3-642-59412-0_16](https://doi.org/10.1007/978-3-642-59412-0_16)
 
-<a id="2">[2]</a> Elmasri, R., & Navathe, S. (2011). Fundamentals of Database Systems (6th ed). Addison-Wesley.
+[^2]: Elmasri, R., & Navathe, S. (2011). Fundamentals of Database Systems (6th ed). Addison-Wesley.
 
-<a id="3">[3]</a> Peixoto, T. P. (n.d.). What is graph-tool? Graph-Tool. Retrieved 20 March 2022, from <https://graph-tool.skewed.de/>
+[^3]: Peixoto, T. P. (n.d.). What is graph-tool? Graph-Tool. Retrieved 20 March 2022, from [graph-tool.skewed.de](https://graph-tool.skewed.de)
 
-<a id="4">[4]</a> Robinson, I., Webber, J., & Eifrem, E. (2015). Graph Databases: New Opportunities for Connected Data.
+[^4]: Robinson, I., Webber, J., & Eifrem, E. (2015). Graph Databases: New Opportunities for Connected Data.
 
-<a id="5">[5]</a> Stopford, B. (2012, August 17). Thinking in Graphs: Neo4J. <http://www.benstopford.com/2012/08/17/thinking-in-graphs-neo4j/>
+[^5]: Stopford, B. (2012, August 17). Thinking in Graphs: Neo4J. [benstopford.com/2012/08/17/thinking-in-graphs-neo4j](http://www.benstopford.com/2012/08/17/thinking-in-graphs-neo4j/)
 
-<a id="6">[6]</a> Needham, M., & Hodler, A. E. (2019). Graph Algorithms: Practical Examples in Apache Spark and Neo4j (First edition). O’Reilly Media.
+[^6]: Needham, M., & Hodler, A. E. (2019). Graph Algorithms: Practical Examples in Apache Spark and Neo4j (First edition). O’Reilly Media.
 
-<a id="7">[7]</a> Bechberger, D., & Perryman, J. (2020). Graph databases in Action: Examples in Gremlin. Manning.
+[^7]: Bechberger, D., & Perryman, J. (2020). Graph databases in Action: Examples in Gremlin. Manning.
 
-<a id="8">[8]</a> Meier, A., & Kaufmann, M. (2019). SQL & NoSQL Databases: Models, Languages, Consistency Options and Architectures for Big Data Management. Springer Vieweg.
+[^8]: Meier, A., & Kaufmann, M. (2019). SQL & NoSQL Databases: Models, Languages, Consistency Options and Architectures for Big Data Management. Springer Vieweg.
 
-<a id="9">[9]</a> Bush, J. (2020). Learn SQL Database Programming: Query and manipulate databases from popular relational database servers using SQL.
+[^9]: Bush, J. (2020). Learn SQL Database Programming: Query and manipulate databases from popular relational database servers using SQL.
 
-<a id="10">[10]</a> Gregg, B. (2020). Systems Performance: Enterprise and the Cloud (Second). Addison-Wesley.
+[^10]: Gregg, B. (2020). Systems Performance: Enterprise and the Cloud (Second). Addison-Wesley.
 
-<a id="11">[11]</a> Gray, J. (Ed.). (1994). The Benchmark Handbook for Database and Transaction Processing Systems (2. ed., 2. [print.]). Morgan Kaufmann.
+[^11]: Gray, J. (Ed.). (1994). The Benchmark Handbook for Database and Transaction Processing Systems (2. ed., 2. [print.]). Morgan Kaufmann.
 
-<a id="12">[12]</a> Fleming, P. J., & Wallace, J. J. (1986). How not to lie with statistics: The correct way to summarize benchmark results. Communications of the ACM, 29(3), 218–221. <https://doi.org/10.1145/5666.5673>
+[^12]: Fleming, P. J., & Wallace, J. J. (1986). How not to lie with statistics: The correct way to summarize benchmark results. Communications of the ACM, 29(3), 218–221. [10.1145/5666.5673](https://doi.org/10.1145/5666.5673)
 
-<a id="13">[13]</a> Scalzo, B. (2018). Database Benchmarking and Stress Testing: An Evidence-Based Approach to Decisions on Architecture and Technology. Springer Science+Business Media, LLC.
+[^13]: Scalzo, B. (2018). Database Benchmarking and Stress Testing: An Evidence-Based Approach to Decisions on Architecture and Technology. Springer Science+Business Media, LLC.
 
-<a id="14">[14]</a> Turner-Trauring, I. (2021, May 12). Docker can slow down your code and distort your benchmarks. Python=>Speed. <https://pythonspeed.com/articles/docker-performance-overhead/>
+[^14]: Turner-Trauring, I. (2021, May 12). Docker can slow down your code and distort your benchmarks. Python=>Speed. [pythonspeed.com/articles/docker-performance-overhead](https://pythonspeed.com/articles/docker-performance-overhead/)
 
-<a id="15">[15]</a> Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
+[^15]: Chauhan, C., & Kumar, D. (2017). PostgreSQL High Performance Cookbook: Mastering query optimization, database monitoring, and performance-tuning for PostgreSQL. Packt Publishing.
