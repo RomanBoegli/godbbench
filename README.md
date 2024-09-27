@@ -57,7 +57,7 @@ The findings will be discussed alongside concrete recommendations in order to fa
 
 Relational databases belong to the most popular database management systems (DBMS) nowadays.
 Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before.
-It was first introduced by Ted Codd in 1970 [[1]](#1).
+It was first introduced by Ted Codd in 1970 [^1].
 Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS.
 Microsoft followed with its own products such as SQLServer and Access.
 Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge [[2]](#2).
@@ -706,7 +706,7 @@ The Cookbook by Chauhan & Kumar (2017) is a great source to be consulted when wo
 
 # References
 
-<a id="1">[1]</a> Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. <https://doi.org/10.1007/978-3-642-59412-0_16>
+[^1]: Codd, E. F. (2002). A Relational Model of Data for Large Shared Data Banks. In M. Broy & E. Denert (Eds.), Software Pioneers (pp. 263–294). Springer Berlin Heidelberg. <https://doi.org/10.1007/978-3-642-59412-0_16>
 
 <a id="2">[2]</a> Elmasri, R., & Navathe, S. (2011). Fundamentals of Database Systems (6th ed). Addison-Wesley.
 
