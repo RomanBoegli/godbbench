@@ -25,7 +25,7 @@ To receive an overview, please see [this presentation](https://romanboegli.githu
     - [Synthetic Mode](#synthetic-mode)
     - [Statement Substitutions](#statement-substitutions)
     - [Custom Script Mode](#custom-script-mode)
-    - [Result Visualisation](#result-visualisation)
+    - [Result Visualization](#result-visualization)
     - [Further Automation](#further-automation)
   - [Showcase](#showcase)
     - [System Specifications](#system-specifications)
@@ -59,7 +59,7 @@ Relational databases belong to the most popular database management systems (DBM
 Every computer science freshman will address this data storage paradigm in an early stage and everybody in the professional world that relies on computer systems has most probably had (un)consciously interacted with it before.
 It was first introduced by Ted Codd in 1970 [[1]](#1).
 Roughly ten years later, its first commercial model became available in form of IBM's Orcale DBMS.
-Micorosft followed with its own products such as SQLServer and Access.
+Microsoft followed with its own products such as SQLServer and Access.
 Besides this, free and open-source solutions like MySQL and PostgreSQL started to emerge [[2]](#2).
 
 Nowadays, the term *post-relational* DBMS is also used for these types of DB systems to emphasize the fact that data storing techniques are not exclusively constrained to relationally linked tables.
@@ -103,7 +103,7 @@ Once a database has been initiated with a schema, one can start storing and quer
 Retroactive changes to this schema are still possible but can induce challenges.
 Imagine adding another attribute to an already existing table with millions of data records in it.
 This new column will store a foreign key to a new entity that holds category types, as new data records can from now on be categorized.
-For the sake of completeness, however, this schema manipulation must also include a major data update in order to retrospectively categorise the already existing data records in this table.
+For the sake of completeness, however, this schema manipulation must also include a major data update in order to retrospectively categorize the already existing data records in this table.
 This directly poses the question if the correct category is always derivable.
 This example illustrates the complexity of retrospective schema manipulations.
 
@@ -159,7 +159,7 @@ DCL         | `GRANT`, `REVOKE`, `COMMIT`, `ROLLBACK`
 The fundamentally different paradigm in graph-based DBMS requires different communication languages.
 Neo4j for example implemented the expressive and compact language called *Cypher* which has a close affinity with the common graph representation habit.
 This facilitates the programmatic interaction with property graphs.
-Other languages are *[SPARQL](https://www.w3.org/TR/rdf-sparql-query/)* or *[Gremlin](https://github.com/tinkerpop/gremlin/wiki)*  which are, however, not further discussed in this work.
+Other languages are *[SPARQL](https://www.w3.org/TR/rdf-sparql-query/)* or *[Gremlin](https://github.com/tinkerpop/gremlin/wiki)* which are, however, not further discussed in this work.
 
 The two languages SQL and Cypher exhibit significant differences in their statement formulation, as the following examples show.
 
@@ -198,7 +198,7 @@ In Cypher, however, joining is done using the (attributed) arrow clause `-->` wh
 The beginning of this chapter covers general considerations regarding database benchmarks.
 Subsequently, it guides through the required system setup in order to start benchmarking with `godbbench`.
 Some examples are shown how to create custom scripts and visualize the resulting measurements.
-Lastly, a whole showcase called `employees` is presesented using further automation via a bash-script.
+Lastly, a whole showcase called `employees` is presented using further automation via a bash-script.
 
 ## General Considerations
 
@@ -229,7 +229,7 @@ Examples will be given in later chapters.
 ### Repeated Execution
 
 Relational as well as graph-based DBMS improve the performance by design using execution plans and cached information.
-Therefore a single execution of a single query is hardly meaningful.
+Therefore, a single execution of a single query is hardly meaningful.
 The database should rather be stressed with thousands of statement executions, for instance querying the purchasing history of customers based on their randomly chosen identification number.
 This not only simulates real-world requirements on the DBMS, it also allows the system to *warm-up* and mitigates the benefits of cached information [[4]](#4).
 
@@ -238,9 +238,9 @@ Usually, these value series follow the pattern of $10^x$.
 
 ### Geometric Mean
 
-Following the advice of repeated statement executions will lead to many different time measurements.
+Following the advice of repeated statement executions will lead to different time measurements.
 In order to draw a conclusion on how fast the given DBMS could handle the task, one should not simply calculate the arithmetic mean of all the data points since it is sensitive to outliers.
-A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to unnormalized data [[12]](#12).
+A better choice to mathematically consolidate the measurements would be the geometric mean which can also be applied to un-normalized data [[12]](#12).
 It is defined as followed:
 
 <h6 align="center">Geometric Mean</h6>
@@ -254,7 +254,7 @@ For all metrics except the latter, the time unit is given in microseconds (μs).
 The stated considerations up to now only scratch the surface in the field of database benchmarking.
 What about different deployment settings (e.g.\ on-premise vs. cloud), concurrent connections or running background jobs, just to name a few.
 The consideration of these aspects will not facilitate the process of a representational database benchmarking test.
-Therefore it might be helpful to consult the industry-standard database benchmarks developed by the [Transaction Processing Council (TPC)](https://www.tpc.org/).
+Therefore, it might be helpful to consult the industry-standard database benchmarks developed by the [Transaction Processing Council (TPC)](https://www.tpc.org/).
 Scalzo (2018) elucidates these standards [[13]](#13).
 
 ## System Setup
@@ -279,7 +279,7 @@ To check whether the installation was successful, enter the following command to
 docker -v  # should print something like "Docker version 20..."
 ```
 
-As a next step, execute the following command in order to create an instance for each DBMS focused in this project.
+As a next step, execute the following command in order to create an instance for each DBMS focused on this project.
 Actually, these are three single commands but using `&&` allows concatenation.
 The backslashes (`\`) allow line breaks.
 
@@ -322,7 +322,7 @@ git clone https://github.com/RomanBoegli/godbbench.git
 After successfully downloading the source code, navigate into the `cmd` folder.
 It contains the two most important files to work with.
 Test the communication with the tool by entering the following command in your terminal.
-It should print the available subcommands.
+It should print the available sub-commands.
 
 ```console
 go run godbbench.go # should print "Available subcommands: ..."
@@ -423,11 +423,11 @@ One would have to extend or repeat it with higher orders of iterations, for inst
 
 ### Custom Script Mode
 
-Since the variety and quality of the synthetic benchmarks are limited to a few basic operations, it is much more recommended to test the database systems with custom scripts.
+Since the variety and quality of the synthetic benchmarks are limited to a few basic operations, it is much more recommended testing the database systems with custom scripts.
 This allows to not only account for a use case-specific data scenario but also to test more realistic and thus often more complex CRUD operations.
 
 Custom scripts require certain annotations to correctly render statements into individual benchmark tasks.
-Everything below such an annotation, e.g.\ various SQL statements delimmited with a semicolon, define a single benchmark.
+Everything below such an annotation, e.g.\ various SQL statements delimited with a semicolon, define a single benchmark.
 These annotations must follow a strict pattern which is explained below.
 
 ```code
@@ -470,7 +470,7 @@ SELECT * FROM mytable WHERE myName LIKE '%{{call .RandString 1 10 }}%';
 -- end of benchmark 'selects', will be executed <100% of given iteration count> times
 ```
 
-Using the example script above, the entire benchmarking procedere consists of three benchmark tasks, namely `setup`, `inserts` and `selects`.
+Using the example script above, the entire benchmarking procedure consists of three benchmark tasks, namely `setup`, `inserts` and `selects`.
 To start it, the following command would be necessary.
 
 ````console
@@ -480,19 +480,19 @@ go run godbbench.go postgres --host 127.0.0.1 --port 5432 --user postgres --pass
 ````
 
 The iteration count in this command is set on `1'000` using the `--iter` option.
-This results in the following number of excutions per benchmark.
+This results in the following number of executions per benchmark.
 
 Benchmark | Executions | Reason
 :---------|:--------------------:|:---------
-`setup` | 1 | Single benchmark due to `once` annoation
+`setup` | 1 | Single benchmark due to `once` annotation
 `inserts` | 750 | Looping benchmark with scale factor of 75%
 `selects` | 1'000 | Looping benchmark with scale factor of 100%
 
-Further examples can be found in the [script folder](./scripts/) of this project.
+Further, examples can be found in the [script folder](./scripts/) of this project.
 
-### Result Visualisation
+### Result Visualization
 
-Each interation of a benchmark is timed in order to measure its performance.
+Each integration of a benchmark is timed in order to measure its performance.
 As seen before, the individual results can be saved as CSV files and merged into one single file.
 The following excerpt exemplifies what such a merged result file could look like.
 
@@ -539,7 +539,7 @@ The following excerpt exemplifies what such a merged result file could look like
 └───────────┴─────────────────┴──────────┴─────────────┴─────────────┴─────────────────┴───────────────┴───────────┴───────────┴────────┴────────┘
 ```
 
-The file serves as a basis for any kind of subsequent data analysis or visualisation routines.
+The file serves as a basis for any kind of subsequent data analysis or visualization routines.
 One routine is already implemented in `godbbench` and can be invoked using the `createcharts` command.
 Most of the metrics are specified with the time unit of *microseconds*, that is `1` second (s) equals `1'000'0000` microseconds (μs).
 The following table explains the meaning of all available columns in this file.
@@ -551,7 +551,7 @@ Column / Metric  | Definition
 `name`           | The benchmark's name.
 `executions`     | Number of executions the given benchmark was performed under consideration of the annotated scale factor.
 `total (μs)`     | Total amount of microseconds spend for all executions of the given benchmark.
-`arithMean (μs)` | Average execution time microseconds calculated using the aithmetic mean.
+`arithMean (μs)` | Average execution time microseconds calculated using the arithmetic mean.
 `geoMean (μs)`   | Average execution time microseconds calculated using the geometric mean.
 `min (μs)`       | Fastest single execution.
 `max (μs)`       | Slowest single execution.
@@ -559,9 +559,9 @@ Column / Metric  | Definition
 This is the only metric in this collection where high values are considered as good.
 `μs/op`          | Microseconds per operation which equals `total (μs)` divided by `executions`.
 
-The current implementation of the automated data visualisation using `createcharts` command only accounts for the metrics `arithMean (μs)`, `geoMean (μs)`, `ops/s` and `μs/op` for each benchmark (column `name`).
+The current implementation of the automated data visualization using `createcharts` command only accounts for the metrics `arithMean (μs)`, `geoMean (μs)`, `ops/s` and `μs/op` for each benchmark (column `name`).
 The X-axsis represents the available iteration counts and the actual values are dynamically projected on the Y-axsis.
-The command argument `--type` also allows to alternate between a bar or a line chart, as illustrated below.
+The command argument `--type` also allows alternating between a bar or a line chart, as illustrated below.
 Additionally, the charts introduce a few interaction possibilities as demonstrated in the animation below.
 
 <h6 align="center">Chart Interaction Options</h6>
@@ -572,7 +572,7 @@ Additionally, the charts introduce a few interaction possibilities as demonstrat
 
 So far it was shown several times how `godbbench` can be used to perform benchmarks against a DBMS using synthetic or custom-created statements and a specified amount of iterations.
 This must then be repeated for each DBMS and iteration count which is tedious.
-Therefore this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
+Therefore, this project also provides an automation script written in [Bash](https://www.gnu.org/software/bash/) and named [`benchmark.sh`](./cmd/benchmark.sh).
 
 ```console
 bash benchmark.sh # use PowerShell when working on Windows
@@ -593,28 +593,28 @@ This ensures equal container conditions for each benchmarking procedure.
 
 Two examples of custom scripts already exist in this repository.
 The first is named [`merchant`](./scripts/merchant/) and represents the popular data scenario of a merchandising company that sells products from suppliers to their customers using orders.
-This use case is predestinated for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)).
+This use case is predestined for a relational DBMS since due to its popular nature it is well understood and can concludingly be modeled as a database schema (see ERD image in chapter [Relational Database Systems](#relational-database-systems)).
 Alternations to this schema are rather unlikely which makes it legitimately rigid.
-Therefore one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS.
+Therefore, one must state that running benchmarks using this biased data scenario does not provide valuable insights when comparing relational and graph-based DBMS.
 The reason why the `merchant` script nonetheless exists in this repository simply serves the act of establishing an understanding of how to write such custom scripts.
 However, this script will be disregarded during the showcase.
 
 The second custom script example is called [`employees`](./scripts/employees/).
 Measured on the number of entities it seems to be less complex than the `merchant` script as it holds only one entity representing employees of a company.
-However, it introduces a recursive relationship that models the organisational hierarchy, commonly known as the chain of command.
+However, it introduces a recursive relationship that models the organizational hierarchy, commonly known as the chain of command.
 The image below represents this data scenario in both relational and graph-based.
 
 <p align="center"> <img src="./docs/assets/employees_schema.svg" width="60%"/> </p>
 <h6 align="center">Relational and Graph-Based Representation of Organsational Hierchary</h6>
 
-Looking at the right hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*.
+Looking at the right-hand side visualization, it follows that the data scenario of the `employees` script creates a *directed acyclic graph*.
 As relational and graph-based DBMS should be able to handle this data scenario, it provides a more fair challenge to them.
-Therefore, this script will showcase the benchmarking with several different iteration counts in this chapter, directly followed by the result discussion.
+Therefore, this script will showcase the benchmarking with different iteration counts in this chapter, directly followed by the result discussion.
 
 ### System Specifications
 
 All benchmarks are conducted on a [MacBook Pro (2019, 2.8 GHz Quad-Core Intel Core i7, 16 GB RAM)](https://everymac.com/systems/apple/macbook_pro/specs/macbook-pro-core-i7-2.8-quad-core-13-mid-2019-touch-bar-specs.html).
-The three databases at focus (MySQL, PostgreSQL and Neo4j) were setup with Docker exactly as documented in an earlier chapter.
+The three databases at focus (MySQL, PostgreSQL and Neo4j) were initialized (setup) with Docker exactly as documented in an earlier chapter.
 The images used are the official database images which are available for download in the [Docker Hub](https://hub.docker.com/search?q=).
 No improvements or modifications have been made to these images.
 Additionally, no other applications were running during the benchmarking process except Docker and a terminal window.
@@ -677,7 +677,7 @@ The tutorial [Import Relational Data Into Neo4j](https://neo4j.com/developer/gui
 
 Furthermore, it should be obvious that the measured performance for a given benchmark depends on the embedding system environment.
 In real-world scenarios are many more influential factors such as network topology and latency, provided hardware as well as software.
-Thus it must be mentioned that the containerized approach choosen in this work using Docker also influenced the obtained measurements [[14]](#14).
+Thus, it must be mentioned that the containerized approach chosen in this work using Docker also influenced the obtained measurements [[14]](#14).
 
 Last but not least, two important aspects were ignored in this project due to simplicity.
 The first one concerns the DBMS customization and tuning.
@@ -690,18 +690,18 @@ The showcased benchmark demonstrated that Neo4j has room for improvement in comp
 It must be said, however, that performance is by far not the only criteria for an implementation decision in the real world.
 Other factors such as the software engineer's experiences, corporate code of practice or operating costs play as well an important role in this decision process.
 
-Future work on this project may include the implementation of further database adaptors as well as the mentioned missing features such as concurrent connections.
+Future work on this project may include the implementation of further database adapters as well as the mentioned missing features such as concurrent connections.
 Work may also be invested in the creation of more sophisticated custom scripts, as they form the core of a benchmark.
 
 # Acknowledgements
 
-Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially ispired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench).
+Thanks to Simon Jürgensmeyer for his work on [dbbench](https://github.com/sj14/dbbench), which according to him was initially inspired by [Fale's post]([Fale](https://github.com/cockroachdb/cockroach/issues/23061#issue-300012178)), [pgbench](https://www.postgresql.org/docs/current/pgbench.html) and [MemSQL's dbbench](https://github.com/memsql/dbbench).
 His project served as a basis for this work.
 
-Also, attention should drawn to other database benchmarking tools out there in the open-source space.
+Also, attention should be drawn to other database benchmarking tools out there in the open-source space.
 For instance [sysbench](https://github.com/akopytov/sysbench), [Phoronix Test Suite](http://www.phoronix-test-suite.com/) or [hammerdb](https://github.com/TPC-Council/HammerDB).
-They are based on a similiar usability approach and may provide more sophisticated funcionalities for a given use case.
-The project [pgbench](https://www.postgresql.org/docs/current/pgbench.html), for instance, focuses excusively on PostgreSQL.
+They are based on a similar usability approach and may provide more sophisticated functionalities for a given use case.
+The project [pgbench](https://www.postgresql.org/docs/current/pgbench.html), for instance, focuses exclusively on PostgreSQL.
 The Cookbook by Chauhan & Kumar (2017) is a great source to be consulted when working with Phoronix [[15]](#15).
 
 # References
